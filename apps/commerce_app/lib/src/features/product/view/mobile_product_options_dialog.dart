@@ -65,7 +65,7 @@ final class _MobileProductOptionsSheet extends StatelessWidget {
                       tooltip:
                           MaterialLocalizations.of(context).closeButtonTooltip,
                       onPressed: Navigator.of(context).pop,
-                      icon: const Icon(Icons.close),
+                      icon: const Icon(Icons.close, size: 20),
                     ),
                   ),
                 ),
