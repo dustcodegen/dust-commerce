@@ -44,12 +44,17 @@ final class _ProductTabState extends State<ProductTab> {
           textColor: StoreColors.foregroundSubtle,
           tilePadding: const EdgeInsets.symmetric(horizontal: 4),
           title: widget.title,
-          trailing: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: Icon(
-              _expanded ? Icons.remove : Icons.add,
-              key: ValueKey(_expanded),
-              size: 20,
+          trailing: SizedBox.square(
+            dimension: 32,
+            child: Center(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: Icon(
+                  _expanded ? Icons.remove : Icons.add,
+                  key: ValueKey(_expanded),
+                  size: 20,
+                ),
+              ),
             ),
           ),
           children: [widget.child],
