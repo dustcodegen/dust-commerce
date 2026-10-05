@@ -36,12 +36,21 @@ class ListingCategoryFilters extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          for (final category in categories)
-            _CategoryChoice(
-              category: category,
-              selected: selectedHandles.contains(category.handle),
-              onChanged: () => onChanged(_toggled(category.handle)),
+          Padding(
+            padding: const EdgeInsets.only(right: 24),
+            child: Column(
+              children: [
+                for (final (index, category) in categories.indexed) ...[
+                  _CategoryChoice(
+                    category: category,
+                    selected: selectedHandles.contains(category.handle),
+                    onChanged: () => onChanged(_toggled(category.handle)),
+                  ),
+                  if (index != categories.length - 1) const SizedBox(height: 8),
+                ],
+              ],
             ),
+          ),
         ],
       );
 
@@ -69,41 +78,38 @@ class _CategoryChoice extends StatelessWidget {
         button: true,
         child: InkWell(
           onTap: onChanged,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox.square(
-                  dimension: 18,
-                  child: Checkbox(
-                    value: selected,
-                    onChanged: (_) => onChanged(),
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox.square(
+                dimension: 18,
+                child: Checkbox(
+                  value: selected,
+                  onChanged: (_) => onChanged(),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    category.name,
-                    style: TextStyle(
-                      color: selected
-                          ? StoreColors.foreground
-                          : StoreColors.foregroundSubtle,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '(${category.count})',
-                  style: const TextStyle(
-                    color: StoreColors.foregroundMuted,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  category.name,
+                  style: TextStyle(
+                    color: selected
+                        ? StoreColors.foreground
+                        : StoreColors.foregroundSubtle,
                     fontSize: 12,
                   ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '(${category.count})',
+                style: const TextStyle(
+                  color: StoreColors.foregroundMuted,
+                  fontSize: 12,
+                ),
+              ),
+            ],
           ),
         ),
       );

@@ -36,12 +36,21 @@ class ListingLabelFilters extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          for (final label in labels)
-            _LabelChoice(
-              label: label,
-              selected: selectedValues.contains(label.value),
-              onChanged: () => onChanged(_toggled(label.value)),
+          Padding(
+            padding: const EdgeInsets.only(right: 24),
+            child: Column(
+              children: [
+                for (final (index, label) in labels.indexed) ...[
+                  _LabelChoice(
+                    label: label,
+                    selected: selectedValues.contains(label.value),
+                    onChanged: () => onChanged(_toggled(label.value)),
+                  ),
+                  if (index != labels.length - 1) const SizedBox(height: 8),
+                ],
+              ],
             ),
+          ),
         ],
       );
 
@@ -69,41 +78,38 @@ class _LabelChoice extends StatelessWidget {
         button: true,
         child: InkWell(
           onTap: onChanged,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox.square(
-                  dimension: 18,
-                  child: Checkbox(
-                    value: selected,
-                    onChanged: (_) => onChanged(),
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox.square(
+                dimension: 18,
+                child: Checkbox(
+                  value: selected,
+                  onChanged: (_) => onChanged(),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    label.value,
-                    style: TextStyle(
-                      color: selected
-                          ? StoreColors.foreground
-                          : StoreColors.foregroundSubtle,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  '(${label.count})',
-                  style: const TextStyle(
-                    color: StoreColors.foregroundMuted,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label.value,
+                  style: TextStyle(
+                    color: selected
+                        ? StoreColors.foreground
+                        : StoreColors.foregroundSubtle,
                     fontSize: 12,
                   ),
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '(${label.count})',
+                style: const TextStyle(
+                  color: StoreColors.foregroundMuted,
+                  fontSize: 12,
+                ),
+              ),
+            ],
           ),
         ),
       );
