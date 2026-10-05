@@ -29,11 +29,16 @@ class ListingOnSaleToggle extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Checkbox(
-            value: selected,
-            onChanged: (value) => onChanged(value ?? false),
-            activeColor: StoreColors.interactive,
+          SizedBox.square(
+            dimension: 18,
+            child: Checkbox(
+              value: selected,
+              onChanged: (value) => onChanged(value ?? false),
+              activeColor: StoreColors.interactive,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
           ),
+          const SizedBox(width: 8),
           const TranslatedText(
             'shop_on_sale_only',
             defaultText: 'On sale only',
