@@ -3,6 +3,12 @@ import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
+const _listingTitleStyle = TextStyle(
+  fontSize: 30,
+  height: 1.6,
+  fontWeight: FontWeight.w600,
+);
+
 /// Title, breadcrumb, description, and child links from CategoryTemplate.
 class ListingHeader extends StatelessWidget {
   /// Creates listing context above the product grid.
@@ -35,9 +41,7 @@ class ListingHeader extends StatelessWidget {
               TranslatedText.dynamic(
                 'shop_listing_${state.requestKey}',
                 fallback: state.title,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: _listingTitleStyle,
               ),
             ],
           ),
@@ -83,9 +87,7 @@ class _ParentLink extends StatelessWidget {
             style: TextButton.styleFrom(
               padding: EdgeInsets.zero,
               foregroundColor: StoreColors.foregroundSubtle,
-              textStyle: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+              textStyle: _listingTitleStyle,
             ),
             child: TranslatedText.dynamic(
               'shop_category_${category.id}',
@@ -96,10 +98,9 @@ class _ParentLink extends StatelessWidget {
           TranslatedText.dynamic(
             'shop_category_separator',
             fallback: '/',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: StoreColors.foregroundSubtle,
-                  fontWeight: FontWeight.w600,
-                ),
+            style: _listingTitleStyle.copyWith(
+              color: StoreColors.foregroundSubtle,
+            ),
           ),
         ],
       );
