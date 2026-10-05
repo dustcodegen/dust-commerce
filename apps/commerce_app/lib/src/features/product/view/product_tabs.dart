@@ -47,6 +47,7 @@ class _ProductInformation extends StatelessWidget {
         children: [
           Expanded(
             child: Column(
+              spacing: 16,
               children: [
                 _Fact(
                   label: context.tr('shop_material', defaultText: 'Material'),
@@ -69,6 +70,7 @@ class _ProductInformation extends StatelessWidget {
           const SizedBox(width: 24),
           Expanded(
             child: Column(
+              spacing: 16,
               children: [
                 _Fact(
                   label: context.tr('shop_weight', defaultText: 'Weight'),
@@ -95,17 +97,14 @@ class _Fact extends StatelessWidget {
   final String? value;
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 16),
-        child: Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-              Text(value ?? '-'),
-            ],
-          ),
+  Widget build(BuildContext context) => Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+            Text(value ?? '-'),
+          ],
         ),
       );
 }
