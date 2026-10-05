@@ -48,6 +48,7 @@ class ProductSection extends StatelessWidget {
               key: inlineActionsKey,
               child: ProductActions(state: state),
             ),
+            const SizedBox(height: 32),
           ],
         ),
       );
