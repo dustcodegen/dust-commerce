@@ -32,7 +32,9 @@ class ProductPrice extends StatelessWidget {
     final label = price == null ? '-' : '$prefix${formatMoney(price)}';
     final style = compact
         ? Theme.of(context).textTheme.bodyLarge
-        : Theme.of(context).textTheme.titleLarge;
+        : Theme.of(context).textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+            );
     final sale = price != null && original != null && original > price;
     if (compact) {
       return Row(
