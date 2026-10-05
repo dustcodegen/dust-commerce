@@ -127,6 +127,7 @@ class _ShippingInformation extends StatelessWidget {
                   'up location or in the comfort of your home.',
             ),
           ),
+          const SizedBox(height: 32),
           _ShippingFact(
             icon: Icons.refresh,
             title: context.tr(
@@ -140,6 +141,7 @@ class _ShippingInformation extends StatelessWidget {
                   'your product for a new one.',
             ),
           ),
+          const SizedBox(height: 32),
           _ShippingFact(
             icon: Icons.keyboard_return,
             title: context.tr('shop_easy_returns', defaultText: 'Easy returns'),
@@ -167,25 +169,22 @@ class _ShippingFact extends StatelessWidget {
   final String title;
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 24),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, size: 16),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title,
-                      style: const TextStyle(fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 4),
-                  Text(body),
-                ],
-              ),
+  Widget build(BuildContext context) => Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 16),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: const TextStyle(fontWeight: FontWeight.w600)),
+                const SizedBox(height: 4),
+                Text(body),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       );
 }
