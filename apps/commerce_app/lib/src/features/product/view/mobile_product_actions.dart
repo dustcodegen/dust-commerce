@@ -66,7 +66,7 @@ class MobileProductActions extends StatelessWidget {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            const Icon(Icons.keyboard_arrow_down, size: 18),
+                            const Icon(Icons.keyboard_arrow_down, size: 16),
                           ],
                         ),
                       ),
