@@ -31,7 +31,7 @@ class HomeHero extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 32,
                       height: 1.25,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
                   const TranslatedText(
@@ -41,7 +41,7 @@ class HomeHero extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 32,
                       height: 1.25,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w400,
                       color: StoreColors.foregroundSubtle,
                     ),
                   ),
