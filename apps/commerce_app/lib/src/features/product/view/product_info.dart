@@ -1,6 +1,5 @@
 import 'package:commerce_app/route.dart';
 import 'package:commerce_app/src/core/store_theme.dart';
-import 'package:commerce_app/src/features/product/view/product_tabs.dart';
 import 'package:commerce_shared/commerce_shared.dart';
 import 'package:flutter/material.dart';
 
@@ -46,8 +45,6 @@ class ProductInfo extends StatelessWidget {
                   color: StoreColors.foregroundSubtle,
                 ),
           ),
-          const SizedBox(height: 24),
-          ProductTabs(details: product.details),
         ],
       );
 }

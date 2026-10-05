@@ -24,6 +24,7 @@ class ProductSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final product = state.product!;
     final info = ProductInfo(product: product);
+    final tabs = ProductTabs(details: product.details);
     final gallery = ProductGallery(
       urls: product
           .imagesForVariant(state.selectedVariant?.id)
@@ -41,6 +42,8 @@ class ProductSection extends StatelessWidget {
               padding: const EdgeInsets.only(top: 32),
               child: info,
             ),
+            const SizedBox(height: 24),
+            tabs,
             const SizedBox(height: 32),
             gallery,
             const SizedBox(height: 32),
@@ -62,7 +65,13 @@ class ProductSection extends StatelessWidget {
             pinned: true,
             delegate: _PinnedColumnDelegate(
               extent: 960,
-              child: info,
+              child: Column(
+                children: [
+                  info,
+                  const SizedBox(height: 24),
+                  tabs,
+                ],
+              ),
             ),
           ),
         ),
