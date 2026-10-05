@@ -5,8 +5,15 @@ import 'package:flutter/material.dart';
 /// Source-matched SortProducts control.
 class SortProducts extends StatelessWidget {
   /// Creates the Store sort radio list.
-  const SortProducts(
-      {required this.selected, required this.onChanged, super.key});
+  const SortProducts({
+    required this.selected,
+    required this.onChanged,
+    required this.extended,
+    super.key,
+  });
+
+  /// Whether this is the Store search page with indexed sort choices.
+  final bool extended;
 
   /// Receives one Medusa sort query value.
   final ValueChanged<String> onChanged;
@@ -15,7 +22,14 @@ class SortProducts extends StatelessWidget {
   final String selected;
 
   /// Medusa-supported sort query values.
-  static const choices = <String>[
+  static const sourceChoices = <String>[
+    'created_at',
+    'price_asc',
+    'price_desc',
+  ];
+
+  /// Store-search sort query values from the current Medusa source.
+  static const storeChoices = <String>[
     'relevance',
     'created_at',
     'price_asc',
@@ -38,7 +52,7 @@ class SortProducts extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          for (final value in choices)
+          for (final value in extended ? storeChoices : sourceChoices)
             _SortChoice(
               value: value,
               label: label(context, value),

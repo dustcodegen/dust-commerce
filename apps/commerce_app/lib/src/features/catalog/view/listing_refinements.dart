@@ -107,6 +107,7 @@ class ListingRefinements extends StatelessWidget {
             SortProducts(
               selected: selected,
               onChanged: onChanged,
+              extended: onCategoryHandlesChanged != null,
             ),
             if (onClearAll case final clearAll?)
               ListingCurrentRefinements(
