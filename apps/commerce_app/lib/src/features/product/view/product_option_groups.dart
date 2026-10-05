@@ -9,8 +9,12 @@ class ProductOptionGroups extends StatelessWidget {
   const ProductOptionGroups({
     required this.state,
     this.disabled = false,
+    this.axisSpacing = 16,
     super.key,
   });
+
+  /// Space between option axes.
+  final double axisSpacing;
 
   /// Whether an add-to-cart request temporarily blocks option changes.
   final bool disabled;
@@ -71,7 +75,8 @@ class ProductOptionGroups extends StatelessWidget {
               );
             },
           ),
-          if (option.id != product.options.last.id) const SizedBox(height: 16),
+          if (option.id != product.options.last.id)
+            SizedBox(height: axisSpacing),
         ],
       ],
     );

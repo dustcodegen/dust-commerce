@@ -76,7 +76,11 @@ final class _MobileProductOptionsSheet extends StatelessWidget {
               color: StoreColors.base,
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(24, 48, 24, 48),
-                child: ProductOptionGroups(state: state, disabled: busy),
+                child: ProductOptionGroups(
+                  state: state,
+                  disabled: busy,
+                  axisSpacing: 24,
+                ),
               ),
             ),
           ],
