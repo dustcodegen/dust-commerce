@@ -71,7 +71,7 @@ class _ListingOptionFiltersState extends State<ListingOptionFilters> {
             padding: const EdgeInsets.only(right: 24),
             child: Column(
               children: [
-                for (final option in widget.options) ...[
+                for (final (index, option) in widget.options.indexed) ...[
                   _OptionGroup(
                     option: option,
                     open: _open.contains(option.id),
@@ -83,7 +83,8 @@ class _ListingOptionFiltersState extends State<ListingOptionFilters> {
                     }),
                     onValueChanged: _toggleValue,
                   ),
-                  const SizedBox(height: 12),
+                  if (index != widget.options.length - 1)
+                    const SizedBox(height: 12),
                 ],
               ],
             ),
@@ -125,13 +126,28 @@ class _OptionGroup extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    '$title  ($selectedCount)',
-                    style: const TextStyle(
-                      color: StoreColors.foreground,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  child: Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          title,
+                          style: const TextStyle(
+                            color: StoreColors.foreground,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '($selectedCount)',
+                        style: const TextStyle(
+                          color: StoreColors.foregroundMuted,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 AnimatedRotation(
