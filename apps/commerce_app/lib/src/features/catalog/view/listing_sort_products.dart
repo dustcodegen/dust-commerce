@@ -115,10 +115,11 @@ class _SortChoice extends StatelessWidget {
                 children: [
                   if (selected) ...[
                     const SizedBox(
-                        width: 16, child: Icon(Icons.circle, size: 8)),
-                    const SizedBox(width: 7),
+                      width: 15,
+                      child: Icon(Icons.circle, size: 8),
+                    ),
+                    const SizedBox(width: 8),
                   ],
-                  const SizedBox(width: 6),
                   Text(
                     label,
                     style: TextStyle(
