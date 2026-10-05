@@ -47,7 +47,11 @@ class FeaturedProductRailView extends StatelessWidget {
                           child: TranslatedText.dynamic(
                             'shop_collection_${rail.collection.id}',
                             fallback: rail.collection.title,
-                            style: Theme.of(context).textTheme.bodyLarge,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              height: 1.6,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                         ),
                         const SizedBox(width: 8),
