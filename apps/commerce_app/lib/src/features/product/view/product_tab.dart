@@ -43,7 +43,12 @@ final class _ProductTabState extends State<ProductTab> {
           shape: const Border(),
           textColor: StoreColors.foregroundSubtle,
           tilePadding: const EdgeInsets.symmetric(horizontal: 4),
-          title: widget.title,
+          title: DefaultTextStyle.merge(
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: StoreColors.foregroundSubtle,
+                ),
+            child: widget.title,
+          ),
           trailing: SizedBox.square(
             dimension: 32,
             child: Center(
