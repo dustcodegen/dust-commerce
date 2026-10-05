@@ -12,40 +12,46 @@ class ProductInfo extends StatelessWidget {
   final Product product;
 
   @override
-  Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (product.collection case final collection?) ...[
-            TextButton(
-              onPressed: () => context.navigator
-                  .collection(handle: collection.handle)
-                  .push(),
-              style: TextButton.styleFrom(
-                foregroundColor: StoreColors.foregroundMuted,
-                padding: EdgeInsets.zero,
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                textStyle: Theme.of(context).textTheme.bodyLarge,
+  Widget build(BuildContext context) => Align(
+        alignment: AlignmentDirectional.topCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 500),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (product.collection case final collection?) ...[
+                TextButton(
+                  onPressed: () => context.navigator
+                      .collection(handle: collection.handle)
+                      .push(),
+                  style: TextButton.styleFrom(
+                    foregroundColor: StoreColors.foregroundMuted,
+                    padding: EdgeInsets.zero,
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    textStyle: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  child: Text(collection.title),
+                ),
+                const SizedBox(height: 16),
+              ],
+              Text(
+                product.title,
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontSize: 32,
+                      height: 4 / 3,
+                      fontWeight: FontWeight.w600,
+                    ),
               ),
-              child: Text(collection.title),
-            ),
-            const SizedBox(height: 16),
-          ],
-          Text(
-            product.title,
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontSize: 32,
-                  height: 4 / 3,
-                  fontWeight: FontWeight.w600,
-                ),
+              const SizedBox(height: 16),
+              Text(
+                product.description ?? '',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: StoreColors.foregroundSubtle,
+                    ),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
-          Text(
-            product.description ?? '',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: StoreColors.foregroundSubtle,
-                ),
-          ),
-        ],
+        ),
       );
 }
