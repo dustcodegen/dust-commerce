@@ -3,7 +3,7 @@ import 'package:commerce_app/src/core/store_theme.dart';
 import 'package:commerce_shared/commerce_shared.dart';
 import 'package:flutter/material.dart';
 
-/// Product title, description, and accordions from Medusa `ProductInfo`.
+/// Product title and description from Medusa `ProductInfo`.
 class ProductInfo extends StatelessWidget {
   /// Creates product information for [product].
   const ProductInfo({required this.product, super.key});
@@ -34,6 +34,7 @@ class ProductInfo extends StatelessWidget {
           Text(
             product.title,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontSize: 32,
                   height: 4 / 3,
                   fontWeight: FontWeight.w600,
                 ),
