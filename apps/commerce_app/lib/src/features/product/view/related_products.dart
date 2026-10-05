@@ -20,7 +20,7 @@ class RelatedProducts extends StatelessWidget {
       builder: (context, constraints) {
         final wide = constraints.maxWidth >= 1024;
         return Padding(
-          padding: EdgeInsets.fromLTRB(0, wide ? 128 : 64, 0, 96),
+          padding: EdgeInsets.symmetric(vertical: wide ? 128 : 64),
           child: Column(
             children: [
               const TranslatedText(
