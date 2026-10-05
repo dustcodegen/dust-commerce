@@ -180,7 +180,10 @@ class _ShippingFact extends StatelessWidget {
                 Text(title,
                     style: const TextStyle(fontWeight: FontWeight.w600)),
                 const SizedBox(height: 4),
-                Text(body),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 384),
+                  child: Text(body),
+                ),
               ],
             ),
           ),
