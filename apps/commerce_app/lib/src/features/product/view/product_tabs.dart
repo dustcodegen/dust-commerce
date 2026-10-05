@@ -67,7 +67,7 @@ class _ProductInformation extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 24),
+          const SizedBox(width: 32),
           Expanded(
             child: Column(
               spacing: 16,
