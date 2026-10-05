@@ -132,7 +132,7 @@ abstract final class StoreTheme {
           backgroundColor: StoreColors.buttonPrimary,
           foregroundColor: StoreColors.base,
           disabledBackgroundColor: const Color(0xff808080),
-          disabledForegroundColor: const Color(0xffbfbfbf),
+          disabledForegroundColor: StoreColors.base,
           minimumSize: const Size(48, 40),
           padding: const EdgeInsets.symmetric(horizontal: 16),
           shape: RoundedRectangleBorder(
