@@ -31,6 +31,7 @@ class ProductGallery extends StatelessWidget {
             ProductImage(
               url: images[index],
               aspectRatio: 29 / 34,
+              border: false,
               semanticLabel: 'Product image ${index + 1}',
             ),
             if (index != images.length - 1) const SizedBox(height: 16),
