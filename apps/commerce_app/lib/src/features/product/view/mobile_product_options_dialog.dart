@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:commerce_app/commerce_app.dart';
 import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +10,7 @@ Future<void> showMobileProductOptions(BuildContext context) =>
       context: context,
       barrierDismissible: true,
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      barrierColor: StoreColors.foregroundSubtle.withValues(alpha: 0.75),
+      barrierColor: const Color(0xff374151).withValues(alpha: 0.75),
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (dialogContext, routeAnimation, secondaryAnimation) =>
           const _MobileProductOptionsRoute(),
@@ -24,12 +26,24 @@ final class _MobileProductOptionsRoute extends StatelessWidget {
   const _MobileProductOptionsRoute();
 
   @override
-  Widget build(BuildContext context) => const Align(
-        alignment: Alignment.bottomCenter,
-        child: Material(
-          type: MaterialType.transparency,
-          child: _MobileProductOptionsSheet(),
-        ),
+  Widget build(BuildContext context) => Stack(
+        children: [
+          Positioned.fill(
+            child: IgnorePointer(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
+                child: const SizedBox.expand(),
+              ),
+            ),
+          ),
+          const Align(
+            alignment: Alignment.bottomCenter,
+            child: Material(
+              type: MaterialType.transparency,
+              child: _MobileProductOptionsSheet(),
+            ),
+          ),
+        ],
       );
 }
 
