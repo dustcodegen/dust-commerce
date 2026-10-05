@@ -37,6 +37,7 @@ class MobileProductActions extends StatelessWidget {
                       product.title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
                   const Padding(
