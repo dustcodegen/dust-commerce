@@ -16,16 +16,7 @@ Future<void> showMobileProductOptions(BuildContext context) =>
         final progress = animation.drive(
           CurveTween(curve: Curves.easeOutCubic),
         );
-        return FadeTransition(
-          opacity: progress,
-          child: SlideTransition(
-            position: Tween(
-              begin: const Offset(0, 1),
-              end: Offset.zero,
-            ).animate(progress),
-            child: child,
-          ),
-        );
+        return FadeTransition(opacity: progress, child: child);
       },
     );
 
@@ -80,7 +71,7 @@ final class _MobileProductOptionsSheet extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             ColoredBox(
               color: StoreColors.base,
               child: SingleChildScrollView(
