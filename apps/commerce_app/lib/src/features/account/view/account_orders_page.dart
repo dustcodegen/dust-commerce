@@ -64,7 +64,9 @@ class _OrdersContent extends StatelessWidget {
           const SizedBox(height: 16),
           const TranslatedText(
             'shop_account_orders_body',
-            defaultText: 'View your previous orders and their status.',
+            defaultText:
+                'View your previous orders and their status. You can also '
+                'create returns or exchanges for your orders if needed.',
           ),
           const SizedBox(height: 32),
           switch (state.status) {
@@ -138,7 +140,7 @@ class _EmptyOrders extends StatelessWidget {
           const SizedBox(height: 16),
           const TranslatedText(
             'shop_account_orders_empty_body',
-            defaultText: "You don't have any orders yet, let us change that.",
+            defaultText: "You don't have any orders yet, let us change that :)",
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 32),
