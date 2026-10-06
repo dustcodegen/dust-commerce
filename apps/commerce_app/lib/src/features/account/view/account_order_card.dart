@@ -4,6 +4,8 @@ import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
+const _orderCardMetaStyle = TextStyle(fontSize: 12);
+
 /// Source-shaped summary for one completed or pending customer order.
 class AccountOrderCard extends StatelessWidget {
   /// Creates an order card.
@@ -21,18 +23,22 @@ class AccountOrderCard extends StatelessWidget {
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 4),
-          Wrap(
-            spacing: 8,
+          Row(
             children: [
               Text(
                 formatStoreDate(
                   MaterialLocalizations.of(context),
                   order.placedAt,
                 ),
-                style: const TextStyle(fontSize: 12),
+                style: _orderCardMetaStyle,
               ),
-              Text(formatMoney(order.total),
-                  style: const TextStyle(fontSize: 12)),
+              const SizedBox(width: 8),
+              const _OrderMetaDivider(),
+              const SizedBox(width: 8),
+              Text(formatMoney(order.total), style: _orderCardMetaStyle),
+              const SizedBox(width: 8),
+              const _OrderMetaDivider(),
+              const SizedBox(width: 8),
               Text(
                 order.itemCount == 1
                     ? context.tr(
@@ -45,7 +51,7 @@ class AccountOrderCard extends StatelessWidget {
                         defaultText: '{count} items',
                         args: {'count': order.itemCount},
                       ),
-                style: const TextStyle(fontSize: 12),
+                style: _orderCardMetaStyle,
               ),
             ],
           ),
@@ -110,5 +116,16 @@ class AccountOrderCard extends StatelessWidget {
             ),
           ),
         ],
+      );
+}
+
+final class _OrderMetaDivider extends StatelessWidget {
+  const _OrderMetaDivider();
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: 1,
+        height: 16,
+        color: StoreColors.border,
       );
 }
