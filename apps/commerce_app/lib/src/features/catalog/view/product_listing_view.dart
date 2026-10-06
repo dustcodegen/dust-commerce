@@ -140,8 +140,8 @@ class ProductListingView extends StatelessWidget {
                             ? Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
+                                  const SizedBox(width: 26.8),
                                   SizedBox(width: 250, child: refinements),
-                                  const SizedBox(width: 24),
                                   Expanded(child: products),
                                 ],
                               )
