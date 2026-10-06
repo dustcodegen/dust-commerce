@@ -50,8 +50,11 @@ jobs:
             --no-default-features --features sqlite
           sqlx --version
 
-      - name: Resolve dependencies
+      - name: Resolve Dart and Dust package dependencies
         run: flutter pub get --enforce-lockfile
+
+      - name: Validate Dust CLI and package compatibility
+        run: dust doctor
 
       # A clean checkout intentionally contains no .g.dart. Build every output
       # before analysis and tests, then prove the files remain generator-owned.

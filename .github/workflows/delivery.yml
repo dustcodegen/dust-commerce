@@ -37,11 +37,14 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
-      - name: Resolve dependencies
+      - name: Resolve Dart and Dust package dependencies
         run: flutter pub get --enforce-lockfile
 
       - name: Download the verified Dust CLI
         run: ./scripts/install_dust_cli.sh
+
+      - name: Validate Dust CLI and package compatibility
+        run: dust doctor
 
       - name: Generate Dust output
         run: ./scripts/generate.sh
