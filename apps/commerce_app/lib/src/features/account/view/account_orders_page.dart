@@ -88,11 +88,13 @@ class _OrdersContent extends StatelessWidget {
               const _EmptyOrders(),
             AccountOrdersStatus.ready => Column(
                 children: [
-                  for (final order in state.orders) ...[
+                  for (final (index, order) in state.orders.indexed) ...[
                     AccountOrderCard(order: order),
-                    const SizedBox(height: 24),
-                    const Divider(),
-                    const SizedBox(height: 24),
+                    if (index < state.orders.length - 1) ...[
+                      const SizedBox(height: 24),
+                      const Divider(),
+                      const SizedBox(height: 24),
+                    ],
                   ],
                 ],
               ),
