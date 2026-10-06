@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 
 import 'account_section.dart';
 
+const _accountNavLinkHeight = TextStyle(fontSize: 16, height: 1.5);
+
 /// One destination in the desktop account navigation.
 final class AccountNavigationLink extends StatelessWidget {
   /// Creates a source-shaped account destination.
@@ -28,16 +30,17 @@ final class AccountNavigationLink extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.only(bottom: 16),
         child: TextButton(
           onPressed: onPressed,
           style: TextButton.styleFrom(
             padding: EdgeInsets.zero,
             minimumSize: Size.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
             foregroundColor: section == active
                 ? StoreColors.foreground
                 : StoreColors.foregroundSubtle,
-            textStyle: TextStyle(
+            textStyle: _accountNavLinkHeight.copyWith(
               fontWeight: section == active ? FontWeight.w600 : FontWeight.w400,
             ),
           ),

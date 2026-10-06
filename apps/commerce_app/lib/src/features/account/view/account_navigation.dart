@@ -6,6 +6,12 @@ import 'package:flutter/material.dart';
 import 'account_section.dart';
 import 'account_navigation_items.dart';
 
+const _accountNavTitleStyle = TextStyle(
+  fontSize: 16,
+  height: 1.5,
+  fontWeight: FontWeight.w600,
+);
+
 /// Desktop account section navigation translated from Medusa AccountNav.
 final class AccountNavigation extends StatelessWidget {
   /// Creates the navigation for [active].
@@ -25,7 +31,7 @@ final class AccountNavigation extends StatelessWidget {
           const TranslatedText(
             'shop_account_title',
             defaultText: 'Account',
-            style: TextStyle(fontWeight: FontWeight.w600),
+            style: _accountNavTitleStyle,
           ),
           const SizedBox(height: 16),
           AccountNavigationLink(
@@ -64,13 +70,15 @@ final class AccountNavigation extends StatelessWidget {
             ),
             onPressed: () => context.navigator.accountOrders().go(),
           ),
-          const SizedBox(height: 16),
           TextButton(
             onPressed:
                 state.isBusy ? null : context.readAccountViewModel().signOut,
             style: TextButton.styleFrom(
               padding: EdgeInsets.zero,
               minimumSize: Size.zero,
+              foregroundColor: StoreColors.foregroundSubtle,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              textStyle: const TextStyle(fontSize: 16, height: 1.5),
             ),
             child: state.operation == AccountOperation.signOut && state.isBusy
                 ? const SizedBox.square(
