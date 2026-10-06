@@ -59,32 +59,7 @@ jobs:
         run: ./scripts/generate.sh
 
       - name: Generated output policy is enforced
-        run: |
-          set -euo pipefail
-          test -z "$(git ls-files -- '**/*.g.dart')"
-          generated_count="$(find apps packages -type f -name '*.g.dart' \
-            | wc -l | tr -d ' ')"
-          test "$generated_count" -gt 0
-          while IFS= read -r -d '' generated; do
-            git check-ignore --no-index --quiet "$generated" || {
-              echo "Generated Dart is not ignored: $generated" >&2
-              exit 1
-            }
-          done < <(find apps packages -type f -name '*.g.dart' -print0)
-          dust check --root packages/commerce_admin_shared
-          dust check --root packages/commerce_shared
-          dust check --root packages/commerce_server
-          dust check --root apps/commerce_app
-          dust check --root apps/admin_app
-          dust check --db --root packages/commerce_server
-          dust i18n check --root apps/commerce_app
-          git diff --exit-code
-          test -z "$(git ls-files --others --exclude-standard -- \
-            packages/commerce_admin_shared \
-            packages/commerce_shared \
-            packages/commerce_server \
-            apps/commerce_app \
-            apps/admin_app)"
+        run: ./scripts/check_generated_output.sh
 
       # Dust embeds ups for application startup. SQLx remains the operator tool
       # and must also prove that every reversible pair runs in both directions.
