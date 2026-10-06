@@ -44,7 +44,11 @@ final class AccountProfileOverview extends StatelessWidget {
                 defaultText: 'Hello {name}',
                 args: {'name': customer.firstName ?? customer.displayName},
               ),
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                fontSize: 24,
+                height: 36 / 24,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             Text.rich(
               TextSpan(
@@ -59,7 +63,7 @@ final class AccountProfileOverview extends StatelessWidget {
                   ),
                 ],
               ),
-              style: const TextStyle(fontSize: 12),
+              style: const TextStyle(fontSize: 12, height: 20 / 12),
             ),
           ],
         ),
@@ -117,7 +121,11 @@ final class AccountProfileOverview extends StatelessWidget {
         const TranslatedText(
           'shop_account_recent_orders',
           defaultText: 'Recent orders',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontSize: 16,
+            height: 24 / 16,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         const SizedBox(height: 16),
         AccountRecentOrders(state: orders, orders: summary.recentOrders),
@@ -143,7 +151,11 @@ final class _OverviewMetric extends StatelessWidget {
         children: [
           Text(
             label,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontSize: 16,
+              height: 24 / 16,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 16),
           Row(
@@ -153,7 +165,7 @@ final class _OverviewMetric extends StatelessWidget {
               Text(
                 value,
                 style: const TextStyle(
-                  fontSize: 30,
+                  fontSize: 32,
                   fontWeight: FontWeight.w600,
                   height: 1,
                 ),
@@ -164,6 +176,7 @@ final class _OverviewMetric extends StatelessWidget {
                 style: const TextStyle(
                   color: StoreColors.foregroundSubtle,
                   fontSize: 14,
+                  height: 24 / 14,
                 ),
               ),
             ],
