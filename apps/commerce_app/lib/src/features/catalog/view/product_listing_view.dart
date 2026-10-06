@@ -89,7 +89,7 @@ class ProductListingView extends StatelessWidget {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1440),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 96),
+                padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
