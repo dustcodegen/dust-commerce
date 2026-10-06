@@ -80,8 +80,8 @@ final class OrderReceiptTotals extends StatelessWidget {
         children: [
           OrderReceiptTotalRow(
             label: context.tr(
-              'shop_checkout_subtotal',
-              defaultText: 'Subtotal',
+              'shop_cart_subtotal_excl',
+              defaultText: 'Subtotal (excl. shipping and taxes)',
             ),
             value: order.subtotal,
           ),
@@ -108,9 +108,9 @@ final class OrderReceiptTotals extends StatelessWidget {
             ),
             value: order.tax,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           const Divider(),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           OrderReceiptTotalRow(
             label: context.tr(
               'shop_checkout_total',
@@ -119,6 +119,8 @@ final class OrderReceiptTotals extends StatelessWidget {
             value: order.total,
             strong: true,
           ),
+          const SizedBox(height: 16),
+          const Divider(),
         ],
       );
 }

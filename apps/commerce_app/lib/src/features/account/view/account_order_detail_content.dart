@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../checkout/view/order_receipt_details.dart';
 import '../../checkout/view/order_receipt_items.dart';
+import 'account_order_summary.dart';
 
 const _orderDetailTitleStyle = TextStyle(
   fontSize: 30,
@@ -107,13 +108,7 @@ final class AccountOrderDetailContent extends StatelessWidget {
           const SizedBox(height: 32),
           const Divider(height: 1),
           const SizedBox(height: 32),
-          const TranslatedText(
-            'shop_account_order_summary',
-            defaultText: 'Order Summary',
-            style: TextStyle(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 8),
-          OrderReceiptTotals(order: order),
+          AccountOrderSummary(order: order),
           OrderReturnSection(order: order),
           const SizedBox(height: 32),
           CustomerServiceOrderHelp(orderReference: '${order.displayId}'),
