@@ -55,17 +55,16 @@ class ListingHeader extends StatelessWidget {
           ],
           if (state.children.isNotEmpty) ...[
             const SizedBox(height: 32),
-            for (final child in state.children)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: StoreInteractiveLink(
-                  onPressed: () => onCategorySelected(child.handle),
-                  child: TranslatedText.dynamic(
-                    'shop_category_${child.id}',
-                    fallback: child.name,
-                  ),
+            for (final (index, child) in state.children.indexed) ...[
+              StoreInteractiveLink(
+                onPressed: () => onCategorySelected(child.handle),
+                child: TranslatedText.dynamic(
+                  'shop_category_${child.id}',
+                  fallback: child.name,
                 ),
               ),
+              if (index < state.children.length - 1) const SizedBox(height: 8),
+            ],
           ],
           const SizedBox(height: 32),
         ],
