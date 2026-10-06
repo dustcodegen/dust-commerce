@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'listing_products.dart';
 import 'listing_header.dart';
+import 'listing_loading_products.dart';
 import 'listing_refinements.dart';
 
 /// Store, collection, and category body translated from Medusa templates.
@@ -68,9 +69,10 @@ class ProductListingView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final storeSearch = onSearchChanged != null;
+    final loading = state.status == ProductListingStatus.loading;
     if (state.requestKey != requestKey ||
         state.status == ProductListingStatus.idle ||
-        state.status == ProductListingStatus.loading) {
+        (loading && !storeSearch)) {
       return const Center(child: CircularProgressIndicator());
     }
     if (state.status == ProductListingStatus.failed) {
@@ -122,13 +124,18 @@ class ProductListingView extends StatelessWidget {
                           selectedMinPrice: state.selectedMinPrice,
                           selectedOnSale: state.selectedOnSale,
                         );
-                        final products = ListingProducts(
-                          state: state,
-                          onSearchChanged: onSearchChanged,
-                          onPageChanged: onPageChanged,
-                          onCategorySelected: onCategorySelected,
-                          showHeader: !storeSearch,
-                        );
+                        final products = loading
+                            ? ListingLoadingProducts(
+                                query: state.searchQuery,
+                                onSearchChanged: onSearchChanged!,
+                              )
+                            : ListingProducts(
+                                state: state,
+                                onSearchChanged: onSearchChanged,
+                                onPageChanged: onPageChanged,
+                                onCategorySelected: onCategorySelected,
+                                showHeader: !storeSearch,
+                              );
                         return desktop
                             ? Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
