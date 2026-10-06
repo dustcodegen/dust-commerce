@@ -116,7 +116,7 @@ class _PriceRangeBody extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.only(right: 24),
             child: Column(
@@ -124,20 +124,36 @@ class _PriceRangeBody extends StatelessWidget {
                 Semantics(
                   label: context.tr('shop_price', defaultText: 'Price'),
                   value: '${_money(value.start)} - ${_money(value.end)}',
-                  child: RangeSlider(
-                    values: value,
-                    min: bounds.min.toDouble(),
-                    max: bounds.max.toDouble(),
-                    divisions: bounds.max - bounds.min,
-                    labels: RangeLabels(
-                      _money(value.start),
-                      _money(value.end),
+                  child: SizedBox(
+                    height: 20,
+                    child: SliderTheme(
+                      data: SliderTheme.of(context).copyWith(
+                        activeTrackColor: StoreColors.interactive,
+                        inactiveTrackColor: StoreColors.border,
+                        overlayShape: SliderComponentShape.noOverlay,
+                        rangeThumbShape: const RoundRangeSliderThumbShape(
+                          enabledThumbRadius: 8,
+                        ),
+                        thumbColor: StoreColors.base,
+                        trackHeight: 2,
+                      ),
+                      child: RangeSlider(
+                        values: value,
+                        min: bounds.min.toDouble(),
+                        max: bounds.max.toDouble(),
+                        divisions: bounds.max - bounds.min,
+                        labels: RangeLabels(
+                          _money(value.start),
+                          _money(value.end),
+                        ),
+                        semanticFormatterCallback: _money,
+                        onChanged: onChanged,
+                        onChangeEnd: onChangeEnd,
+                      ),
                     ),
-                    semanticFormatterCallback: _money,
-                    onChanged: onChanged,
-                    onChangeEnd: onChangeEnd,
                   ),
                 ),
+                const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -158,5 +174,6 @@ class _PriceRangeBody extends StatelessWidget {
   static const _labelStyle = TextStyle(
     color: StoreColors.foregroundSubtle,
     fontSize: 12,
+    height: 20 / 12,
   );
 }
