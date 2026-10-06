@@ -23,7 +23,7 @@ class ListingLoadingProducts extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ListingSearchBox(query: query, onChanged: onSearchChanged),
-          const _SkeletonProductGrid(count: 12),
+          const _SkeletonPulse(child: _SkeletonProductGrid(count: 12)),
         ],
       );
 }
@@ -82,6 +82,43 @@ final class _SkeletonProduct extends StatelessWidget {
             ],
           ),
         ],
+      );
+}
+
+final class _SkeletonPulse extends StatefulWidget {
+  const _SkeletonPulse({required this.child});
+
+  final Widget child;
+
+  @override
+  State<_SkeletonPulse> createState() => _SkeletonPulseState();
+}
+
+final class _SkeletonPulseState extends State<_SkeletonPulse>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _opacity;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..repeat(reverse: true);
+    _opacity = Tween<double>(begin: .55, end: 1).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => FadeTransition(
+        opacity: _opacity,
+        child: widget.child,
       );
 }
 
