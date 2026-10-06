@@ -1230,6 +1230,10 @@
   "@empty": {
     "description": "Translation for `shop_empty`."
   },
+  "no_products_matched": "No products matched these filters.",
+  "@no_products_matched": {
+    "description": "Store search/refinement empty result from the Medusa source."
+  },
   "explore_products": "Explore products",
   "@explore_products": {
     "description": "Link from the empty cart to the catalogue."

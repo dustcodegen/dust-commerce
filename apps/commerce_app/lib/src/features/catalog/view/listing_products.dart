@@ -49,13 +49,19 @@ class ListingProducts extends StatelessWidget {
             ),
           ],
           if (state.isEmpty)
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 64),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 64),
               child: Center(
-                child: TranslatedText(
-                  'shop_empty',
-                  defaultText: 'Nothing for sale yet',
-                ),
+                child: onSearchChanged == null
+                    ? const TranslatedText(
+                        'shop_empty',
+                        defaultText: 'Nothing for sale yet',
+                      )
+                    : const TranslatedText(
+                        'shop_no_products_matched',
+                        defaultText: 'No products matched these filters.',
+                        style: TextStyle(color: StoreColors.foregroundSubtle),
+                      ),
               ),
             )
           else

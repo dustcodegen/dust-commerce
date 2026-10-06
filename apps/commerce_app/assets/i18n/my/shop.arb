@@ -1230,6 +1230,10 @@
   "@empty": {
     "description": "Translation for `shop_empty`."
   },
+  "no_products_matched": "ဤစစ်ထုတ်မှုများနှင့် ကိုက်ညီသော ကုန်ပစ္စည်း မရှိပါ။",
+  "@no_products_matched": {
+    "description": "Store search/refinement empty result from the Medusa source."
+  },
   "explore_products": "ကုန်ပစ္စည်းများ ကြည့်ရန်",
   "@explore_products": {
     "description": "Link from the empty cart to the catalogue."
