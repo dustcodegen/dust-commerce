@@ -178,17 +178,44 @@ class _RefinementChip extends StatelessWidget {
   final VoidCallback onPressed;
 
   @override
-  Widget build(BuildContext context) => OutlinedButton.icon(
-        onPressed: onPressed,
-        icon: const Icon(Icons.close, size: 14),
-        label: Text(label),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: StoreColors.foreground,
-          side: const BorderSide(color: StoreColors.borderStrong),
-          textStyle: const TextStyle(fontSize: 12),
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: 'Remove filter $label',
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(8),
+            hoverColor: StoreColors.subtleHover,
+            onTap: onPressed,
+            child: Container(
+              height: 32,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                border: Border.all(color: StoreColors.interactive),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(label, style: _chipText),
+                  const SizedBox(width: 6),
+                  const Icon(
+                    Icons.close,
+                    color: StoreColors.foregroundMuted,
+                    size: 14,
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       );
+
+  static const _chipText = TextStyle(
+    color: StoreColors.foreground,
+    fontSize: 12,
+    height: 20 / 12,
+  );
 }
 
 List<String> _without(List<String> values, String removed) =>
