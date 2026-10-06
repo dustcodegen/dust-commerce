@@ -76,7 +76,7 @@ class _AccountInfoEditorState extends State<AccountInfoEditor> {
                 child: OutlinedButton(
                   onPressed: widget.enabled && !widget.busy ? _toggle : null,
                   style: OutlinedButton.styleFrom(
-                    minimumSize: const Size(100, 28),
+                    minimumSize: const Size(100, 25),
                     padding: const EdgeInsets.symmetric(vertical: 4),
                   ),
                   child: Text(
@@ -110,23 +110,27 @@ class _AccountInfoEditorState extends State<AccountInfoEditor> {
                       children: [
                         widget.editor,
                         const SizedBox(height: 16),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: SizedBox(
-                            width: 140,
-                            child: FilledButton(
-                              onPressed: widget.busy ? null : _save,
-                              child: widget.busy
-                                  ? const SizedBox.square(
-                                      dimension: 16,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
+                        LayoutBuilder(
+                          builder: (context, constraints) => Align(
+                            alignment: Alignment.centerRight,
+                            child: SizedBox(
+                              width: MediaQuery.sizeOf(context).width < 640
+                                  ? constraints.maxWidth
+                                  : 140,
+                              child: FilledButton(
+                                onPressed: widget.busy ? null : _save,
+                                child: widget.busy
+                                    ? const SizedBox.square(
+                                        dimension: 16,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : TranslatedText(
+                                        'shop_save_changes',
+                                        defaultText: 'Save changes',
                                       ),
-                                    )
-                                  : TranslatedText(
-                                      'shop_save_changes',
-                                      defaultText: 'Save changes',
-                                    ),
+                              ),
                             ),
                           ),
                         ),
