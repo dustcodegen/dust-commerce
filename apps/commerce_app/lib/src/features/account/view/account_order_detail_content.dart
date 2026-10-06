@@ -81,7 +81,7 @@ final class AccountOrderDetailContent extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Wrap(
-            spacing: 24,
+            spacing: 16,
             runSpacing: 8,
             children: [
               _OrderStatusText(
@@ -182,5 +182,6 @@ final class _OrderStatusText extends StatelessWidget {
             style: const TextStyle(color: StoreColors.foregroundSubtle),
           ),
         ]),
+        style: const TextStyle(fontSize: 12, height: 20 / 12),
       );
 }
