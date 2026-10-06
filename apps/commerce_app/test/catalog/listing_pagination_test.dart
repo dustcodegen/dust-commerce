@@ -28,6 +28,25 @@ void main() {
       ['1', '...', '6', '7', '8', '9', '10'],
     );
   });
+
+  test('matches current StoreHits search pagination window', () {
+    expect(
+      _labels(listingPaginationItems(2, 10, search: true)),
+      ['1', '2', '3', '4', '...', '10'],
+    );
+    expect(
+      _labels(listingPaginationItems(4, 10, search: true)),
+      ['1', '2', '3', '4', '5', '6', '...', '10'],
+    );
+    expect(
+      _labels(listingPaginationItems(6, 12, search: true)),
+      ['1', '...', '4', '5', '6', '7', '8', '...', '12'],
+    );
+    expect(
+      _labels(listingPaginationItems(9, 10, search: true)),
+      ['1', '...', '7', '8', '9', '10'],
+    );
+  });
 }
 
 List<String> _labels(List<ListingPaginationItem> items) => [

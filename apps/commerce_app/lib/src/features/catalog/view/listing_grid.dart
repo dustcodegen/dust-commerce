@@ -13,6 +13,7 @@ class ListingGrid extends StatelessWidget {
     required this.currentPage,
     required this.totalPages,
     required this.onPageChanged,
+    this.searchPagination = false,
     super.key,
   });
 
@@ -27,6 +28,9 @@ class ListingGrid extends StatelessWidget {
 
   /// Products on this page.
   final List<Product> products;
+
+  /// Whether this grid follows StoreHits search pagination.
+  final bool searchPagination;
 
   /// Number of available pages.
   final int totalPages;
@@ -67,6 +71,7 @@ class ListingGrid extends StatelessWidget {
                 const SizedBox(height: 48),
                 ListingPagination(
                   currentPage: currentPage,
+                  search: searchPagination,
                   totalPages: totalPages,
                   onPageChanged: onPageChanged,
                 ),

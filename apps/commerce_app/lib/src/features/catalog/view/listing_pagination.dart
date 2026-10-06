@@ -41,6 +41,7 @@ class ListingPagination extends StatelessWidget {
     required this.currentPage,
     required this.totalPages,
     required this.onPageChanged,
+    this.search = false,
     super.key,
   });
 
@@ -49,6 +50,9 @@ class ListingPagination extends StatelessWidget {
 
   /// Receives a selected one-based page.
   final ValueChanged<int> onPageChanged;
+
+  /// Whether this control follows StoreHits search pagination.
+  final bool search;
 
   /// Last one-based page.
   final int totalPages;
@@ -59,7 +63,11 @@ class ListingPagination extends StatelessWidget {
         crossAxisAlignment: WrapCrossAlignment.end,
         spacing: 12,
         children: [
-          for (final item in listingPaginationItems(currentPage, totalPages))
+          for (final item in listingPaginationItems(
+            currentPage,
+            totalPages,
+            search: search,
+          ))
             switch (item) {
               ListingEllipsis() => const _PaginationEllipsis(),
               ListingPage(:final page) => _PaginationPageButton(
@@ -73,7 +81,12 @@ class ListingPagination extends StatelessWidget {
 }
 
 /// Builds the exact bounded page sequence used by the pinned Medusa source.
-List<ListingPaginationItem> listingPaginationItems(int page, int total) {
+List<ListingPaginationItem> listingPaginationItems(
+  int page,
+  int total, {
+  bool search = false,
+}) {
+  if (search) return searchListingPaginationItems(page, total);
   ListingPage item(int value) => ListingPage(value);
   if (total <= 7) {
     return [for (var value = 1; value <= total; value++) item(value)];
@@ -98,6 +111,24 @@ List<ListingPaginationItem> listingPaginationItems(int page, int total) {
     for (var value = page - 1; value <= page + 1; value++) item(value),
     const ListingEllipsis(),
     item(total),
+  ];
+}
+
+/// Builds the current StoreHits pagination window from source padding 2.
+List<ListingPaginationItem> searchListingPaginationItems(int page, int total) {
+  if (total < 1) return const [];
+  ListingPage item(int value) => ListingPage(value);
+  final current = (page - 1).clamp(0, total - 1);
+  final start = (current - 2).clamp(0, total - 1);
+  final end = (current + 2).clamp(0, total - 1);
+  final pages = [for (var value = start; value <= end; value++) value];
+  return [
+    if (!pages.contains(0)) item(1),
+    if (!pages.contains(0) && !pages.contains(1)) const ListingEllipsis(),
+    for (final value in pages) item(value + 1),
+    if (!pages.contains(total - 1) && !pages.contains(total - 2))
+      const ListingEllipsis(),
+    if (!pages.contains(total - 1)) item(total),
   ];
 }
 

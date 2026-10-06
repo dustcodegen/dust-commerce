@@ -70,6 +70,7 @@ class ListingProducts extends StatelessWidget {
               currencyCode: state.currencyCode,
               currentPage: state.currentPage,
               totalPages: state.totalPages,
+              searchPagination: onSearchChanged != null,
               onPageChanged: onPageChanged,
             ),
         ],
