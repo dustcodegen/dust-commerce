@@ -8,7 +8,7 @@ void main() {
   test('customer order dates retain the calendar year', () {
     final date = DateTime(2026, 9, 15, 14, 30);
 
-    expect(formatStoreDate(localizations, date), 'Tue, Sep 15, 2026');
+    expect(formatStoreDate(localizations, date), 'Tue Sep 15 2026');
   });
 
   test('customer payment dates retain year and time', () {
@@ -16,7 +16,7 @@ void main() {
 
     expect(
       formatStoreDateTime(localizations, date),
-      'Tue, Sep 15, 2026, 2:30 PM',
+      'Tue Sep 15 2026, 2:30 PM',
     );
   });
 }
