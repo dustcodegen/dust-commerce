@@ -53,6 +53,7 @@ final class OrderPaymentDetails extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Container(
+                        alignment: Alignment.center,
                         height: 28,
                         padding: const EdgeInsets.symmetric(horizontal: 8),
                         decoration: BoxDecoration(
