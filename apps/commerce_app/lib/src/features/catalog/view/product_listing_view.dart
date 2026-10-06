@@ -67,19 +67,19 @@ class ProductListingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final storeSearch = onSearchChanged != null;
     if (state.requestKey != requestKey ||
         state.status == ProductListingStatus.idle ||
         state.status == ProductListingStatus.loading) {
       return const Center(child: CircularProgressIndicator());
     }
     if (state.status == ProductListingStatus.failed) {
-      return _ListingFailure(onRetry: onRetry);
+      return _ListingFailure(onRetry: onRetry, storeSearch: storeSearch);
     }
     if (state.status == ProductListingStatus.missing) {
       return const StoreMainNotFound();
     }
 
-    final storeSearch = onSearchChanged != null;
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -164,29 +164,45 @@ class ProductListingView extends StatelessWidget {
 }
 
 class _ListingFailure extends StatelessWidget {
-  const _ListingFailure({required this.onRetry});
+  const _ListingFailure({required this.onRetry, required this.storeSearch});
 
   final VoidCallback onRetry;
+  final bool storeSearch;
 
   @override
-  Widget build(BuildContext context) => Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const TranslatedText(
-              'shop_products_failure',
-              defaultText: 'Could not load products.',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton(
-              onPressed: onRetry,
-              child: const TranslatedText(
-                'shop_retry',
-                defaultText: 'Try again',
-              ),
-            ),
-          ],
+  Widget build(BuildContext context) {
+    if (storeSearch) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 64),
+        child: Center(
+          child: TranslatedText(
+            'shop_store_products_failure',
+            defaultText: "Couldn't load products.",
+            textAlign: TextAlign.center,
+            style: TextStyle(color: StoreColors.danger),
+          ),
         ),
       );
+    }
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const TranslatedText(
+            'shop_products_failure',
+            defaultText: 'Could not load products.',
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton(
+            onPressed: onRetry,
+            child: const TranslatedText(
+              'shop_retry',
+              defaultText: 'Try again',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

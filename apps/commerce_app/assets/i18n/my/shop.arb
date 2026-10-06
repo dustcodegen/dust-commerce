@@ -1481,6 +1481,10 @@
   "@products_failure": {
     "description": "Safe error shown when a product listing cannot load."
   },
+  "store_products_failure": "ကုန်ပစ္စည်းများကို ရယူ၍ မရပါ။",
+  "@store_products_failure": {
+    "description": "Store search/refinement loading error from the Medusa source."
+  },
   "related_products": "ဆက်စပ်ကုန်ပစ္စည်းများ",
   "@related_products": {
     "description": "Recommendation section label."
