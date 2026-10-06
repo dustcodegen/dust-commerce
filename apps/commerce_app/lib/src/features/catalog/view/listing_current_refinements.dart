@@ -5,6 +5,7 @@ import 'package:dust_dart/fp.dart';
 import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
+import 'listing_current_refinement_chip.dart';
 import 'listing_current_refinement_models.dart';
 
 /// Medusa CurrentRefinements clone for the Store sidebar.
@@ -106,7 +107,7 @@ class ListingCurrentRefinements extends StatelessWidget {
             runSpacing: 8,
             children: [
               for (final chip in chips)
-                _RefinementChip(
+                ListingCurrentRefinementChip(
                   label: chip.label,
                   onPressed: () => _remove(chip),
                 ),
@@ -162,6 +163,16 @@ class _CurrentHeader extends StatelessWidget {
             ),
             TextButton(
               onPressed: onClearAll,
+              style: TextButton.styleFrom(
+                foregroundColor: StoreColors.interactive,
+                minimumSize: Size.zero,
+                padding: EdgeInsets.zero,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                textStyle: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               child: Text(
                 context.tr('shop_clear_all', defaultText: 'Clear all'),
               ),
@@ -169,53 +180,6 @@ class _CurrentHeader extends StatelessWidget {
           ],
         ),
       );
-}
-
-class _RefinementChip extends StatelessWidget {
-  const _RefinementChip({required this.label, required this.onPressed});
-
-  final String label;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) => Semantics(
-        button: true,
-        label: 'Remove filter $label',
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(8),
-            hoverColor: StoreColors.subtleHover,
-            onTap: onPressed,
-            child: Container(
-              height: 32,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                border: Border.all(color: StoreColors.interactive),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(label, style: _chipText),
-                  const SizedBox(width: 6),
-                  const Icon(
-                    Icons.close,
-                    color: StoreColors.foregroundMuted,
-                    size: 14,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-
-  static const _chipText = TextStyle(
-    color: StoreColors.foreground,
-    fontSize: 12,
-    height: 20 / 12,
-  );
 }
 
 List<String> _without(List<String> values, String removed) =>
