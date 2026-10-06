@@ -5,6 +5,7 @@ import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
 import '../../checkout/view/order_receipt_details.dart';
+import '../../checkout/view/order_confirmation_email_text.dart';
 import '../../checkout/view/order_receipt_items.dart';
 import 'account_order_summary.dart';
 
@@ -53,12 +54,7 @@ final class AccountOrderDetailContent extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          Text(context.tr(
-            'shop_checkout_confirmation_sent',
-            defaultText:
-                'We have sent the order confirmation details to {email}.',
-            args: {'email': order.email},
-          )),
+          OrderConfirmationEmailText(email: order.email),
           const SizedBox(height: 8),
           Text(context.tr(
             'shop_checkout_order_date',
