@@ -92,7 +92,7 @@ class _AccountInfoEditorState extends State<AccountInfoEditor> {
             _StatusBadge(
               message: context.tr(
                 'shop_account_updated',
-                defaultText: '{label} updated successfully',
+                defaultText: '{label} updated succesfully',
                 args: {'label': widget.label},
               ),
               success: true,

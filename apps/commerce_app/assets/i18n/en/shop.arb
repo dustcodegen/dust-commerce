@@ -604,7 +604,7 @@
       }
     }
   },
-  "account_updated": "{label} updated successfully",
+  "account_updated": "{label} updated succesfully",
   "@account_updated": {
     "description": "Confirms one profile field update.",
     "placeholders": {
