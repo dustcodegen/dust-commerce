@@ -14,6 +14,7 @@ class ListingProducts extends StatelessWidget {
     required this.onSearchChanged,
     required this.onPageChanged,
     required this.onCategorySelected,
+    this.showHeader = true,
     super.key,
   });
 
@@ -26,6 +27,9 @@ class ListingProducts extends StatelessWidget {
   /// Changes the Store free-text search query.
   final ValueChanged<String>? onSearchChanged;
 
+  /// Whether the listing title belongs inside this product column.
+  final bool showHeader;
+
   /// Listing state supplied by its Dust view model.
   final ProductListingState state;
 
@@ -33,12 +37,12 @@ class ListingProducts extends StatelessWidget {
   Widget build(BuildContext context) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ListingHeader(
-            state: state,
-            onCategorySelected: onCategorySelected,
-          ),
+          if (showHeader)
+            ListingHeader(
+              state: state,
+              onCategorySelected: onCategorySelected,
+            ),
           if (onSearchChanged case final onSearchChanged?) ...[
-            const SizedBox(height: 24),
             ListingSearchBox(
               query: state.searchQuery,
               onChanged: onSearchChanged,

@@ -3,6 +3,7 @@ import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
 import 'listing_products.dart';
+import 'listing_header.dart';
 import 'listing_refinements.dart';
 
 /// Store, collection, and category body translated from Medusa templates.
@@ -78,6 +79,7 @@ class ProductListingView extends StatelessWidget {
       return const StoreMainNotFound();
     }
 
+    final storeSearch = onSearchChanged != null;
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -86,58 +88,70 @@ class ProductListingView extends StatelessWidget {
               constraints: const BoxConstraints(maxWidth: 1440),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 24, 24, 96),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final desktop = constraints.maxWidth >= 976;
-                    final refinements = ListingRefinements(
-                      selected: state.sortBy,
-                      onChanged: onSortChanged,
-                      options: state.optionFilters,
-                      selectedOptionValueIds: state.selectedOptionValueIds,
-                      onOptionValuesChanged: onOptionValuesChanged,
-                      categoryFilters: state.categoryFilters,
-                      selectedCategoryHandles: state.selectedCategoryHandles,
-                      onCategoryHandlesChanged: onCategoryHandlesChanged,
-                      labelFilters: state.labelFilters,
-                      selectedLabelValues: state.selectedLabelValues,
-                      onLabelValuesChanged: onLabelValuesChanged,
-                      onPriceRangeChanged: onPriceRangeChanged,
-                      onSaleChanged: onSaleChanged,
-                      onClearAll: onClearRefinements,
-                      priceBounds: state.priceBounds,
-                      canRefineOnSale: state.canRefineOnSale,
-                      currencyCode: state.currencyCode,
-                      selectedMaxPrice: state.selectedMaxPrice,
-                      selectedMinPrice: state.selectedMinPrice,
-                      selectedOnSale: state.selectedOnSale,
-                    );
-                    final products = ListingProducts(
-                      state: state,
-                      onSearchChanged: onSearchChanged,
-                      onPageChanged: onPageChanged,
-                      onCategorySelected: onCategorySelected,
-                    );
-                    return desktop
-                        ? Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(width: 250, child: refinements),
-                              const SizedBox(width: 24),
-                              Expanded(child: products),
-                            ],
-                          )
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(left: 24),
-                                child: refinements,
-                              ),
-                              const SizedBox(height: 32),
-                              products,
-                            ],
-                          );
-                  },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (storeSearch)
+                      ListingHeader(
+                        state: state,
+                        onCategorySelected: onCategorySelected,
+                      ),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final desktop = constraints.maxWidth >= 976;
+                        final refinements = ListingRefinements(
+                          selected: state.sortBy,
+                          onChanged: onSortChanged,
+                          options: state.optionFilters,
+                          selectedOptionValueIds: state.selectedOptionValueIds,
+                          onOptionValuesChanged: onOptionValuesChanged,
+                          categoryFilters: state.categoryFilters,
+                          selectedCategoryHandles:
+                              state.selectedCategoryHandles,
+                          onCategoryHandlesChanged: onCategoryHandlesChanged,
+                          labelFilters: state.labelFilters,
+                          selectedLabelValues: state.selectedLabelValues,
+                          onLabelValuesChanged: onLabelValuesChanged,
+                          onPriceRangeChanged: onPriceRangeChanged,
+                          onSaleChanged: onSaleChanged,
+                          onClearAll: onClearRefinements,
+                          priceBounds: state.priceBounds,
+                          canRefineOnSale: state.canRefineOnSale,
+                          currencyCode: state.currencyCode,
+                          selectedMaxPrice: state.selectedMaxPrice,
+                          selectedMinPrice: state.selectedMinPrice,
+                          selectedOnSale: state.selectedOnSale,
+                        );
+                        final products = ListingProducts(
+                          state: state,
+                          onSearchChanged: onSearchChanged,
+                          onPageChanged: onPageChanged,
+                          onCategorySelected: onCategorySelected,
+                          showHeader: !storeSearch,
+                        );
+                        return desktop
+                            ? Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(width: 250, child: refinements),
+                                  const SizedBox(width: 24),
+                                  Expanded(child: products),
+                                ],
+                              )
+                            : Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 24),
+                                    child: refinements,
+                                  ),
+                                  const SizedBox(height: 32),
+                                  products,
+                                ],
+                              );
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
