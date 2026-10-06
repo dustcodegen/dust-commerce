@@ -8,6 +8,12 @@ import '../../checkout/view/order_receipt_details.dart';
 import '../../checkout/view/order_receipt_items.dart';
 import 'account_order_items.dart';
 
+const _orderDetailTitleStyle = TextStyle(
+  fontSize: 30,
+  height: 48 / 30,
+  fontWeight: FontWeight.w600,
+);
+
 /// Medusa order-detail template rendered from immutable order snapshots.
 final class AccountOrderDetailContent extends StatelessWidget {
   /// Creates the detail content for [order].
@@ -26,12 +32,19 @@ final class AccountOrderDetailContent extends StatelessWidget {
                 child: TranslatedText(
                   'shop_account_order_details',
                   defaultText: 'Order details',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+                  style: _orderDetailTitleStyle,
                 ),
               ),
               TextButton.icon(
                 onPressed: () => context.navigator.accountOrders().go(),
-                icon: const Icon(Icons.close, size: 18),
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  foregroundColor: StoreColors.foregroundSubtle,
+                  textStyle: const TextStyle(fontSize: 14, height: 24 / 14),
+                ),
+                icon: const Icon(Icons.close, size: 16),
                 label: const TranslatedText(
                   'shop_account_back_overview',
                   defaultText: 'Back to overview',
