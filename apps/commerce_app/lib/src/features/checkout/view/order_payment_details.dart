@@ -3,6 +3,11 @@ import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
+const _orderPaymentHeadingStyle = TextStyle(
+  fontSize: 32,
+  height: 44 / 32,
+);
+
 /// Payment provider and final payment status.
 final class OrderPaymentDetails extends StatelessWidget {
   /// Creates the payment detail block.
@@ -20,7 +25,7 @@ final class OrderPaymentDetails extends StatelessWidget {
         const TranslatedText(
           'shop_checkout_payment',
           defaultText: 'Payment',
-          style: TextStyle(fontSize: 30),
+          style: _orderPaymentHeadingStyle,
         ),
         const SizedBox(height: 24),
         if (payment != null)
@@ -36,6 +41,7 @@ final class OrderPaymentDetails extends StatelessWidget {
                   child: Text(_providerTitle(context, payment.providerId)),
                 ),
               ),
+              const SizedBox(width: 4),
               Expanded(
                 flex: 2,
                 child: _PaymentDetail(
