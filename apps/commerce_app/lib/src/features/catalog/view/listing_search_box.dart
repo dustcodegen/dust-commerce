@@ -73,6 +73,8 @@ final class _ListingSearchBoxState extends State<ListingSearchBox> {
                     'shop_search_products',
                     defaultText: 'Search products',
                   ),
+                  hintStyle:
+                      const TextStyle(color: StoreColors.foregroundMuted),
                   isDense: true,
                 ),
                 style: const TextStyle(
