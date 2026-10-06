@@ -68,14 +68,20 @@ class AccountOrderCard extends StatelessWidget {
                     children: [
                       ProductImage(url: item.thumbnail, aspectRatio: 1),
                       const SizedBox(height: 8),
-                      Text(
-                        '${item.title} × ${item.quantity}',
+                      Text.rich(
+                        TextSpan(children: [
+                          TextSpan(
+                            text: item.title,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const TextSpan(text: ' x '),
+                          TextSpan(text: '${item.quantity}'),
+                        ]),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: const TextStyle(fontSize: 12),
                       ),
                     ],
                   ),
