@@ -50,7 +50,7 @@ class ListingHeader extends StatelessWidget {
             TranslatedText.dynamic(
               'shop_listing_description_${state.requestKey}',
               fallback: state.description,
-              style: Theme.of(context).textTheme.bodyLarge,
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
           ],
           if (state.children.isNotEmpty) ...[
