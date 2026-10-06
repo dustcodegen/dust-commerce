@@ -3,7 +3,9 @@ import 'package:commerce_app/route.dart';
 import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
-/// Source-shaped order help link with the visible order number prefilled.
+const _orderHelpTextStyle = TextStyle(fontSize: 14, height: 24 / 14);
+
+/// Source-shaped order help links with the visible order number prefilled.
 final class CustomerServiceOrderHelp extends StatelessWidget {
   /// Creates support navigation for [orderReference].
   const CustomerServiceOrderHelp({required this.orderReference, super.key});
@@ -18,10 +20,21 @@ final class CustomerServiceOrderHelp extends StatelessWidget {
           const TranslatedText(
             'shop_checkout_need_help',
             defaultText: 'Need help?',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 14,
+              height: 24 / 14,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 8),
-          StoreInteractiveLink(
+          TextButton(
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              foregroundColor: StoreColors.foreground,
+              textStyle: _orderHelpTextStyle,
+            ),
             onPressed: () =>
                 context.navigator.contact(orderReference: orderReference).go(),
             child: const TranslatedText(
@@ -30,7 +43,14 @@ final class CustomerServiceOrderHelp extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          StoreInteractiveLink(
+          TextButton(
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              foregroundColor: StoreColors.foreground,
+              textStyle: _orderHelpTextStyle,
+            ),
             onPressed: () =>
                 context.navigator.contact(orderReference: orderReference).go(),
             child: const TranslatedText(
