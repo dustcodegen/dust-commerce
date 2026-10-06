@@ -5,6 +5,11 @@ import 'package:flutter/material.dart';
 
 import 'order_delivery_detail.dart';
 
+const _orderDeliveryHeadingStyle = TextStyle(
+  fontSize: 32,
+  height: 44 / 32,
+);
+
 /// Shipping address, contact, and delivery method from the frozen order.
 final class OrderShippingDetails extends StatelessWidget {
   /// Creates the shipping detail block.
@@ -20,11 +25,11 @@ final class OrderShippingDetails extends StatelessWidget {
           const TranslatedText(
             'shop_checkout_delivery',
             defaultText: 'Delivery',
-            style: TextStyle(fontSize: 30),
+            style: _orderDeliveryHeadingStyle,
           ),
           const SizedBox(height: 24),
           Wrap(
-            spacing: 56,
+            spacing: 32,
             runSpacing: 24,
             children: [
               OrderDeliveryDetail(
