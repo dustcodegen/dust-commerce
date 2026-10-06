@@ -85,7 +85,9 @@ class _ParentLink extends StatelessWidget {
             onPressed: () => onPressed(category.handle),
             style: TextButton.styleFrom(
               padding: EdgeInsets.zero,
+              minimumSize: Size.zero,
               foregroundColor: StoreColors.foregroundSubtle,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               textStyle: _listingTitleStyle,
             ),
             child: TranslatedText.dynamic(
