@@ -49,32 +49,59 @@ final class _ListingSearchBoxState extends State<ListingSearchBox> {
   }
 
   @override
-  Widget build(BuildContext context) => TextField(
-        controller: _controller,
-        textInputAction: TextInputAction.search,
-        decoration: InputDecoration(
-          prefixIcon: const Icon(
-            Icons.search,
-            size: 18,
-            color: StoreColors.foregroundMuted,
-          ),
-          suffixIcon: _controller.text.isEmpty
-              ? null
-              : IconButton(
-                  tooltip: context.tr(
-                    'shop_search_clear',
-                    defaultText: 'Clear search',
-                  ),
-                  icon: const Icon(Icons.close, size: 18),
-                  onPressed: _clear,
-                ),
-          hintText: context.tr(
-            'shop_search_products',
-            defaultText: 'Search products',
-          ),
-          border: const UnderlineInputBorder(),
+  Widget build(BuildContext context) => Container(
+        margin: const EdgeInsets.only(bottom: 24),
+        decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: StoreColors.border)),
         ),
-        onChanged: _changed,
+        child: Row(
+          children: [
+            const Icon(
+              Icons.search,
+              size: 20,
+              color: StoreColors.foregroundMuted,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextField(
+                controller: _controller,
+                textInputAction: TextInputAction.search,
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                  hintText: context.tr(
+                    'shop_search_products',
+                    defaultText: 'Search products',
+                  ),
+                  isDense: true,
+                ),
+                style: const TextStyle(
+                  color: StoreColors.foreground,
+                  fontSize: 16,
+                  height: 1.5,
+                ),
+                onChanged: _changed,
+              ),
+            ),
+            if (_controller.text.isNotEmpty)
+              Semantics(
+                button: true,
+                label: context.tr(
+                  'shop_search_clear',
+                  defaultText: 'Clear search',
+                ),
+                child: InkWell(
+                  hoverColor: Colors.transparent,
+                  onTap: _clear,
+                  child: const Icon(
+                    Icons.close,
+                    color: StoreColors.foregroundMuted,
+                    size: 20,
+                  ),
+                ),
+              ),
+          ],
+        ),
       );
 
   void _changed(String value) {
