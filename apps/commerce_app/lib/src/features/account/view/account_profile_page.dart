@@ -71,7 +71,11 @@ final class _ProfileContent extends StatelessWidget {
           TranslatedText(
             'shop_account_profile',
             defaultText: 'Profile',
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontSize: 30,
+              height: 48 / 30,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 16),
           TranslatedText(
@@ -79,6 +83,7 @@ final class _ProfileContent extends StatelessWidget {
             defaultText: 'View and update your profile information, including '
                 'your name, email, and phone number. You can also update your '
                 'billing address, or change your password.',
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 32),
           ProfileNameEditor(customer: customer),

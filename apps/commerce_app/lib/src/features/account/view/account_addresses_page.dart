@@ -62,13 +62,19 @@ final class _AddressBookContent extends StatelessWidget {
           TranslatedText(
             'shop_account_shipping_addresses',
             defaultText: 'Shipping Addresses',
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontSize: 30,
+              height: 48 / 30,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 16),
           TranslatedText(
             'shop_account_addresses_body',
-            defaultText: 'View and update your shipping addresses. Add as '
-                'many as you like to make them available during checkout.',
+            defaultText: 'View and update your shipping addresses, you can add '
+                'as many as you like. Saving your addresses will make them '
+                'available during checkout.',
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 32),
           if (state.status == AddressBookStatus.loading &&

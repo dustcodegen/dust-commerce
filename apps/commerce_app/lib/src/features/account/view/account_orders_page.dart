@@ -59,14 +59,19 @@ class _OrdersContent extends StatelessWidget {
           const TranslatedText(
             'shop_account_orders',
             defaultText: 'Orders',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 30,
+              height: 48 / 30,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 16),
-          const TranslatedText(
+          TranslatedText(
             'shop_account_orders_body',
             defaultText:
                 'View your previous orders and their status. You can also '
                 'create returns or exchanges for your orders if needed.',
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 32),
           switch (state.status) {
