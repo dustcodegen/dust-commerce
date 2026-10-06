@@ -16,7 +16,7 @@ void main() {
 
     expect(
       formatStoreDateTime(localizations, date),
-      'Tue Sep 15 2026, 2:30 PM',
+      '9/15/2026, 2:30:00 PM',
     );
   });
 }
