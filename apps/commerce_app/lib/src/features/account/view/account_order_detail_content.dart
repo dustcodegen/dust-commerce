@@ -97,7 +97,6 @@ final class AccountOrderDetailContent extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          const Divider(height: 1),
           OrderReceiptItems(order: order),
           const SizedBox(height: 32),
           OrderShippingDetails(order: order),

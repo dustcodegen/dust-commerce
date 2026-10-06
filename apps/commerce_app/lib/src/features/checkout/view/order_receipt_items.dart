@@ -16,6 +16,7 @@ final class OrderReceiptItems extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Column(
         children: [
+          const Divider(height: 1),
           for (final item in order.items) ...[
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
