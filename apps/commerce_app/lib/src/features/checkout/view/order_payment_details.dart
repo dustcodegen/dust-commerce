@@ -78,6 +78,8 @@ final class OrderPaymentDetails extends StatelessWidget {
               ),
             ],
           ),
+        const SizedBox(height: 32),
+        const Divider(),
       ],
     );
   }

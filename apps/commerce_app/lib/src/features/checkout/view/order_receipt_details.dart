@@ -72,6 +72,8 @@ final class OrderShippingDetails extends StatelessWidget {
               ),
             ],
           ),
+          const SizedBox(height: 32),
+          const Divider(),
         ],
       );
 }

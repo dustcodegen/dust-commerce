@@ -92,8 +92,6 @@ final class OrderConfirmationView extends StatelessWidget {
                       const SizedBox(height: 40),
                       OrderPaymentDetails(order: order),
                       const SizedBox(height: 40),
-                      const Divider(),
-                      const SizedBox(height: 24),
                       CustomerServiceOrderHelp(
                         orderReference: '${order.displayId}',
                       ),
