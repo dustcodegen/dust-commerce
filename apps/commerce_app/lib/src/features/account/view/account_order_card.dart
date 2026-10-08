@@ -81,20 +81,23 @@ class AccountOrderCard extends StatelessWidget {
                         children: [
                           ProductImage(url: item.thumbnail, aspectRatio: 1),
                           const SizedBox(height: 8),
-                          Text.rich(
-                            TextSpan(children: [
-                              TextSpan(
-                                text: item.title,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  item.title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: _orderCardSmallStyle.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
-                              const TextSpan(text: ' x '),
-                              TextSpan(text: '${item.quantity}'),
-                            ]),
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: _orderCardSmallStyle,
+                              const SizedBox(width: 8),
+                              const Text('x', style: _orderCardSmallStyle),
+                              Text('${item.quantity}',
+                                  style: _orderCardSmallStyle),
+                            ],
                           ),
                         ],
                       ),
