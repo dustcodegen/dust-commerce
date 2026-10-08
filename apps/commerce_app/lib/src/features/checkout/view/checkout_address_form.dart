@@ -7,7 +7,6 @@ import 'checkout_address_controllers.dart';
 import 'checkout_address_fields.dart';
 import 'checkout_billing_toggle.dart';
 import 'checkout_contact_fields.dart';
-import 'checkout_error_message.dart';
 import 'checkout_primary_action.dart';
 import 'checkout_saved_address_selector.dart';
 
@@ -122,7 +121,7 @@ final class CheckoutAddressForm extends StatelessWidget {
               ),
               if (state.status == CheckoutStatus.failed &&
                   state.operation == CheckoutOperation.prepare)
-                CheckoutErrorMessage(state.message!),
+                StoreErrorMessage(state.message!),
             ],
           ),
         ),

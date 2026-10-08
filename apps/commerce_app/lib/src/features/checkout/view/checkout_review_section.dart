@@ -3,7 +3,6 @@ import 'package:commerce_app/route.dart';
 import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
-import 'checkout_error_message.dart';
 import 'checkout_primary_action.dart';
 import 'checkout_step_header.dart';
 
@@ -43,7 +42,7 @@ final class CheckoutReviewSection extends StatelessWidget {
             ),
             if (state.status == CheckoutStatus.failed &&
                 state.operation == CheckoutOperation.place)
-              CheckoutErrorMessage(state.message!),
+              StoreErrorMessage(state.message!),
             const SizedBox(height: 24),
             Align(
               alignment: Alignment.centerLeft,

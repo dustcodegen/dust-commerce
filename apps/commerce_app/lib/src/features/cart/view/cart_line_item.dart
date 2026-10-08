@@ -99,16 +99,12 @@ class CartLineItem extends StatelessWidget {
           ),
         ),
         if (state.status == CartStatus.failed && state.activeLineId == item.id)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: Text(
-              state.message ??
-                  context.tr(
-                    'shop_cart_update_failed',
-                    defaultText: 'Could not update this item.',
-                  ),
-              style: const TextStyle(color: Colors.red),
-            ),
+          StoreErrorMessage(
+            state.message ??
+                context.tr(
+                  'shop_cart_update_failed',
+                  defaultText: 'Could not update this item.',
+                ),
           ),
         if (showDivider) const Divider(),
       ],

@@ -94,16 +94,12 @@ class _PromotionCodeState extends State<PromotionCode> {
             ],
           ),
           if (failed)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Text(
-                widget.state.message ??
-                    context.tr(
-                      'shop_cart_promotion_failed',
-                      defaultText: 'Could not apply this code.',
-                    ),
-                style: const TextStyle(color: Colors.red),
-              ),
+            StoreErrorMessage(
+              widget.state.message ??
+                  context.tr(
+                    'shop_cart_promotion_failed',
+                    defaultText: 'Could not apply this code.',
+                  ),
             ),
           const SizedBox(height: 20),
         ],
