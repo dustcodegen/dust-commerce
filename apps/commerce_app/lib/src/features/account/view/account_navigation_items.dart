@@ -77,9 +77,12 @@ final class MobileAccountNavigationItem extends StatelessWidget {
         children: [
           ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 32),
+            horizontalTitleGap: 8,
             leading: Icon(icon, size: 20),
+            minLeadingWidth: 20,
             title: Text(label),
-            trailing: const Icon(Icons.chevron_right, size: 20),
+            titleTextStyle: Theme.of(context).textTheme.bodyLarge,
+            trailing: const Icon(Icons.chevron_right, size: 16),
             enabled: enabled,
             onTap: onTap,
           ),
