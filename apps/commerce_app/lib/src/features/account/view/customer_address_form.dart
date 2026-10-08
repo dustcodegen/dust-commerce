@@ -10,6 +10,7 @@ final class CustomerAddressForm extends StatelessWidget {
   const CustomerAddressForm({
     required this.controllers,
     required this.countries,
+    this.profileBilling = false,
     super.key,
   });
 
@@ -18,6 +19,9 @@ final class CustomerAddressForm extends StatelessWidget {
 
   /// Controllers that own this form's text.
   final CustomerAddressControllers controllers;
+
+  /// Whether this form is rendered inside Medusa ProfileBillingAddress.
+  final bool profileBilling;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -48,6 +52,15 @@ final class CustomerAddressForm extends StatelessWidget {
             autofillHints: const [AutofillHints.organizationName],
           ),
           const SizedBox(height: 8),
+          if (profileBilling) ...[
+            CustomerAddressField(
+              controller: controllers.phone,
+              label: context.tr('shop_account_phone', defaultText: 'Phone'),
+              keyboardType: TextInputType.phone,
+              autofillHints: const [AutofillHints.telephoneNumber],
+            ),
+            const SizedBox(height: 8),
+          ],
           CustomerAddressField(
             controller: controllers.line1,
             label: context.tr('shop_account_address', defaultText: 'Address'),
@@ -85,7 +98,7 @@ final class CustomerAddressForm extends StatelessWidget {
             controller: controllers.province,
             label: context.tr(
               'shop_account_province',
-              defaultText: 'Province / State',
+              defaultText: profileBilling ? 'Province' : 'Province / State',
             ),
             required: false,
             autofillHints: const [AutofillHints.addressState],
@@ -99,14 +112,16 @@ final class CustomerAddressForm extends StatelessWidget {
               defaultText: 'Country',
             ),
           ),
-          const SizedBox(height: 8),
-          CustomerAddressField(
-            controller: controllers.phone,
-            label: context.tr('shop_account_phone', defaultText: 'Phone'),
-            required: false,
-            keyboardType: TextInputType.phone,
-            autofillHints: const [AutofillHints.telephoneNumber],
-          ),
+          if (!profileBilling) ...[
+            const SizedBox(height: 8),
+            CustomerAddressField(
+              controller: controllers.phone,
+              label: context.tr('shop_account_phone', defaultText: 'Phone'),
+              required: false,
+              keyboardType: TextInputType.phone,
+              autofillHints: const [AutofillHints.telephoneNumber],
+            ),
+          ],
         ],
       );
 }

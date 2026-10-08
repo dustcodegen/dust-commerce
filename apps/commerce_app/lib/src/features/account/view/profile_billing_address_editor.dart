@@ -98,6 +98,7 @@ class _ProfileBillingAddressEditorState
         child: CustomerAddressForm(
           controllers: _controllers,
           countries: state.countries,
+          profileBilling: true,
         ),
       ),
     );
