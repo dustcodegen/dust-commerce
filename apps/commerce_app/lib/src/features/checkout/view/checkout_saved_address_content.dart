@@ -3,6 +3,8 @@ import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
+import 'checkout_radio_mark.dart';
+
 /// Greeting and source-shaped selector for usable saved addresses.
 final class CheckoutSavedAddressContent extends StatelessWidget {
   /// Creates saved-address content.
@@ -48,6 +50,7 @@ final class CheckoutSavedAddressContent extends StatelessWidget {
           isExpanded: true,
           itemHeight: null,
           menuMaxHeight: 320,
+          style: _savedAddressTextStyle,
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             enabledBorder: OutlineInputBorder(
@@ -105,19 +108,11 @@ final class _SavedAddressOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 16),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(
-              selected
-                  ? Icons.radio_button_checked
-                  : Icons.radio_button_unchecked,
-              size: 18,
-              color: selected
-                  ? StoreColors.interactive
-                  : StoreColors.foregroundMuted,
-            ),
+            CheckoutRadioMark(selected: selected),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -125,15 +120,24 @@ final class _SavedAddressOption extends StatelessWidget {
                 children: [
                   Text(
                     '${address.firstName} ${address.lastName}',
-                    style: const TextStyle(fontWeight: FontWeight.w600),
+                    style: _savedAddressNameStyle,
                   ),
-                  const SizedBox(height: 4),
-                  if (address.company case final company?) Text(company),
-                  Text('${address.line1}${_line2(address.line2)}'),
-                  Text('${address.postalCode}, ${address.city}'),
-                  Text(
-                    '${_province(address.province)}'
-                    '${address.countryCode.toUpperCase()}',
+                  if (address.company case final company?)
+                    Text(company, style: _savedAddressCompanyStyle),
+                  const SizedBox(height: 8),
+                  DefaultTextStyle(
+                    style: _savedAddressTextStyle,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('${address.line1}${_line2(address.line2)}'),
+                        Text('${address.postalCode}, ${address.city}'),
+                        Text(
+                          '${_province(address.province)}'
+                          '${address.countryCode.toUpperCase()}',
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -146,3 +150,17 @@ final class _SavedAddressOption extends StatelessWidget {
 
   static String _province(String? value) => value == null ? '' : '$value, ';
 }
+
+const _savedAddressCompanyStyle = TextStyle(fontSize: 12, height: 20 / 12);
+
+const _savedAddressNameStyle = TextStyle(
+  fontSize: 16,
+  height: 24 / 16,
+  fontWeight: FontWeight.w600,
+);
+
+const _savedAddressTextStyle = TextStyle(
+  color: StoreColors.foreground,
+  fontSize: 16,
+  height: 24 / 16,
+);
