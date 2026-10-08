@@ -4,6 +4,7 @@ import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
+import 'cart_preview_footer.dart';
 import 'cart_preview_line.dart';
 
 /// Source-sized contents of the desktop navigation cart popover.
@@ -104,53 +105,7 @@ class _PopulatedPreview extends StatelessWidget {
               itemCount: view.cart.items.length,
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      context.tr(
-                        'shop_cart_preview_subtotal',
-                        defaultText: 'Subtotal (excl. taxes)',
-                      ),
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    Text(
-                      formatMoney(view.subtotal),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton(
-                    onPressed: () {
-                      onClose();
-                      context.navigator.cart().go();
-                    },
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size.fromHeight(48),
-                      textStyle: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    child: const TranslatedText(
-                      'shop_cart_go_to_cart',
-                      defaultText: 'Go to cart',
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          CartPreviewFooter(subtotal: view.subtotal, onClose: onClose),
         ],
       );
 }
