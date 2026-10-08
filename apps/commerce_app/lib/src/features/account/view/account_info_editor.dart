@@ -65,7 +65,6 @@ class _AccountInfoEditorState extends State<AccountInfoEditor> {
                       widget.label.toUpperCase(),
                       style: _sourceTextSmall,
                     ),
-                    const SizedBox(height: 4),
                     DefaultTextStyle.merge(
                       style: _sourceTextSmall.copyWith(
                         fontWeight: FontWeight.w600,
