@@ -5,14 +5,21 @@ import 'package:flutter/material.dart';
 /// Source-shaped registration or sign-in verification notice.
 final class AccountVerificationNotice extends StatelessWidget {
   /// Creates the notice for a credential-proven [email].
-  const AccountVerificationNotice({required this.email, super.key});
+  const AccountVerificationNotice({
+    required this.email,
+    required this.bottomMargin,
+    super.key,
+  });
+
+  /// Space before the form that follows this notice.
+  final double bottomMargin;
 
   /// Normalized recipient returned by the registration flow.
   final String email;
 
   @override
   Widget build(BuildContext context) => Container(
-        margin: const EdgeInsets.only(bottom: 16),
+        margin: EdgeInsets.only(bottom: bottomMargin),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: StoreColors.subtle,

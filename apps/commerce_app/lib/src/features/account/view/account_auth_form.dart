@@ -104,7 +104,10 @@ class _AccountAuthFormState extends State<AccountAuthForm> {
                   ),
                   SizedBox(height: registering ? 16 : 32),
                   verificationEmail.match(
-                    some: (email) => AccountVerificationNotice(email: email),
+                    some: (email) => AccountVerificationNotice(
+                      email: email,
+                      bottomMargin: registering ? 16 : 24,
+                    ),
                     none: SizedBox.shrink,
                   ),
                   _AccountFormFields(
