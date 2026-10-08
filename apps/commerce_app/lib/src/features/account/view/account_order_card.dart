@@ -146,7 +146,7 @@ final class _OrderMetaDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
         width: 1,
-        height: 16,
+        height: 20,
         color: StoreColors.border,
       );
 }
