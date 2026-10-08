@@ -57,11 +57,22 @@ class CartPreviewLine extends StatelessWidget {
                           item.title,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            height: 24 / 14,
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Text(formatMoney(item.subtotal)),
+                    Text(
+                      formatMoney(item.subtotal),
+                      style: const TextStyle(
+                        color: StoreColors.foregroundSubtle,
+                        fontSize: 14,
+                        height: 24 / 14,
+                      ),
+                    ),
                   ],
                 ),
                 if (item.variantTitle case final title?)
@@ -75,6 +86,8 @@ class CartPreviewLine extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: StoreColors.foregroundSubtle,
+                      fontSize: 14,
+                      height: 20 / 14,
                     ),
                   ),
                 Text(
@@ -83,6 +96,7 @@ class CartPreviewLine extends StatelessWidget {
                     defaultText: 'Quantity: {count}',
                     args: {'count': item.quantity},
                   ),
+                  style: const TextStyle(fontSize: 14, height: 20 / 14),
                 ),
                 const Spacer(),
                 TextButton.icon(
@@ -100,9 +114,11 @@ class CartPreviewLine extends StatelessWidget {
                     defaultText: 'Remove',
                   ),
                   style: TextButton.styleFrom(
+                    foregroundColor: StoreColors.foregroundSubtle,
                     padding: EdgeInsets.zero,
                     minimumSize: const Size(0, 20),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    textStyle: const TextStyle(fontSize: 12, height: 20 / 12),
                   ),
                 ),
               ],
