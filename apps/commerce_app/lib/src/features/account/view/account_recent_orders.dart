@@ -109,7 +109,10 @@ final class _RecentOrderCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Icon(Icons.chevron_right, size: 20),
+                  const RotatedBox(
+                    quarterTurns: 3,
+                    child: Icon(Icons.keyboard_arrow_down, size: 16),
+                  ),
                 ],
               ),
             ),
