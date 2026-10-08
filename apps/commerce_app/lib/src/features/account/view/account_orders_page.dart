@@ -100,7 +100,7 @@ class _OrdersContent extends StatelessWidget {
                     if (index < state.orders.length - 1) ...[
                       const SizedBox(height: 24),
                       const Divider(),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 32),
                     ],
                   ],
                 ],
