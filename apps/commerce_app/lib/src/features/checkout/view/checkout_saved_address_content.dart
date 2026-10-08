@@ -37,12 +37,15 @@ final class CheckoutSavedAddressContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(context.tr(
-          'shop_checkout_saved_address_prompt',
-          defaultText:
-              'Hi {name}, do you want to use one of your saved addresses?',
-          args: {'name': _greetingName},
-        )),
+        Text(
+          context.tr(
+            'shop_checkout_saved_address_prompt',
+            defaultText:
+                'Hi {name}, do you want to use one of your saved addresses?',
+            args: {'name': _greetingName},
+          ),
+          style: _savedAddressCompanyStyle,
+        ),
         const SizedBox(height: 16),
         DropdownButtonFormField<String>(
           key: ValueKey(selected),
