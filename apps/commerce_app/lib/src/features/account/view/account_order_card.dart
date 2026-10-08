@@ -81,7 +81,7 @@ class AccountOrderCard extends StatelessWidget {
           const SizedBox(height: 16),
           LayoutBuilder(
             builder: (context, constraints) {
-              final columns = constraints.maxWidth >= 640 ? 4 : 2;
+              final columns = constraints.maxWidth >= 1024 ? 4 : 2;
               final tileWidth =
                   (constraints.maxWidth - (columns - 1) * 16) / columns;
               return Wrap(
