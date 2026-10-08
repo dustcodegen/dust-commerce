@@ -152,9 +152,9 @@ final class _CheckoutTotals extends StatelessWidget {
             ),
             money: view.tax,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           const Divider(),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           CheckoutTotalRow(
             label: context.tr(
               'shop_checkout_total',
@@ -163,6 +163,7 @@ final class _CheckoutTotals extends StatelessWidget {
             money: view.total,
             strong: true,
           ),
+          const SizedBox(height: 8),
           const SizedBox(height: 16),
           const Divider(),
         ],
