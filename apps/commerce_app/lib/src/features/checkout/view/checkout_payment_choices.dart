@@ -3,6 +3,7 @@ import 'package:commerce_app/route.dart';
 import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
+import 'checkout_error_message.dart';
 import 'checkout_payment_choice.dart';
 import 'checkout_primary_action.dart';
 
@@ -21,8 +22,7 @@ final class CheckoutPaymentChoices extends StatelessWidget {
           if (!state.paymentProvidersLoaded && state.isBusy)
             const Center(child: CircularProgressIndicator())
           else if (!state.paymentProvidersLoaded) ...[
-            if (state.message != null)
-              Text(state.message!, style: const TextStyle(color: Colors.red)),
+            if (state.message != null) CheckoutErrorMessage(state.message!),
             const SizedBox(height: 12),
             Align(
               alignment: Alignment.centerLeft,
@@ -49,8 +49,7 @@ final class CheckoutPaymentChoices extends StatelessWidget {
               ),
               const SizedBox(height: 8),
             ],
-            if (state.message != null)
-              Text(state.message!, style: const TextStyle(color: Colors.red)),
+            if (state.message != null) CheckoutErrorMessage(state.message!),
             const SizedBox(height: 24),
             Align(
               alignment: Alignment.centerLeft,

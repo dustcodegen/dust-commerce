@@ -5,6 +5,7 @@ import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
 import 'checkout_delivery_choice.dart';
+import 'checkout_error_message.dart';
 import 'checkout_primary_action.dart';
 
 /// Expanded server-priced delivery choices and progression action.
@@ -66,8 +67,7 @@ final class CheckoutDeliveryChoices extends StatelessWidget {
             ],
           if (state.status == CheckoutStatus.failed &&
               state.operation == CheckoutOperation.delivery) ...[
-            const SizedBox(height: 8),
-            Text(state.message!, style: const TextStyle(color: Colors.red)),
+            CheckoutErrorMessage(state.message!),
             const SizedBox(height: 8),
             Align(
               alignment: Alignment.centerLeft,
