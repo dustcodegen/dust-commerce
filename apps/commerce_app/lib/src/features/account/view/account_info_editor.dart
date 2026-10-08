@@ -1,6 +1,8 @@
 import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
+const _sourceTextSmall = TextStyle(fontSize: 12, height: 20 / 12);
+
 /// Expandable account-information editor translated from Medusa AccountInfo.
 final class AccountInfoEditor extends StatefulWidget {
   /// Creates one editable account-information row.
@@ -61,11 +63,13 @@ class _AccountInfoEditorState extends State<AccountInfoEditor> {
                   children: [
                     Text(
                       widget.label.toUpperCase(),
-                      style: const TextStyle(fontSize: 12),
+                      style: _sourceTextSmall,
                     ),
                     const SizedBox(height: 4),
                     DefaultTextStyle.merge(
-                      style: const TextStyle(fontWeight: FontWeight.w600),
+                      style: _sourceTextSmall.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
                       child: widget.currentInfo,
                     ),
                   ],
@@ -78,6 +82,7 @@ class _AccountInfoEditorState extends State<AccountInfoEditor> {
                   style: OutlinedButton.styleFrom(
                     minimumSize: const Size(100, 25),
                     padding: const EdgeInsets.symmetric(vertical: 4),
+                    textStyle: _sourceTextSmall,
                   ),
                   child: Text(
                     _open
@@ -119,6 +124,11 @@ class _AccountInfoEditorState extends State<AccountInfoEditor> {
                                   : 140,
                               child: FilledButton(
                                 onPressed: widget.busy ? null : _save,
+                                style: FilledButton.styleFrom(
+                                  textStyle: _sourceTextSmall.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
                                 child: widget.busy
                                     ? const SizedBox.square(
                                         dimension: 16,
@@ -180,6 +190,7 @@ final class _StatusBadge extends StatelessWidget {
           style: TextStyle(
             color: success ? const Color(0xff166534) : const Color(0xffbe123c),
             fontSize: 12,
+            height: 20 / 12,
           ),
         ),
       );
