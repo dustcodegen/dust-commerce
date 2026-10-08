@@ -31,12 +31,25 @@ final class MobileAccountNavigation extends StatelessWidget {
     if (active != AccountSection.overview) {
       return Align(
         alignment: Alignment.centerLeft,
-        child: TextButton.icon(
+        child: TextButton(
           onPressed: () => context.navigator.account().go(),
-          icon: const Icon(Icons.chevron_left, size: 18),
-          label: const TranslatedText(
-            'shop_account_title',
-            defaultText: 'Account',
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            minimumSize: Size.zero,
+            foregroundColor: StoreColors.foreground,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            textStyle: const TextStyle(fontSize: 12, height: 20 / 12),
+          ),
+          child: const Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.keyboard_arrow_left, size: 16),
+              SizedBox(width: 8),
+              TranslatedText(
+                'shop_account_title',
+                defaultText: 'Account',
+              ),
+            ],
           ),
         ),
       );
@@ -52,7 +65,11 @@ final class MobileAccountNavigation extends StatelessWidget {
               defaultText: 'Hello {name}',
               args: {'name': customer.firstName ?? customer.displayName},
             ),
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontSize: 20,
+              height: 28 / 20,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
         const SizedBox(height: 16),
