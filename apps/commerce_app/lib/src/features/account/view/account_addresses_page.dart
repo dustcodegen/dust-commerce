@@ -87,7 +87,7 @@ final class _AddressBookContent extends StatelessWidget {
             ],
             LayoutBuilder(
               builder: (context, constraints) {
-                final twoColumns = constraints.maxWidth >= 720;
+                final twoColumns = constraints.maxWidth >= 1024;
                 final width = twoColumns
                     ? (constraints.maxWidth - 16) / 2
                     : constraints.maxWidth;
