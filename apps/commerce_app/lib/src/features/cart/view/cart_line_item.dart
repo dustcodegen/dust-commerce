@@ -57,13 +57,27 @@ class CartLineItem extends StatelessWidget {
                 ),
               ),
               if (wide)
-                SizedBox(width: 80, child: Text(formatMoney(item.unitPrice))),
+                SizedBox(
+                  width: 80,
+                  child: Text(
+                    formatMoney(item.unitPrice),
+                    style: const TextStyle(
+                      color: StoreColors.foregroundMuted,
+                      fontSize: 14,
+                      height: 24 / 14,
+                    ),
+                  ),
+                ),
               SizedBox(
                 width: 88,
                 child: Text(
                   formatMoney(item.subtotal),
                   textAlign: TextAlign.right,
-                  style: const TextStyle(fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                    color: StoreColors.foregroundSubtle,
+                    fontSize: 14,
+                    height: 24 / 14,
+                  ),
                 ),
               ),
             ],
