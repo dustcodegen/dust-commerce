@@ -39,7 +39,7 @@ class ProductInfo extends StatelessWidget {
                 product.title,
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                       fontSize: 32,
-                      height: 4 / 3,
+                      height: 40 / 32,
                       fontWeight: FontWeight.w600,
                     ),
               ),
