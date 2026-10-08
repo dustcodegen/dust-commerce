@@ -76,7 +76,7 @@ final class _AddressBookContent extends StatelessWidget {
                 'available during checkout.',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 48),
           if (state.status == AddressBookStatus.loading &&
               state.addresses.isEmpty)
             const Center(child: CircularProgressIndicator())
