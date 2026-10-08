@@ -32,6 +32,7 @@ class ListingCategoryFilters extends StatelessWidget {
             style: TextStyle(
               color: StoreColors.foregroundSubtle,
               fontSize: 12,
+              height: 20 / 12,
               fontWeight: FontWeight.w600,
             ),
           ),

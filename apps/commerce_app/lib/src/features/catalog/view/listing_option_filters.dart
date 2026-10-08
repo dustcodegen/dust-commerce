@@ -117,6 +117,7 @@ class _OptionGroup extends StatelessWidget {
                           style: const TextStyle(
                             color: StoreColors.foreground,
                             fontSize: 12,
+                            height: 20 / 12,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -127,6 +128,7 @@ class _OptionGroup extends StatelessWidget {
                         style: const TextStyle(
                           color: StoreColors.foregroundMuted,
                           fontSize: 12,
+                          height: 20 / 12,
                           fontWeight: FontWeight.w600,
                         ),
                       ),

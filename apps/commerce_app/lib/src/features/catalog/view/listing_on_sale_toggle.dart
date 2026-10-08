@@ -49,6 +49,7 @@ class ListingOnSaleToggle extends StatelessWidget {
             style: TextStyle(
               color: StoreColors.foregroundSubtle,
               fontSize: 12,
+              height: 20 / 12,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -58,6 +59,7 @@ class ListingOnSaleToggle extends StatelessWidget {
             style: const TextStyle(
               color: StoreColors.foregroundMuted,
               fontSize: 12,
+              height: 20 / 12,
             ),
           ),
         ],

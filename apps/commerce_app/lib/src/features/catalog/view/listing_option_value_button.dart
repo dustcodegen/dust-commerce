@@ -38,7 +38,7 @@ class ListingOptionValueButton extends StatelessWidget {
             ),
             foregroundColor:
                 selected ? StoreColors.foreground : StoreColors.foregroundMuted,
-            textStyle: const TextStyle(fontSize: 14),
+            textStyle: const TextStyle(fontSize: 12, height: 20 / 12),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,

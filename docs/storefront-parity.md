@@ -91,9 +91,9 @@ value chips include the source count treatment, e.g. `Black (3)`, and the
 on-sale toggle carries the same muted count treatment. Option
 discovery is intentionally non-fatal, while collection and category routes
 retain incoming selections but hide the picker exactly as the source templates
-do. Category and label checkbox rows keep the source top checkbox offset and
-12px/20px text rhythm. Sort radio rows keep the current Medusa
-`FilterRadioGroup` compact 20px text line box for the title and labels.
+do. Store refinement titles, counts, option chips, category and label checkbox
+rows, and sort radio rows keep the source compact 12px/20px text rhythm; the
+category and label checkbox controls also keep the source top offset.
 
 Store search was browser-verified on 2026-09-26 against commit `d89bed8` using
 a fresh seeded SQLite database and the live Store on `127.0.0.1:13001`. The nav
