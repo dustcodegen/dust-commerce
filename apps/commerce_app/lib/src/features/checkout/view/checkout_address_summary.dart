@@ -11,34 +11,43 @@ final class CheckoutAddressSummary extends StatelessWidget {
   final CheckoutState state;
 
   @override
-  Widget build(BuildContext context) => Wrap(
-        spacing: 32,
-        runSpacing: 24,
+  Widget build(BuildContext context) => Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SummaryColumn(
-            title: context.tr(
-              'shop_checkout_shipping_address',
-              defaultText: 'Shipping Address',
+          Expanded(
+            child: _SummaryColumn(
+              title: context.tr(
+                'shop_checkout_shipping_address',
+                defaultText: 'Shipping Address',
+              ),
+              lines: _addressLines(state.shipping),
             ),
-            lines: _addressLines(state.shipping),
           ),
-          _SummaryColumn(
-            title: context.tr('shop_checkout_contact', defaultText: 'Contact'),
-            lines: [state.shipping.phone, state.email],
-          ),
-          _SummaryColumn(
-            title: context.tr(
-              'shop_checkout_billing_address',
-              defaultText: 'Billing Address',
+          const SizedBox(width: 4),
+          Expanded(
+            child: _SummaryColumn(
+              title:
+                  context.tr('shop_checkout_contact', defaultText: 'Contact'),
+              lines: [state.shipping.phone, state.email],
             ),
-            lines: state.sameAsBilling
-                ? [
-                    context.tr(
-                      'shop_checkout_same_billing_summary',
-                      defaultText: 'Billing and delivery address are the same.',
-                    ),
-                  ]
-                : _addressLines(state.billing),
+          ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: _SummaryColumn(
+              title: context.tr(
+                'shop_checkout_billing_address',
+                defaultText: 'Billing Address',
+              ),
+              lines: state.sameAsBilling
+                  ? [
+                      context.tr(
+                        'shop_checkout_same_billing_summary',
+                        defaultText:
+                            'Billing and delivery address are the same.',
+                      ),
+                    ]
+                  : _addressLines(state.billing),
+            ),
           ),
         ],
       );
@@ -58,19 +67,25 @@ final class _SummaryColumn extends StatelessWidget {
   final String title;
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-        width: 180,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 4),
-            for (final line in lines.where((line) => line.isNotEmpty))
-              Text(line,
-                  style: const TextStyle(
-                    color: StoreColors.foregroundSubtle,
-                  )),
-          ],
-        ),
+  Widget build(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: _addressSummaryTitleStyle),
+          const SizedBox(height: 4),
+          for (final line in lines.where((line) => line.isNotEmpty))
+            Text(line, style: _addressSummaryValueStyle),
+        ],
       );
 }
+
+const _addressSummaryTitleStyle = TextStyle(
+  fontSize: 14,
+  height: 20 / 14,
+  fontWeight: FontWeight.w600,
+);
+
+const _addressSummaryValueStyle = TextStyle(
+  color: StoreColors.foregroundSubtle,
+  fontSize: 14,
+  height: 20 / 14,
+);
