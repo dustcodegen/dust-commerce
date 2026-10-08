@@ -14,7 +14,7 @@ class StorePage extends StatelessWidget {
   const StorePage({
     this.page = 1,
     this.q = '',
-    this.sortBy = 'created_at',
+    this.sortBy = 'relevance',
     this.optionValueIds = const [],
     this.category = const [],
     this.labels = const [],

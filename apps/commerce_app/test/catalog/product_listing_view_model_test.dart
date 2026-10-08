@@ -86,6 +86,12 @@ void main() {
     expect(viewModel.state.products.first.title, 'T-Shirt');
   });
 
+  test('store defaults to current Medusa relevance sort', () async {
+    await viewModel.loadStore();
+
+    expect(viewModel.state.sortBy, 'relevance');
+  });
+
   test('currency is part of the listing request identity', () async {
     await viewModel.loadCollection('summer');
     final usdKey = viewModel.state.requestKey;

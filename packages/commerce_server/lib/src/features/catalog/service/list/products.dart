@@ -14,7 +14,7 @@ Future<Result<ProductPageResponse, SqlxError>> listProducts(
   Option<String> collection = const None(),
   List<String> categoryHandles = const [],
   List<String> labels = const [],
-  String sortBy = 'created_at',
+  String sortBy = 'relevance',
   Option<int> minPrice = const None(),
   Option<int> maxPrice = const None(),
   bool onSale = false,

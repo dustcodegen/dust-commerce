@@ -51,6 +51,7 @@ void main() {
   });
 
   test('generated listing routes retain sort and page queries', () {
+    const defaultStore = StoreRoute();
     final store = parseCommerceRoute(
       Uri.parse(
         '/store?page=2&sortBy=price_asc&optionValueIds=small&optionValueIds=blue&category=shirts&labels=Cotton&minPrice=100&maxPrice=2000',
@@ -65,6 +66,7 @@ void main() {
       Uri.parse('/categories/clothing%2Fshirts?page=3'),
     );
 
+    expect(defaultStore.location, '/store');
     expect(store, isA<StoreRoute>());
     expect(
       store.location,

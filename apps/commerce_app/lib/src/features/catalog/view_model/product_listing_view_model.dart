@@ -35,7 +35,7 @@ class ProductListingViewModel extends $ProductListingViewModel {
   /// Loads the source `/store` route.
   Future<void> loadStore({
     int page = 1,
-    String sortBy = 'created_at',
+    String sortBy = 'relevance',
     String query = '',
     List<String> optionValueIds = const [],
     List<String> categoryHandles = const [],

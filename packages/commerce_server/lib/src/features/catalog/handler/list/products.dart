@@ -49,7 +49,7 @@ Future<Result<ProductPageResponse, Rejection>> listProductsHandler(
 Result<String, Rejection> _sortOf(Request request) {
   final value = switch (queryOptionOf(request, 'sortBy')) {
     Some(:final value) => value,
-    None() => 'created_at',
+    None() => 'relevance',
   };
   if (const {
     'relevance',

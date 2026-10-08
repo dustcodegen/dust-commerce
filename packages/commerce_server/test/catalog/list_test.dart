@@ -111,6 +111,8 @@ void main() {
     });
 
     test('sorts before paging through the Store API order values', () async {
+      expect(
+          ok(await list(limit: 1, sortBy: 'relevance')).single.handle, 'mug');
       expect(ok(await list(limit: 1, sortBy: 'title_desc')).single.handle,
           't-shirt');
       expect(
