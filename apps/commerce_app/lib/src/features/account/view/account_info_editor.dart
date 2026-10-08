@@ -181,14 +181,15 @@ final class _StatusBadge extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 16),
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: success ? const Color(0xfff0fdf4) : const Color(0xfffff1f2),
-          borderRadius: BorderRadius.circular(6),
+          color: success ? const Color(0xffdcfce7) : const Color(0xfffee2e2),
+          borderRadius: BorderRadius.circular(999),
         ),
         child: Text(
           message,
           style: TextStyle(
-            color: success ? const Color(0xff166534) : const Color(0xffbe123c),
+            color: success ? const Color(0xff15803d) : const Color(0xffb91c1c),
             fontSize: 12,
+            fontWeight: FontWeight.w500,
             height: 20 / 12,
           ),
         ),
