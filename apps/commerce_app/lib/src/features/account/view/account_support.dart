@@ -30,7 +30,7 @@ class AccountSupport extends StatelessWidget {
             defaultText: 'You can find frequently asked questions and '
                 'answers on our customer service page.',
           ),
-          style: const TextStyle(fontSize: 16, height: 1.5),
+          style: const TextStyle(fontSize: 14, height: 20 / 14),
         ),
       ],
     );
