@@ -99,11 +99,7 @@ final class CheckoutAddressForm extends StatelessWidget {
                 const TranslatedText(
                   'shop_checkout_billing_address',
                   defaultText: 'Billing address',
-                  style: TextStyle(
-                    fontSize: 24,
-                    height: 1.5,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: _billingAddressHeadingStyle,
                 ),
                 const SizedBox(height: 24),
                 CheckoutAddressFields(
@@ -135,3 +131,8 @@ final class CheckoutAddressForm extends StatelessWidget {
         ),
       );
 }
+
+const _billingAddressHeadingStyle = TextStyle(
+  fontSize: 32,
+  height: 44 / 32,
+);
