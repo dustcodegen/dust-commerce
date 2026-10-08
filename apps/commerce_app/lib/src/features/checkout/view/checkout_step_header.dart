@@ -40,9 +40,8 @@ final class CheckoutStepHeader extends StatelessWidget {
                       child: Text(
                         title,
                         style: const TextStyle(
-                          fontSize: 24,
-                          height: 1.5,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 32,
+                          height: 44 / 32,
                         ),
                       ),
                     ),
