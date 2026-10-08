@@ -4,7 +4,11 @@ import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
-const _orderCardMetaStyle = TextStyle(fontSize: 12);
+const _orderCardSmallStyle = TextStyle(
+  fontSize: 12,
+  height: 20 / 12,
+  color: StoreColors.foreground,
+);
 
 /// Source-shaped summary for one completed or pending customer order.
 class AccountOrderCard extends StatelessWidget {
@@ -34,12 +38,12 @@ class AccountOrderCard extends StatelessWidget {
                   MaterialLocalizations.of(context),
                   order.placedAt,
                 ),
-                style: _orderCardMetaStyle,
+                style: _orderCardSmallStyle,
               ),
               const SizedBox(width: 8),
               const _OrderMetaDivider(),
               const SizedBox(width: 8),
-              Text(formatMoney(order.total), style: _orderCardMetaStyle),
+              Text(formatMoney(order.total), style: _orderCardSmallStyle),
               const SizedBox(width: 8),
               const _OrderMetaDivider(),
               const SizedBox(width: 8),
@@ -55,7 +59,7 @@ class AccountOrderCard extends StatelessWidget {
                         defaultText: '{count} items',
                         args: {'count': order.itemCount},
                       ),
-                style: _orderCardMetaStyle,
+                style: _orderCardSmallStyle,
               ),
             ],
           ),
@@ -90,7 +94,7 @@ class AccountOrderCard extends StatelessWidget {
                             ]),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 12),
+                            style: _orderCardSmallStyle,
                           ),
                         ],
                       ),
@@ -105,12 +109,12 @@ class AccountOrderCard extends StatelessWidget {
                           children: [
                             Text(
                               '+ ${order.itemCount - 4}',
-                              style: const TextStyle(fontSize: 12),
+                              style: _orderCardSmallStyle,
                             ),
                             const TranslatedText(
                               'shop_more',
                               defaultText: 'more',
-                              style: TextStyle(fontSize: 12),
+                              style: _orderCardSmallStyle,
                             ),
                           ],
                         ),
