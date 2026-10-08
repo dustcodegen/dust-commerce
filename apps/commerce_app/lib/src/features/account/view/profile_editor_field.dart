@@ -34,16 +34,25 @@ final class ProfileEditorField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const border = OutlineInputBorder(
+      borderRadius: BorderRadius.all(Radius.circular(6)),
+      borderSide: BorderSide(color: StoreColors.border),
+    );
     final field = TextFormField(
       controller: controller,
       obscureText: obscureText,
       autofillHints: autofillHints,
       validator: validator,
+      style: const TextStyle(fontSize: 14, height: 20 / 14),
       decoration: InputDecoration(
         labelText: '$label *',
         filled: true,
-        fillColor: StoreColors.subtle,
-        border: const OutlineInputBorder(),
+        fillColor: StoreColors.base,
+        border: border,
+        enabledBorder: border,
+        focusedBorder: border.copyWith(
+          borderSide: const BorderSide(color: StoreColors.foreground),
+        ),
       ),
     );
     return width == null ? field : SizedBox(width: width, child: field);
