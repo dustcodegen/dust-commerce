@@ -96,6 +96,7 @@ class _AddressEditorDialogState extends State<AddressEditorDialog> {
                 ],
                 const SizedBox(height: 24),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     OutlinedButton(
                       onPressed: state.isBusy
