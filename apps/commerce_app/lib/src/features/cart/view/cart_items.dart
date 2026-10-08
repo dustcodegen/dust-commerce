@@ -63,6 +63,7 @@ class _CartHeader extends StatelessWidget {
     const style = TextStyle(
       color: StoreColors.foregroundSubtle,
       fontSize: 14,
+      height: 20 / 14,
       fontWeight: FontWeight.w500,
     );
     return Container(
