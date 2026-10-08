@@ -3,6 +3,8 @@ import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
+const _sourceTextSmall = TextStyle(fontSize: 12, height: 20 / 12);
+
 /// Honest read-only rendering of the customer's sign-in email.
 final class ProfileEmailInfo extends StatelessWidget {
   /// Creates email information for [customer].
@@ -23,12 +25,13 @@ final class ProfileEmailInfo extends StatelessWidget {
                   context
                       .tr('shop_account_email', defaultText: 'Email')
                       .toUpperCase(),
-                  style: const TextStyle(fontSize: 12),
+                  style: _sourceTextSmall,
                 ),
-                const SizedBox(height: 4),
                 Text(
                   customer.email,
-                  style: const TextStyle(fontWeight: FontWeight.w600),
+                  style: _sourceTextSmall.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ],
             ),
@@ -38,9 +41,8 @@ final class ProfileEmailInfo extends StatelessWidget {
               'shop_account_sign_in_email',
               defaultText: 'Sign-in email',
             ),
-            style: const TextStyle(
+            style: _sourceTextSmall.copyWith(
               color: StoreColors.foregroundMuted,
-              fontSize: 12,
             ),
           ),
         ],
