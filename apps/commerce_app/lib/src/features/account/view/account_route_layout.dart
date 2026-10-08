@@ -31,10 +31,15 @@ final class AccountRouteLayout extends StatelessWidget {
   final AccountState state;
 
   @override
-  Widget build(BuildContext context) => SingleChildScrollView(
-        child: Column(
-          children: [
-            Center(
+  Widget build(BuildContext context) {
+    final desktop = MediaQuery.sizeOf(context).width >= 1024;
+
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: desktop ? 48 : 0),
+            child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 1040),
                 child: Padding(
@@ -43,7 +48,7 @@ final class AccountRouteLayout extends StatelessWidget {
                     children: [
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 48),
-                        child: MediaQuery.sizeOf(context).width >= 1024
+                        child: desktop
                             ? Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -72,8 +77,7 @@ final class AccountRouteLayout extends StatelessWidget {
                                 ],
                               ),
                       ),
-                      if (MediaQuery.sizeOf(context).width >= 1024)
-                        const Divider(),
+                      if (desktop) const Divider(),
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 48),
                         child: AccountSupport(),
@@ -83,8 +87,10 @@ final class AccountRouteLayout extends StatelessWidget {
                 ),
               ),
             ),
-            const StoreFooter(),
-          ],
-        ),
-      );
+          ),
+          const StoreFooter(),
+        ],
+      ),
+    );
+  }
 }
