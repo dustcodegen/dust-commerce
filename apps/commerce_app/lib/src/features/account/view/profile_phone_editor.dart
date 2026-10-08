@@ -4,6 +4,7 @@ import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
 import 'account_info_editor.dart';
+import 'profile_editor_field.dart';
 
 /// Editable customer phone translated from Medusa ProfilePhone.
 final class ProfilePhoneEditor extends StatefulWidget {
@@ -18,6 +19,7 @@ final class ProfilePhoneEditor extends StatefulWidget {
 }
 
 class _ProfilePhoneEditorState extends State<ProfilePhoneEditor> {
+  final _formKey = GlobalKey<FormState>();
   late final TextEditingController _phone;
 
   @override
@@ -55,23 +57,32 @@ class _ProfilePhoneEditorState extends State<ProfilePhoneEditor> {
           ? state.message
           : null,
       onSave: _save,
-      editor: TextFormField(
-        controller: _phone,
-        keyboardType: TextInputType.phone,
-        autofillHints: const [AutofillHints.telephoneNumber],
-        decoration: InputDecoration(
-          labelText: context.tr('shop_account_phone', defaultText: 'Phone'),
-          filled: true,
-          fillColor: StoreColors.subtle,
-          border: const OutlineInputBorder(),
+      editor: Form(
+        key: _formKey,
+        child: ProfileEditorField(
+          controller: _phone,
+          label: context.tr('shop_account_phone', defaultText: 'Phone'),
+          autofillHints: const [AutofillHints.telephoneNumber],
+          validator: (value) => _required(context, value),
         ),
       ),
     );
   }
 
-  Future<bool> _save() => context.readAccountViewModel().updateProfile(
-        firstName: widget.customer.firstName ?? '',
-        lastName: widget.customer.lastName ?? '',
-        phone: _phone.text,
-      );
+  String? _required(BuildContext context, String? value) =>
+      value == null || value.trim().isEmpty
+          ? context.tr(
+              'shop_account_required',
+              defaultText: 'This field is required.',
+            )
+          : null;
+
+  Future<bool> _save() async {
+    if (!_formKey.currentState!.validate()) return false;
+    return context.readAccountViewModel().updateProfile(
+          firstName: widget.customer.firstName ?? '',
+          lastName: widget.customer.lastName ?? '',
+          phone: _phone.text,
+        );
+  }
 }
