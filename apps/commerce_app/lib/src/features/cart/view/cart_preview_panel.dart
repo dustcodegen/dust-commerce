@@ -125,18 +125,23 @@ class _EmptyPreview extends StatelessWidget {
               height: 24,
               alignment: Alignment.center,
               decoration: const BoxDecoration(
-                color: StoreColors.inverted,
+                color: Color(0xff111827),
                 shape: BoxShape.circle,
               ),
               child: Text(
                 0.toString(),
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  height: 20 / 12,
+                ),
               ),
             ),
             const SizedBox(height: 16),
             const TranslatedText(
               'shop_cart_preview_empty',
               defaultText: 'Your shopping bag is empty.',
+              style: TextStyle(fontSize: 16, height: 24 / 16),
             ),
             const SizedBox(height: 16),
             FilledButton(
