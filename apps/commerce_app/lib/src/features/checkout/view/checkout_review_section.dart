@@ -38,7 +38,7 @@ final class CheckoutReviewSection extends StatelessWidget {
                   'have read, understand and accept our Terms of Use, Terms of '
                   'Sale and Returns Policy and acknowledge that you have read '
                   "Morrow's Privacy Policy.",
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: _reviewTermsStyle,
             ),
             if (state.status == CheckoutStatus.failed &&
                 state.operation == CheckoutOperation.place) ...[
@@ -67,3 +67,9 @@ final class CheckoutReviewSection extends StatelessWidget {
     context.navigator.orderConfirmed(id: checkout.state.order!.id).go();
   }
 }
+
+const _reviewTermsStyle = TextStyle(
+  fontSize: 14,
+  height: 20 / 14,
+  fontWeight: FontWeight.w600,
+);
