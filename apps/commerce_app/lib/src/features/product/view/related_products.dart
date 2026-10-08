@@ -26,7 +26,11 @@ class RelatedProducts extends StatelessWidget {
               const TranslatedText(
                 'shop_related_products',
                 defaultText: 'Related products',
-                style: TextStyle(color: StoreColors.foregroundSubtle),
+                style: TextStyle(
+                  color: StoreColors.foregroundSubtle,
+                  fontSize: 16,
+                  height: 24 / 16,
+                ),
               ),
               const SizedBox(height: 24),
               ConstrainedBox(
@@ -36,7 +40,7 @@ class RelatedProducts extends StatelessWidget {
                   defaultText:
                       'You might also want to check out these products.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 24, height: 1.5),
+                  style: TextStyle(fontSize: 30, height: 48 / 30),
                 ),
               ),
               const SizedBox(height: 64),
