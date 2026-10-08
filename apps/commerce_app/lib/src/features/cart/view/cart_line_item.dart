@@ -174,7 +174,7 @@ class _LineIdentity extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
-                color: StoreColors.foregroundMuted,
+                color: StoreColors.foregroundSubtle,
                 fontSize: 14,
                 height: 20 / 14,
               ),
