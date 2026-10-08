@@ -20,7 +20,11 @@ class AccountOrderCard extends StatelessWidget {
         children: [
           Text(
             '#${order.displayId}',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+              fontSize: 16,
+              height: 24 / 16,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 4),
           Row(

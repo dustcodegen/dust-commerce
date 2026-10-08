@@ -140,7 +140,11 @@ class _EmptyOrders extends StatelessWidget {
           const TranslatedText(
             'shop_account_orders_empty_title',
             defaultText: 'Nothing to see here',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 16,
+              height: 24 / 16,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 16),
           const TranslatedText(
