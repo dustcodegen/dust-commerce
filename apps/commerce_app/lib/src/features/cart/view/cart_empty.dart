@@ -17,10 +17,16 @@ class CartEmpty extends StatelessWidget {
                 constraints: const BoxConstraints(maxWidth: 1440),
                 child: const Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 192,
+                    horizontal: 24,
+                    vertical: 48,
                   ),
-                  child: _CartEmptyContent(),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 192,
+                    ),
+                    child: _CartEmptyContent(),
+                  ),
                 ),
               ),
             ),
