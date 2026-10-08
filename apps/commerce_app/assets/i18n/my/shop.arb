@@ -727,9 +727,13 @@
       }
     }
   },
-  "cart_preview_subtotal": "အခွန်မပါ ကြားဖြတ်စုစုပေါင်း",
-  "@cart_preview_subtotal": {
-    "description": "Goods subtotal label in the navigation cart preview."
+  "cart_preview_subtotal_label": "ကြားဖြတ်စုစုပေါင်း ",
+  "@cart_preview_subtotal_label": {
+    "description": "Semibold goods subtotal label in the navigation cart preview."
+  },
+  "cart_preview_subtotal_tax_note": "(အခွန်မပါ)",
+  "@cart_preview_subtotal_tax_note": {
+    "description": "Normal-weight tax note after the navigation cart preview subtotal label."
   },
   "cart_price": "ဈေးနှုန်း",
   "@cart_price": {

@@ -727,9 +727,13 @@
       }
     }
   },
-  "cart_preview_subtotal": "Subtotal (excl. taxes)",
-  "@cart_preview_subtotal": {
-    "description": "Goods subtotal label in the navigation cart preview."
+  "cart_preview_subtotal_label": "Subtotal ",
+  "@cart_preview_subtotal_label": {
+    "description": "Semibold goods subtotal label in the navigation cart preview."
+  },
+  "cart_preview_subtotal_tax_note": "(excl. taxes)",
+  "@cart_preview_subtotal_tax_note": {
+    "description": "Normal-weight tax note after the navigation cart preview subtotal label."
   },
   "cart_price": "Price",
   "@cart_price": {

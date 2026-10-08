@@ -27,10 +27,21 @@ class CartPreviewFooter extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  context.tr(
-                    'shop_cart_preview_subtotal',
-                    defaultText: 'Subtotal (excl. taxes)',
+                Text.rich(
+                  TextSpan(
+                    text: context.tr(
+                      'shop_cart_preview_subtotal_label',
+                      defaultText: 'Subtotal ',
+                    ),
+                    children: [
+                      TextSpan(
+                        text: context.tr(
+                          'shop_cart_preview_subtotal_tax_note',
+                          defaultText: '(excl. taxes)',
+                        ),
+                        style: const TextStyle(fontWeight: FontWeight.w400),
+                      ),
+                    ],
                   ),
                   style: const TextStyle(
                     fontSize: 12,
