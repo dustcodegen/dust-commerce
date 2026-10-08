@@ -20,10 +20,14 @@ class _AccountFormActions extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (error case final message?) ...[
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Text(
               message,
-              style: const TextStyle(color: Colors.redAccent),
+              style: const TextStyle(
+                color: StoreColors.rose,
+                fontSize: 12,
+                height: 20 / 12,
+              ),
             ),
           ],
           if (registering) ...[
