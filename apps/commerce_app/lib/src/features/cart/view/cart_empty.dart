@@ -52,7 +52,7 @@ class _CartEmptyContent extends StatelessWidget {
                 defaultText: "You don't have anything in your cart. Let's "
                     'change that, use the link below to start browsing our '
                     'products.',
-                style: TextStyle(fontSize: 14, height: 24 / 14),
+                style: TextStyle(fontSize: 16, height: 24 / 16),
               ),
               const SizedBox(height: 24),
               StoreInteractiveLink(
