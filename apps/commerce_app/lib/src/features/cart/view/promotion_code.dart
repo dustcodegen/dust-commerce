@@ -3,6 +3,8 @@ import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
+import 'cart_promotion_badge.dart';
+
 /// Source promotion disclosure, input, applied badge, and removal action.
 class PromotionCode extends StatefulWidget {
   /// Creates the promotion control.
@@ -43,6 +45,7 @@ class _PromotionCodeState extends State<PromotionCode> {
             style: TextButton.styleFrom(
               foregroundColor: StoreColors.interactive,
               padding: const EdgeInsets.symmetric(vertical: 8),
+              textStyle: const TextStyle(fontSize: 14, height: 20 / 14),
             ),
             child: const TranslatedText(
               'shop_cart_add_promotion_codes',
@@ -115,36 +118,20 @@ class _PromotionCodeState extends State<PromotionCode> {
           const TranslatedText(
             'shop_cart_promotions_applied',
             defaultText: 'Promotion(s) applied:',
-            style: TextStyle(fontWeight: FontWeight.w500),
+            style: TextStyle(
+              fontSize: 14,
+              height: 20 / 14,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: 8),
           for (final promotion in widget.cart.promotions)
             Row(
               children: [
                 Flexible(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: StoreColors.subtleHover,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            promotion.code,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                        ),
-                      ),
-                      Text(' (${_promotionValue(promotion)})'),
-                    ],
+                  child: CartPromotionBadge(
+                    code: promotion.code,
+                    value: _promotionValue(promotion),
                   ),
                 ),
                 const Spacer(),
@@ -152,6 +139,11 @@ class _PromotionCodeState extends State<PromotionCode> {
                   onPressed:
                       busy ? null : context.readCartViewModel().removePromotion,
                   icon: const Icon(Icons.delete_outline, size: 16),
+                  constraints: const BoxConstraints.tightFor(
+                    width: 24,
+                    height: 24,
+                  ),
+                  padding: EdgeInsets.zero,
                   tooltip: context.tr(
                     'shop_cart_remove_promotion',
                     defaultText: 'Remove promotion',
