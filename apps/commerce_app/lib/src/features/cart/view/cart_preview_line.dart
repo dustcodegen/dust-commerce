@@ -4,6 +4,21 @@ import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
+const _previewThumbnailShadow = [
+  BoxShadow(color: Color(0x14000000), spreadRadius: 1),
+  BoxShadow(
+    color: Color(0x14000000),
+    offset: Offset(0, 1),
+    blurRadius: 2,
+    spreadRadius: -1,
+  ),
+  BoxShadow(
+    color: Color(0x0a000000),
+    offset: Offset(0, 2),
+    blurRadius: 4,
+  ),
+];
+
 /// One item in the desktop navigation cart preview.
 class CartPreviewLine extends StatelessWidget {
   /// Creates a compact preview line.
@@ -37,7 +52,13 @@ class CartPreviewLine extends StatelessWidget {
             onTap: () => _product(context),
             child: SizedBox.square(
               dimension: 96,
-              child: ProductImage(url: item.thumbnail, aspectRatio: 1),
+              child: ProductImage(
+                url: item.thumbnail,
+                aspectRatio: 1,
+                border: false,
+                boxShadow: _previewThumbnailShadow,
+                transitionDuration: const Duration(milliseconds: 150),
+              ),
             ),
           ),
           // The source reserves a 122px image track around the 96px thumbnail,
