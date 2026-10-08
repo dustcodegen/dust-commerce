@@ -105,6 +105,7 @@ final class CheckoutAddressForm extends StatelessWidget {
                 CheckoutAddressFields(
                   controllers: billing,
                   countries: countries,
+                  includePhone: true,
                 ),
               ],
               const SizedBox(height: 36),

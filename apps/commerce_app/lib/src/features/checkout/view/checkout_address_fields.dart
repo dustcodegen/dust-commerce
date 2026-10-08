@@ -10,6 +10,7 @@ final class CheckoutAddressFields extends StatelessWidget {
   const CheckoutAddressFields({
     required this.controllers,
     required this.countries,
+    this.includePhone = false,
     super.key,
   });
 
@@ -18,6 +19,9 @@ final class CheckoutAddressFields extends StatelessWidget {
 
   /// Controllers for this address block.
   final CheckoutAddressControllers controllers;
+
+  /// Whether this block includes Medusa's standalone billing phone field.
+  final bool includePhone;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -38,7 +42,7 @@ final class CheckoutAddressFields extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           CheckoutFieldRow(
             left: CheckoutFormField(
               controller: controllers.line1,
@@ -56,7 +60,7 @@ final class CheckoutAddressFields extends StatelessWidget {
               required: false,
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           CheckoutFieldRow(
             left: CheckoutFormField(
               controller: controllers.postalCode,
@@ -73,7 +77,7 @@ final class CheckoutAddressFields extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
           CheckoutFieldRow(
             left: CheckoutCountryField(
               controller: controllers.countryCode,
@@ -88,6 +92,21 @@ final class CheckoutAddressFields extends StatelessWidget {
               required: false,
             ),
           ),
+          if (includePhone) ...[
+            const SizedBox(height: 16),
+            CheckoutFieldRow(
+              left: CheckoutFormField(
+                controller: controllers.phone,
+                label: context.tr(
+                  'shop_checkout_phone',
+                  defaultText: 'Phone',
+                ),
+                keyboardType: TextInputType.phone,
+                required: false,
+              ),
+              right: const SizedBox.shrink(),
+            ),
+          ],
         ],
       );
 }
