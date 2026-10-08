@@ -95,17 +95,24 @@ final class CustomerCountryField extends StatelessWidget {
   Widget build(BuildContext context) {
     final current = controller.text;
     final options = <String>{...countries, if (current.isNotEmpty) current};
-    return DropdownButtonFormField<String>(
-      initialValue:
-          options.contains(current) && current.isNotEmpty ? current : null,
-      items: [
-        for (final country in options)
-          DropdownMenuItem(value: country, child: Text(country.toUpperCase())),
-      ],
-      onChanged:
-          countries.isEmpty ? null : (value) => controller.text = value ?? '',
-      validator: (value) => _required(context, value),
-      decoration: _decoration(label),
+    return Semantics(
+      label: label,
+      child: DropdownButtonFormField<String>(
+        initialValue:
+            options.contains(current) && current.isNotEmpty ? current : null,
+        hint: const Text('Select...'),
+        icon: const Icon(Icons.unfold_more, size: 20),
+        items: [
+          const DropdownMenuItem(value: '', child: Text('-')),
+          for (final country in options)
+            DropdownMenuItem(
+                value: country, child: Text(country.toUpperCase())),
+        ],
+        onChanged:
+            countries.isEmpty ? null : (value) => controller.text = value ?? '',
+        validator: (value) => _required(context, value),
+        decoration: _nativeSelectDecoration(),
+      ),
     );
   }
 }
@@ -146,4 +153,21 @@ InputDecoration _decoration(String label, {bool required = true}) =>
         borderSide: const BorderSide(color: StoreColors.interactive),
       ),
       contentPadding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+    );
+
+InputDecoration _nativeSelectDecoration() => InputDecoration(
+      filled: true,
+      fillColor: StoreColors.subtle,
+      isDense: true,
+      constraints: const BoxConstraints(minHeight: 44),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(6),
+        borderSide: BorderSide(color: StoreColors.border),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(6),
+        borderSide: const BorderSide(color: StoreColors.interactive),
+      ),
+      contentPadding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
     );
