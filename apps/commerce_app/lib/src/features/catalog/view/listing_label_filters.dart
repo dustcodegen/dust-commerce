@@ -81,12 +81,15 @@ class _LabelChoice extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox.square(
-                dimension: 18,
-                child: Checkbox(
-                  value: selected,
-                  onChanged: (_) => onChanged(),
-                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: SizedBox.square(
+                  dimension: 18,
+                  child: Checkbox(
+                    value: selected,
+                    onChanged: (_) => onChanged(),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
