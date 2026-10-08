@@ -98,6 +98,7 @@ class AccountOrderCard extends StatelessWidget {
                             url: item.thumbnail,
                             aspectRatio: 9 / 16,
                             border: false,
+                            borderRadius: 16,
                             boxShadow: _orderCardThumbnailShadow,
                             transitionDuration:
                                 const Duration(milliseconds: 150),

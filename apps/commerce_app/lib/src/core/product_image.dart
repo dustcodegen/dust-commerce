@@ -8,6 +8,7 @@ class ProductImage extends StatelessWidget {
     required this.url,
     this.aspectRatio = 11 / 14,
     this.border = true,
+    this.borderRadius = 8,
     this.boxShadow,
     this.placeholderColor,
     this.placeholderSize,
@@ -21,6 +22,9 @@ class ProductImage extends StatelessWidget {
 
   /// Whether the image slot draws the default storefront border.
   final bool border;
+
+  /// Corner radius for the source image slot.
+  final double borderRadius;
 
   /// Optional source shadow for card-style image slots.
   final List<BoxShadow>? boxShadow;
@@ -51,11 +55,11 @@ class ProductImage extends StatelessWidget {
         decoration: BoxDecoration(
           color: StoreColors.subtle,
           border: border ? Border.all(color: StoreColors.border) : null,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(borderRadius),
           boxShadow: boxShadow,
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(borderRadius),
           child: source == null
               ? Semantics(
                   label: semanticLabel,
