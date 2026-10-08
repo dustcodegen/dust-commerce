@@ -30,7 +30,11 @@ class CartQuantityControl extends StatelessWidget {
             onPressed: enabled
                 ? () => context.readCartViewModel().remove(item.id)
                 : null,
-            icon: const Icon(Icons.delete_outline, size: 18),
+            icon: const Icon(
+              Icons.delete_outline,
+              color: StoreColors.foregroundSubtle,
+              size: 16,
+            ),
             tooltip: context.tr('shop_cart_remove', defaultText: 'Remove'),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints.tightFor(width: 32, height: 40),
@@ -40,15 +44,24 @@ class CartQuantityControl extends StatelessWidget {
             height: 40,
             padding: const EdgeInsets.symmetric(horizontal: 4),
             decoration: BoxDecoration(
-              color: StoreColors.subtleHover,
+              color: const Color(0xfff3f4f6),
               border: Border.all(color: StoreColors.border),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(999),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<int>(
                 value: item.quantity.clamp(1, 10),
+                alignment: Alignment.center,
+                iconEnabledColor: StoreColors.foregroundSubtle,
+                iconDisabledColor: StoreColors.foregroundDisabled,
+                iconSize: 16,
                 isExpanded: true,
                 onChanged: enabled ? (value) => _update(context, value) : null,
+                style: const TextStyle(
+                  color: StoreColors.foreground,
+                  fontSize: 12,
+                  height: 16 / 12,
+                ),
                 items: [
                   for (var quantity = 1; quantity <= 10; quantity++)
                     DropdownMenuItem(value: quantity, child: Text('$quantity')),
