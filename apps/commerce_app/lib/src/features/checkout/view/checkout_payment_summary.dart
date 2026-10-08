@@ -26,6 +26,7 @@ final class CheckoutPaymentSummary extends StatelessWidget {
               ),
             ),
           ),
+          const SizedBox(width: 4),
           Expanded(
             child: _PaymentSummaryColumn(
               title: context.tr(
@@ -34,7 +35,19 @@ final class CheckoutPaymentSummary extends StatelessWidget {
               ),
               child: const Row(
                 children: [
-                  Icon(Icons.credit_card, size: 18),
+                  SizedBox(
+                    height: 28,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: StoreColors.subtleHover,
+                        borderRadius: BorderRadius.all(Radius.circular(6)),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        child: Center(child: Icon(Icons.credit_card, size: 16)),
+                      ),
+                    ),
+                  ),
                   SizedBox(width: 8),
                   Flexible(
                     child: TranslatedText(
@@ -46,6 +59,7 @@ final class CheckoutPaymentSummary extends StatelessWidget {
               ),
             ),
           ),
+          const Spacer(),
         ],
       );
 }
@@ -80,12 +94,24 @@ final class _PaymentSummaryColumn extends StatelessWidget {
   Widget build(BuildContext context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+          Text(title, style: _paymentSummaryTitleStyle),
           const SizedBox(height: 4),
           DefaultTextStyle.merge(
-            style: const TextStyle(color: StoreColors.foregroundSubtle),
+            style: _paymentSummaryValueStyle,
             child: child,
           ),
         ],
       );
 }
+
+const _paymentSummaryTitleStyle = TextStyle(
+  fontSize: 14,
+  height: 20 / 14,
+  fontWeight: FontWeight.w600,
+);
+
+const _paymentSummaryValueStyle = TextStyle(
+  color: StoreColors.foregroundSubtle,
+  fontSize: 14,
+  height: 20 / 14,
+);
