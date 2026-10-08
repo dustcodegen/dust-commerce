@@ -6,6 +6,21 @@ import 'package:flutter/material.dart';
 
 import 'cart_quantity_control.dart';
 
+const _lineThumbnailShadow = [
+  BoxShadow(color: Color(0x14000000), spreadRadius: 1),
+  BoxShadow(
+    color: Color(0x14000000),
+    offset: Offset(0, 1),
+    blurRadius: 2,
+    spreadRadius: -1,
+  ),
+  BoxShadow(
+    color: Color(0x0a000000),
+    offset: Offset(0, 2),
+    blurRadius: 4,
+  ),
+];
+
 /// One source-faithful cart table row.
 class CartLineItem extends StatelessWidget {
   /// Creates a cart row.
@@ -117,7 +132,13 @@ class _LineImage extends StatelessWidget {
                 context.navigator.product(handle: item.productHandle).push(),
             child: SizedBox(
               width: wide ? 96 : 48,
-              child: ProductImage(url: item.thumbnail, aspectRatio: 1),
+              child: ProductImage(
+                url: item.thumbnail,
+                aspectRatio: 1,
+                border: false,
+                boxShadow: _lineThumbnailShadow,
+                transitionDuration: const Duration(milliseconds: 150),
+              ),
             ),
           ),
         ),
