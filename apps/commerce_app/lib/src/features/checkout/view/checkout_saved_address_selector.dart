@@ -42,7 +42,6 @@ final class CheckoutSavedAddressSelector extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: StoreColors.base,
-        border: Border.all(color: StoreColors.border),
         borderRadius: BorderRadius.circular(8),
       ),
       child: switch (state.status) {
