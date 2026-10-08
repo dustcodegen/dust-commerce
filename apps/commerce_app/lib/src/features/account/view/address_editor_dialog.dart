@@ -59,9 +59,9 @@ class _AddressEditorDialogState extends State<AddressEditorDialog> {
         : null;
     return Dialog(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 600),
+        constraints: const BoxConstraints(maxWidth: 576),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(20),
           child: Form(
             key: _formKey,
             child: Column(
