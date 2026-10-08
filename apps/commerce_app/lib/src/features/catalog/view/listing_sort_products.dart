@@ -48,6 +48,7 @@ class SortProducts extends StatelessWidget {
             style: TextStyle(
               color: StoreColors.foregroundMuted,
               fontSize: 12,
+              height: 20 / 12,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -124,6 +125,7 @@ class _SortChoice extends StatelessWidget {
                     label,
                     style: TextStyle(
                       fontSize: 12,
+                      height: 20 / 12,
                       color: selected
                           ? StoreColors.foreground
                           : StoreColors.foregroundSubtle,
