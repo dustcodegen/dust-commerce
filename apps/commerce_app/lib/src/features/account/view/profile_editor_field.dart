@@ -45,9 +45,12 @@ final class ProfileEditorField extends StatelessWidget {
       validator: validator,
       style: const TextStyle(fontSize: 14, height: 20 / 14),
       decoration: InputDecoration(
-        labelText: '$label *',
         filled: true,
         fillColor: StoreColors.base,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 8,
+        ),
         border: border,
         enabledBorder: border,
         focusedBorder: border.copyWith(
@@ -55,6 +58,21 @@ final class ProfileEditorField extends StatelessWidget {
         ),
       ),
     );
-    return width == null ? field : SizedBox(width: width, child: field);
+    final input = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      spacing: 4,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            height: 20 / 14,
+          ),
+        ),
+        field,
+      ],
+    );
+    return width == null ? input : SizedBox(width: width, child: input);
   }
 }
