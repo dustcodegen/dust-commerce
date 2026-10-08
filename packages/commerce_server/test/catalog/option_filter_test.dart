@@ -38,7 +38,8 @@ void main() {
 
     expect(body.keys.toSet(), {'count', 'product_options'});
     expect(option.keys.toSet(), {'id', 'title', 'values'});
-    expect(value.keys.toSet(), {'id', 'value'});
+    expect(value.keys.toSet(), {'id', 'count', 'value'});
+    expect(value['count'], isA<int>());
   });
 
   test('product listing filters by repeated stable value ids', () async {

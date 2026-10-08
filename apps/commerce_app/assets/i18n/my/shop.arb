@@ -1377,10 +1377,6 @@
   "@option_fallback": {
     "description": "Fallback heading for a merchant option without a title."
   },
-  "options": "ရွေးချယ်စရာများ",
-  "@options": {
-    "description": "Heading above store-wide option filters."
-  },
   "order_transfer_accept": "လွှဲပြောင်းမှုကို လက်ခံမည်",
   "@order_transfer_accept": {
     "description": "Accepts an order-transfer request."

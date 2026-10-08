@@ -40,7 +40,17 @@ class ListingOptionValueButton extends StatelessWidget {
                 selected ? StoreColors.foreground : StoreColors.foregroundMuted,
             textStyle: const TextStyle(fontSize: 14),
           ),
-          child: Text(value.value),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(value.value),
+              const SizedBox(width: 6),
+              Text(
+                '(${value.count})',
+                style: const TextStyle(color: StoreColors.foregroundMuted),
+              ),
+            ],
+          ),
         ),
       );
 }

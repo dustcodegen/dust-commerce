@@ -10,10 +10,17 @@ part 'option_filter_response.g.dart';
 @SerDe(renameAll: SerDeRename.snakeCase)
 final class ProductOptionValueResponse with _$ProductOptionValueResponse {
   /// Creates one stable public value.
-  const ProductOptionValueResponse({required this.id, required this.value});
+  const ProductOptionValueResponse({
+    required this.id,
+    required this.value,
+    required this.count,
+  });
 
   /// Stable value identifier accepted by product-list queries.
   final String id;
+
+  /// Number of matching published products for this value.
+  final int count;
 
   /// Customer-facing value label.
   final String value;
@@ -77,5 +84,6 @@ final class ProductOptionValuesFromJson
       ProductOptionValueResponse(
         id: value['id']! as String,
         value: value['value']! as String,
+        count: value['count']! as int,
       );
 }

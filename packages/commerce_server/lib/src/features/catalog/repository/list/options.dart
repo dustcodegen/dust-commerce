@@ -17,10 +17,12 @@ SELECT option.id, option.title,
          SELECT json_group_array(json(ordered.value_json))
          FROM (
            SELECT json_object('id', available.id,
-                              'value', available.value) AS value_json
+                              'value', available.value,
+                              'count', available.count) AS value_json
            FROM (
              SELECT DISTINCT option_value.id, option_value.value,
-                             option_value.rank
+                             option_value.rank,
+                             count(DISTINCT product.id) AS count
              FROM product_option_values option_value
              JOIN product_product_option_values availability
                ON availability.product_option_value_id = option_value.id
@@ -33,6 +35,7 @@ SELECT option.id, option.title,
                AND product_option.deleted_at IS NULL
                AND product.status = 'published'
                AND product.deleted_at IS NULL
+             GROUP BY option_value.id, option_value.value, option_value.rank
            ) available
            ORDER BY available.rank, available.id
          ) ordered

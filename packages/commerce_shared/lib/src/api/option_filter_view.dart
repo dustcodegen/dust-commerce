@@ -7,14 +7,21 @@ part 'option_filter_view.g.dart';
 @SerDe(renameAll: SerDeRename.snakeCase)
 final class ProductOptionValueView with _$ProductOptionValueView {
   /// Creates a public selectable value.
-  const ProductOptionValueView({required this.id, required this.value});
+  const ProductOptionValueView({
+    required this.id,
+    required this.value,
+    this.count = 0,
+  });
 
   /// Creates a selectable value from the generated wire decoder.
   factory ProductOptionValueView.fromJson(Map<String, Object?> json) =>
-      _$ProductOptionValueViewFromJson(json);
+      _$ProductOptionValueViewFromJson({'count': 0, ...json});
 
   /// Stable identifier used by the repeated `optionValueIds` query.
   final String id;
+
+  /// Number of matching published products for this value.
+  final int count;
 
   /// Customer-facing value, such as `Black` or `M`.
   final String value;

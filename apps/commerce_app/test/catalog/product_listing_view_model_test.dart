@@ -110,6 +110,7 @@ void main() {
     expect(viewModel.state.status, ProductListingStatus.ready);
     expect(viewModel.state.selectedOptionValueIds, ['optval_small']);
     expect(viewModel.state.optionFilters.single.id, 'opt_size');
+    expect(viewModel.state.optionFilters.single.values.first.count, 1);
     expect(viewModel.state.products.map((product) => product.handle), [
       't-shirt',
     ]);
