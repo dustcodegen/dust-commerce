@@ -134,12 +134,16 @@ class _PromotionCodeState extends State<PromotionCode> {
                     onPressed: busy
                         ? null
                         : context.readCartViewModel().removePromotion,
-                    icon: const Icon(Icons.delete_outline, size: 16),
+                    icon: const Icon(Icons.delete_outline, size: 14),
                     constraints: const BoxConstraints.tightFor(
-                      width: 24,
-                      height: 24,
+                      width: 20,
+                      height: 20,
                     ),
                     padding: EdgeInsets.zero,
+                    style: const ButtonStyle(
+                      overlayColor: WidgetStatePropertyAll(Colors.transparent),
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
                     tooltip: context.tr(
                       'shop_cart_remove_promotion',
                       defaultText: 'Remove promotion',
