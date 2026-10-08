@@ -105,6 +105,10 @@ final class _ProfileDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const Padding(
         padding: EdgeInsets.symmetric(vertical: 32),
-        child: Divider(),
+        child: Divider(
+          height: 1,
+          thickness: 1,
+          color: Color(0xffe5e7eb),
+        ),
       );
 }
