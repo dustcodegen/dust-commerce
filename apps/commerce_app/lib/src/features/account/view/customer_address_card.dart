@@ -46,16 +46,16 @@ final class CustomerAddressCard extends StatelessWidget {
             const Spacer(),
             Row(
               children: [
-                TextButton.icon(
+                _AddressCardAction(
                   onPressed: busy ? null : onEdit,
-                  icon: const Icon(Icons.edit_outlined, size: 16),
+                  icon: const Icon(Icons.edit_square, size: 16),
                   label: TranslatedText(
                     'shop_edit',
                     defaultText: 'Edit',
                   ),
                 ),
-                const SizedBox(width: 8),
-                TextButton.icon(
+                const SizedBox(width: 16),
+                _AddressCardAction(
                   onPressed: busy
                       ? null
                       : () =>
@@ -75,4 +75,42 @@ final class CustomerAddressCard extends StatelessWidget {
   static String _line2(String? value) => value == null ? '' : ', $value';
 
   static String _province(String? value) => value == null ? '' : '$value, ';
+}
+
+final class _AddressCardAction extends StatelessWidget {
+  const _AddressCardAction({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+  });
+
+  final Widget icon;
+  final Widget label;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final enabled = onPressed != null;
+    final color =
+        enabled ? StoreColors.foreground : StoreColors.foregroundMuted;
+    return TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        foregroundColor: color,
+        iconColor: color,
+        minimumSize: Size.zero,
+        padding: EdgeInsets.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        textStyle: const TextStyle(fontSize: 12, height: 20 / 12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconTheme.merge(data: IconThemeData(color: color), child: icon),
+          const SizedBox(width: 8),
+          label,
+        ],
+      ),
+    );
+  }
 }
