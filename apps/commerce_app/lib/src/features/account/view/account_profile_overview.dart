@@ -117,7 +117,7 @@ final class AccountProfileOverview extends StatelessWidget {
             ),
           ),
         ],
-        const SizedBox(height: 32),
+        const SizedBox(height: 40),
         const TranslatedText(
           'shop_account_recent_orders',
           defaultText: 'Recent orders',
