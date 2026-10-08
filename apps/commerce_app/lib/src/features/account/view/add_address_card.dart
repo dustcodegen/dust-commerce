@@ -1,3 +1,4 @@
+import 'package:commerce_app/commerce_app.dart';
 import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
@@ -13,30 +14,41 @@ final class AddAddressCard extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => OutlinedButton(
-        onPressed: enabled ? onTap : null,
-        style: OutlinedButton.styleFrom(
-          minimumSize: const Size.fromHeight(220),
+  Widget build(BuildContext context) {
+    final color =
+        enabled ? StoreColors.foreground : StoreColors.foregroundMuted;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: enabled ? onTap : null,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 220),
+          width: double.infinity,
           padding: const EdgeInsets.all(20),
-          alignment: Alignment.centerLeft,
-          shape: RoundedRectangleBorder(
+          decoration: BoxDecoration(
+            border: Border.all(color: StoreColors.border),
             borderRadius: BorderRadius.circular(8),
           ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TranslatedText(
+                'shop_account_new_address',
+                defaultText: 'New address',
+                style: TextStyle(
+                  color: color,
+                  fontSize: 14,
+                  height: 24 / 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Icon(Icons.add, size: 16, color: color),
+            ],
+          ),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            TranslatedText(
-              'shop_account_new_address',
-              defaultText: 'New address',
-              style: const TextStyle(fontWeight: FontWeight.w600),
-            ),
-            const Align(
-              alignment: Alignment.bottomRight,
-              child: Icon(Icons.add, size: 24),
-            ),
-          ],
-        ),
-      );
+      ),
+    );
+  }
 }
