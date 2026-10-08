@@ -37,7 +37,8 @@ final class CustomerAddressCard extends StatelessWidget {
               '${address.firstName} ${address.lastName}',
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
-            if (address.company case final company?) Text(company),
+            if (address.company case final company?)
+              Text(company, style: _companyStyle),
             const SizedBox(height: 8),
             Text('${address.line1}${_line2(address.line2)}'),
             Text('${address.postalCode}, ${address.city}'),
@@ -114,3 +115,9 @@ final class _AddressCardAction extends StatelessWidget {
     );
   }
 }
+
+const _companyStyle = TextStyle(
+  color: StoreColors.foreground,
+  fontSize: 13,
+  height: 20 / 13,
+);
