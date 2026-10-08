@@ -32,12 +32,22 @@ class CartQuantityControl extends StatelessWidget {
                 : null,
             icon: const Icon(
               Icons.delete_outline,
-              color: StoreColors.foregroundSubtle,
               size: 16,
             ),
             tooltip: context.tr('shop_cart_remove', defaultText: 'Remove'),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints.tightFor(width: 32, height: 40),
+            style: ButtonStyle(
+              foregroundColor: WidgetStateProperty.resolveWith(
+                (states) => states.contains(WidgetState.disabled)
+                    ? StoreColors.foregroundDisabled
+                    : states.contains(WidgetState.hovered)
+                        ? StoreColors.foreground
+                        : StoreColors.foregroundSubtle,
+              ),
+              overlayColor: const WidgetStatePropertyAll(Colors.transparent),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
           ),
           Container(
             width: 56,

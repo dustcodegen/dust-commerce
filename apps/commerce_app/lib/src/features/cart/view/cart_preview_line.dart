@@ -135,11 +135,20 @@ class CartPreviewLine extends StatelessWidget {
                     defaultText: 'Remove',
                   ),
                   style: TextButton.styleFrom(
-                    foregroundColor: StoreColors.foregroundSubtle,
                     padding: EdgeInsets.zero,
                     minimumSize: const Size(0, 20),
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     textStyle: const TextStyle(fontSize: 12, height: 20 / 12),
+                  ).copyWith(
+                    foregroundColor: WidgetStateProperty.resolveWith(
+                      (states) => states.contains(WidgetState.disabled)
+                          ? StoreColors.foregroundDisabled
+                          : states.contains(WidgetState.hovered)
+                              ? StoreColors.foreground
+                              : StoreColors.foregroundSubtle,
+                    ),
+                    overlayColor:
+                        const WidgetStatePropertyAll(Colors.transparent),
                   ),
                 ),
               ],
