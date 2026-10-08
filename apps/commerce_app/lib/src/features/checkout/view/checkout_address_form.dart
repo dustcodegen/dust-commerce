@@ -121,10 +121,10 @@ final class CheckoutAddressForm extends StatelessWidget {
               ),
               if (state.status == CheckoutStatus.failed &&
                   state.operation == CheckoutOperation.prepare) ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Text(
                   state.message!,
-                  style: const TextStyle(color: Colors.red),
+                  style: _addressErrorStyle,
                 ),
               ],
             ],
@@ -136,4 +136,10 @@ final class CheckoutAddressForm extends StatelessWidget {
 const _billingAddressHeadingStyle = TextStyle(
   fontSize: 32,
   height: 44 / 32,
+);
+
+const _addressErrorStyle = TextStyle(
+  color: StoreColors.rose,
+  fontSize: 12,
+  height: 20 / 12,
 );
