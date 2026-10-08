@@ -51,15 +51,14 @@ final class CheckoutSavedAddressContent extends StatelessWidget {
           itemHeight: null,
           menuMaxHeight: 320,
           style: _savedAddressTextStyle,
-          decoration: const InputDecoration(
-            border: OutlineInputBorder(),
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: StoreColors.border),
-            ),
-          ),
-          hint: TranslatedText(
+          icon: const Icon(Icons.unfold_more, size: 20),
+          borderRadius: BorderRadius.circular(8),
+          dropdownColor: StoreColors.base,
+          decoration: _savedAddressSelectDecoration,
+          hint: const TranslatedText(
             'shop_checkout_choose_saved_address',
             defaultText: 'Choose an address',
+            style: _savedAddressTextStyle,
           ),
           selectedItemBuilder: (_) => [
             for (final address in addresses)
@@ -152,6 +151,19 @@ final class _SavedAddressOption extends StatelessWidget {
 }
 
 const _savedAddressCompanyStyle = TextStyle(fontSize: 12, height: 20 / 12);
+
+const _savedAddressSelectDecoration = InputDecoration(
+  isDense: true,
+  contentPadding: EdgeInsets.fromLTRB(16, 10, 16, 10),
+  enabledBorder: OutlineInputBorder(
+    borderRadius: BorderRadius.all(Radius.circular(8)),
+    borderSide: BorderSide(color: StoreColors.border),
+  ),
+  focusedBorder: OutlineInputBorder(
+    borderRadius: BorderRadius.all(Radius.circular(8)),
+    borderSide: BorderSide(color: StoreColors.borderStrong),
+  ),
+);
 
 const _savedAddressNameStyle = TextStyle(
   fontSize: 16,
