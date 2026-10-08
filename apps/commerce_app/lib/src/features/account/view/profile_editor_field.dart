@@ -34,46 +34,32 @@ final class ProfileEditorField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const border = OutlineInputBorder(
-      borderRadius: BorderRadius.all(Radius.circular(6)),
-      borderSide: BorderSide(color: StoreColors.border),
-    );
     final field = TextFormField(
       controller: controller,
       obscureText: obscureText,
       autofillHints: autofillHints,
       validator: validator,
       style: const TextStyle(fontSize: 14, height: 20 / 14),
-      decoration: InputDecoration(
-        isDense: true,
-        filled: true,
-        fillColor: StoreColors.base,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 8,
-        ),
-        border: border,
-        enabledBorder: border,
-        focusedBorder: border.copyWith(
-          borderSide: const BorderSide(color: StoreColors.foreground),
-        ),
-      ),
+      decoration: _sourceInputDecoration(label),
     );
-    final input = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 4,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            height: 20 / 14,
-          ),
-        ),
-        field,
-      ],
-    );
-    return width == null ? input : SizedBox(width: width, child: input);
+    return width == null ? field : SizedBox(width: width, child: field);
   }
 }
+
+InputDecoration _sourceInputDecoration(String label) => InputDecoration(
+      labelText: label,
+      filled: true,
+      fillColor: StoreColors.subtle,
+      isDense: true,
+      constraints: const BoxConstraints(minHeight: 44),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(6),
+        borderSide: const BorderSide(color: StoreColors.border),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(6),
+        borderSide: const BorderSide(color: StoreColors.interactive),
+      ),
+      contentPadding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
+    );

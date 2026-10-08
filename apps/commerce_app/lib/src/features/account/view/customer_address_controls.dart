@@ -68,7 +68,7 @@ final class CustomerAddressField extends StatelessWidget {
         keyboardType: keyboardType,
         autofillHints: autofillHints,
         validator: required ? (value) => _required(context, value) : null,
-        decoration: _decoration(required ? '$label *' : label),
+        decoration: _decoration(label, required: required),
       );
 }
 
@@ -105,7 +105,7 @@ final class CustomerCountryField extends StatelessWidget {
       onChanged:
           countries.isEmpty ? null : (value) => controller.text = value ?? '',
       validator: (value) => _required(context, value),
-      decoration: _decoration('$label *'),
+      decoration: _decoration(label),
     );
   }
 }
@@ -118,13 +118,32 @@ String? _required(BuildContext context, String? value) =>
           )
         : null;
 
-InputDecoration _decoration(String label) => InputDecoration(
-      labelText: label,
+InputDecoration _decoration(String label, {bool required = true}) =>
+    InputDecoration(
+      label: Text.rich(
+        TextSpan(
+          children: [
+            TextSpan(text: label),
+            if (required)
+              const TextSpan(
+                text: '*',
+                style: TextStyle(color: StoreColors.rose),
+              ),
+          ],
+        ),
+      ),
       filled: true,
       fillColor: StoreColors.subtle,
-      border: const OutlineInputBorder(),
-      enabledBorder: const OutlineInputBorder(
+      isDense: true,
+      constraints: const BoxConstraints(minHeight: 44),
+      border: OutlineInputBorder(borderRadius: BorderRadius.circular(6)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(6),
         borderSide: BorderSide(color: StoreColors.border),
       ),
-      contentPadding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(6),
+        borderSide: const BorderSide(color: StoreColors.interactive),
+      ),
+      contentPadding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
     );
