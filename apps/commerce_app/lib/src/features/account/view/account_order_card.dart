@@ -23,7 +23,7 @@ class AccountOrderCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            '#${order.displayId}',
+            '#${order.displayId}'.toUpperCase(),
             style: const TextStyle(
               fontSize: 16,
               height: 24 / 16,
