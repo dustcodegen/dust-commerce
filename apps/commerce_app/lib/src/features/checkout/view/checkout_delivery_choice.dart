@@ -2,6 +2,8 @@ import 'package:commerce_app/commerce_app.dart';
 import 'package:commerce_shared/commerce_shared.dart';
 import 'package:flutter/material.dart';
 
+import 'checkout_radio_mark.dart';
+
 /// Source-shaped delivery radio row with explicit selection semantics.
 final class CheckoutDeliveryChoice extends StatelessWidget {
   /// Creates one server-priced delivery choice.
@@ -57,17 +59,7 @@ final class CheckoutDeliveryChoice extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(
-                    selected
-                        ? Icons.radio_button_checked
-                        : Icons.radio_button_unchecked,
-                    size: 18,
-                    color: !available
-                        ? StoreColors.foregroundDisabled
-                        : selected
-                            ? StoreColors.interactive
-                            : StoreColors.foregroundMuted,
-                  ),
+                  CheckoutRadioMark(selected: selected, enabled: available),
                   const SizedBox(width: 16),
                   Expanded(
                     child: Text(

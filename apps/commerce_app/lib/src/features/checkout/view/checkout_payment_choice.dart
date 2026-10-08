@@ -3,6 +3,7 @@ import 'package:commerce_shared/commerce_shared.dart';
 import 'package:flutter/material.dart';
 
 import 'checkout_payment_summary.dart';
+import 'checkout_radio_mark.dart';
 
 /// Source-shaped payment radio row with explicit selection semantics.
 final class CheckoutPaymentChoice extends StatelessWidget {
@@ -52,15 +53,7 @@ final class CheckoutPaymentChoice extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      selected
-                          ? Icons.radio_button_checked
-                          : Icons.radio_button_unchecked,
-                      size: 18,
-                      color: selected
-                          ? StoreColors.interactive
-                          : StoreColors.foregroundMuted,
-                    ),
+                    CheckoutRadioMark(selected: selected, enabled: enabled),
                     const SizedBox(width: 16),
                     Expanded(child: PaymentProviderTitle(id: provider.id)),
                     const Icon(Icons.credit_card, size: 20),
