@@ -40,8 +40,8 @@ class _AccountFormActions extends StatelessWidget {
               ),
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: StoreColors.foregroundSubtle,
                 fontSize: 12,
+                height: 20 / 12,
               ),
             ),
           ],
