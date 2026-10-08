@@ -56,58 +56,65 @@ class AccountOrderCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: [
-              for (final item in order.items.take(3))
-                SizedBox(
-                  width: 144,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ProductImage(url: item.thumbnail, aspectRatio: 1),
-                      const SizedBox(height: 8),
-                      Text.rich(
-                        TextSpan(children: [
-                          TextSpan(
-                            text: item.title,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
-                            ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final columns = constraints.maxWidth >= 640 ? 4 : 2;
+              final tileWidth =
+                  (constraints.maxWidth - (columns - 1) * 16) / columns;
+              return Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                children: [
+                  for (final item in order.items.take(3))
+                    SizedBox(
+                      width: tileWidth,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ProductImage(url: item.thumbnail, aspectRatio: 1),
+                          const SizedBox(height: 8),
+                          Text.rich(
+                            TextSpan(children: [
+                              TextSpan(
+                                text: item.title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const TextSpan(text: ' x '),
+                              TextSpan(text: '${item.quantity}'),
+                            ]),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 12),
                           ),
-                          const TextSpan(text: ' x '),
-                          TextSpan(text: '${item.quantity}'),
-                        ]),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(fontSize: 12),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-              if (order.items.length > 4)
-                SizedBox(
-                  width: 144,
-                  height: 144,
-                  child: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '+ ${order.itemCount - 4}',
-                          style: const TextStyle(fontSize: 12),
-                        ),
-                        const TranslatedText(
-                          'shop_more',
-                          defaultText: 'more',
-                          style: TextStyle(fontSize: 12),
-                        ),
-                      ],
                     ),
-                  ),
-                ),
-            ],
+                  if (order.items.length > 4)
+                    SizedBox(
+                      width: tileWidth,
+                      height: tileWidth,
+                      child: Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '+ ${order.itemCount - 4}',
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                            const TranslatedText(
+                              'shop_more',
+                              defaultText: 'more',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
           ),
           const SizedBox(height: 16),
           Align(
