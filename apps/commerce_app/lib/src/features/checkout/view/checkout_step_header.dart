@@ -60,6 +60,12 @@ final class CheckoutStepHeader extends StatelessWidget {
             if (!open && complete && onEdit != null)
               TextButton(
                 onPressed: onEdit,
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  foregroundColor: StoreColors.interactive,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
                 child: const TranslatedText(
                   'shop_checkout_edit',
                   defaultText: 'Edit',
