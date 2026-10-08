@@ -45,6 +45,7 @@ final class ProfileEditorField extends StatelessWidget {
       validator: validator,
       style: const TextStyle(fontSize: 14, height: 20 / 14),
       decoration: InputDecoration(
+        isDense: true,
         filled: true,
         fillColor: StoreColors.base,
         contentPadding: const EdgeInsets.symmetric(
