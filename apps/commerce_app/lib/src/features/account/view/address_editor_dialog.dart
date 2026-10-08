@@ -78,11 +78,12 @@ class _AddressEditorDialogState extends State<AddressEditorDialog> {
                           defaultText: 'Edit address',
                         ),
                   style: const TextStyle(
-                    fontSize: 20,
+                    fontSize: 24,
+                    height: 32 / 24,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 CustomerAddressForm(
                   controllers: _controllers,
                   countries: widget.countries,
