@@ -101,6 +101,7 @@ class _CategoryChoice extends StatelessWidget {
                         ? StoreColors.foreground
                         : StoreColors.foregroundSubtle,
                     fontSize: 12,
+                    height: 20 / 12,
                   ),
                 ),
               ),
@@ -110,6 +111,7 @@ class _CategoryChoice extends StatelessWidget {
                 style: const TextStyle(
                   color: StoreColors.foregroundMuted,
                   fontSize: 12,
+                  height: 20 / 12,
                 ),
               ),
             ],
