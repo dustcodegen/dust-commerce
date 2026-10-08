@@ -30,7 +30,7 @@ extension _ProductListingLoader on ProductListingViewModel {
         categoryFilters,
         labelFilters,
         priceBounds,
-        _optionalCanRefineOnSale(args.api, meta),
+        _optionalOnSaleCount(args.api, meta),
         meta,
       );
       if (!_active(revision)) return;

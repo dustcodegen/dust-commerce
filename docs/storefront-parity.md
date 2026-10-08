@@ -87,7 +87,8 @@ come from `/store/product-options`, every group starts expanded, selections use
 stable value identifiers in repeated `optionValueIds` query keys, and changing
 a selection removes the current page. Current Store option refinements start
 directly with option groups, without a separate `Options` section label. Option
-value chips include the source count treatment, e.g. `Black (3)`. Option
+value chips include the source count treatment, e.g. `Black (3)`, and the
+on-sale toggle carries the same muted count treatment. Option
 discovery is intentionally non-fatal, while collection and category routes
 retain incoming selections but hide the picker exactly as the source templates
 do.

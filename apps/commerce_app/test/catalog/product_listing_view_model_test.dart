@@ -175,7 +175,7 @@ void main() {
   test('store exposes sale toggle and filters discounted products', () async {
     await viewModel.loadStore();
 
-    expect(viewModel.state.canRefineOnSale, isTrue);
+    expect(viewModel.state.onSaleCount, 1);
     expect(viewModel.state.products.any((it) => it.isOnSaleIn('usd')), isTrue);
 
     await viewModel.loadStore(onSale: true);

@@ -89,6 +89,7 @@ final class ProductListingState with _$ProductListingState {
     this.optionFilters = const [],
     this.priceBounds = const None(),
     this.canRefineOnSale = false,
+    this.onSaleCount = 0,
     this.selectedCategoryHandles = const [],
     this.selectedLabelValues = const [],
     this.selectedMaxPrice = const None(),
@@ -111,6 +112,9 @@ final class ProductListingState with _$ProductListingState {
 
   /// Whether the current Store result set contains any sale-priced products.
   final bool canRefineOnSale;
+
+  /// Number of currently matching sale-priced products.
+  final int onSaleCount;
 
   /// Store-only label refinements discovered from matching products.
   final List<ProductLabelFilter> labelFilters;

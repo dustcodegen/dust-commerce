@@ -28,7 +28,7 @@ class ListingRefinements extends StatelessWidget {
     required this.selectedMaxPrice,
     required this.selectedMinPrice,
     required this.selectedOnSale,
-    required this.canRefineOnSale,
+    required this.onSaleCount,
     required this.currencyCode,
     this.onCategoryHandlesChanged,
     this.onLabelValuesChanged,
@@ -40,9 +40,6 @@ class ListingRefinements extends StatelessWidget {
 
   /// Store-only category refinements discovered from matching products.
   final List<ProductCategoryFilter> categoryFilters;
-
-  /// Whether the current Store result can be narrowed to sale items.
-  final bool canRefineOnSale;
 
   /// Currency used by price-range labels.
   final String currencyCode;
@@ -70,6 +67,9 @@ class ListingRefinements extends StatelessWidget {
 
   /// Replaces the sale-only query toggle.
   final ValueChanged<bool>? onSaleChanged;
+
+  /// Number of currently matching sale-priced products.
+  final int onSaleCount;
 
   /// Store-only option axes discovered from the backend.
   final List<ProductOptionFilterView> options;
@@ -147,10 +147,11 @@ class ListingRefinements extends StatelessWidget {
               ),
             ],
             if (onSaleChanged case final onChanged?
-                when canRefineOnSale || selectedOnSale) ...[
+                when onSaleCount > 0 || selectedOnSale) ...[
               const SizedBox(height: 48),
               ListingOnSaleToggle(
-                canRefine: canRefineOnSale,
+                canRefine: onSaleCount > 0,
+                count: onSaleCount,
                 selected: selectedOnSale,
                 onChanged: onChanged,
               ),

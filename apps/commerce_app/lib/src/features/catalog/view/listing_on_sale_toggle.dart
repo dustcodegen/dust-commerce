@@ -7,6 +7,7 @@ class ListingOnSaleToggle extends StatelessWidget {
   /// Creates the sale-only checkbox.
   const ListingOnSaleToggle({
     required this.canRefine,
+    required this.count,
     required this.selected,
     required this.onChanged,
     super.key,
@@ -14,6 +15,9 @@ class ListingOnSaleToggle extends StatelessWidget {
 
   /// Whether any current product can be narrowed by sale state.
   final bool canRefine;
+
+  /// Number of currently matching sale-priced products.
+  final int count;
 
   /// Whether sale-only filtering is active.
   final bool selected;
@@ -46,6 +50,14 @@ class ListingOnSaleToggle extends StatelessWidget {
               color: StoreColors.foregroundSubtle,
               fontSize: 12,
               fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '($count)',
+            style: const TextStyle(
+              color: StoreColors.foregroundMuted,
+              fontSize: 12,
             ),
           ),
         ],

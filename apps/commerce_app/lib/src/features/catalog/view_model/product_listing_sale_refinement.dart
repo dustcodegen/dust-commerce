@@ -1,6 +1,6 @@
 part of 'product_listing_view_model.dart';
 
-Future<bool> _optionalCanRefineOnSale(
+Future<int> _optionalOnSaleCount(
   CommerceApi api,
   _ListingMeta meta,
 ) async {
@@ -17,8 +17,8 @@ Future<bool> _optionalCanRefineOnSale(
       optionValueIds: meta.selectedOptionValueIds,
       limit: 1,
     );
-    return result.total > 0;
+    return result.total;
   } on Object {
-    return meta.canRefineOnSale;
+    return meta.onSaleCount;
   }
 }

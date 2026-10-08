@@ -14,6 +14,7 @@ final class _ListingMeta {
     this.optionFilters = const [],
     this.priceBounds = const None(),
     this.canRefineOnSale = false,
+    this.onSaleCount = 0,
     this.selectedCategoryHandles = const [],
     this.selectedLabelValues = const [],
     this.selectedMaxPrice = const None(),
@@ -35,6 +36,7 @@ final class _ListingMeta {
   final String description;
   final List<ProductLabelFilter> labelFilters;
   final List<ProductOptionFilterView> optionFilters;
+  final int onSaleCount;
   final int page;
   final List<ProductCategory> parents;
   final Option<ProductPriceBounds> priceBounds;
@@ -59,6 +61,7 @@ final class _ListingMeta {
     List<ProductOptionFilterView>? optionFilters,
     Option<ProductPriceBounds>? priceBounds,
     bool? canRefineOnSale,
+    int? onSaleCount,
   }) =>
       _ListingMeta(
         requestKey: requestKey,
@@ -73,6 +76,7 @@ final class _ListingMeta {
         optionFilters: optionFilters ?? this.optionFilters,
         priceBounds: priceBounds ?? this.priceBounds,
         canRefineOnSale: canRefineOnSale ?? this.canRefineOnSale,
+        onSaleCount: onSaleCount ?? this.onSaleCount,
         selectedCategoryHandles: selectedCategoryHandles,
         selectedLabelValues: selectedLabelValues,
         selectedMaxPrice: selectedMaxPrice,
@@ -102,6 +106,7 @@ final class _ListingMeta {
         optionFilters: optionFilters,
         priceBounds: priceBounds,
         canRefineOnSale: canRefineOnSale,
+        onSaleCount: onSaleCount,
         selectedCategoryHandles: selectedCategoryHandles,
         selectedLabelValues: selectedLabelValues,
         selectedMaxPrice: selectedMaxPrice,

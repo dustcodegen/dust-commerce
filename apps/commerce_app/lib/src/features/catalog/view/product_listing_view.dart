@@ -118,11 +118,11 @@ class ProductListingView extends StatelessWidget {
                           onSaleChanged: onSaleChanged,
                           onClearAll: onClearRefinements,
                           priceBounds: state.priceBounds,
-                          canRefineOnSale: state.canRefineOnSale,
                           currencyCode: state.currencyCode,
                           selectedMaxPrice: state.selectedMaxPrice,
                           selectedMinPrice: state.selectedMinPrice,
                           selectedOnSale: state.selectedOnSale,
+                          onSaleCount: state.onSaleCount,
                         );
                         final products = loading
                             ? ListingLoadingProducts(
