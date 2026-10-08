@@ -24,32 +24,35 @@ class CartLayout extends StatelessWidget {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 1440),
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 72, 24, 72),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 48,
+                  ),
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       final wide = MediaQuery.sizeOf(context).width >= 1024;
                       final account = context.watchAccountViewModel().value;
-                      final items = Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          if (!account.isAuthenticated) ...[
-                            const CartSignInPrompt(),
-                            const SizedBox(height: 24),
-                            const Divider(),
-                            const SizedBox(height: 24),
+                      final items = _CartColumn(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (!account.isAuthenticated) ...[
+                              const CartSignInPrompt(),
+                              const SizedBox(height: 24),
+                              const Divider(),
+                              const SizedBox(height: 24),
+                            ],
+                            CartItems(view: view, state: state),
                           ],
-                          CartItems(view: view, state: state),
-                        ],
+                        ),
                       );
-                      final summary = CartSummary(view: view, state: state);
+                      final summary = _CartColumn(
+                        child: CartSummary(view: view, state: state),
+                      );
                       if (!wide) {
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            items,
-                            const SizedBox(height: 48),
-                            summary
-                          ],
+                          children: [items, summary],
                         );
                       }
                       return Row(
@@ -68,5 +71,17 @@ class CartLayout extends StatelessWidget {
             const StoreFooter(),
           ],
         ),
+      );
+}
+
+class _CartColumn extends StatelessWidget {
+  const _CartColumn({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        child: child,
       );
 }
