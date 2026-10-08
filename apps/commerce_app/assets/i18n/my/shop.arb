@@ -613,7 +613,17 @@
       }
     }
   },
-  "account_verification_sent": "{email} သို့ အတည်ပြုလင့်ခ် ပို့လိုက်ပါပြီ။ အီးမေးလ်ကို အတည်ပြုပြီး အကောင့်ဝင်ပါ။",
+  "account_sign_in_verification_sent": "{email} သို့ အတည်ပြုလင့်ခ် ပို့လိုက်ပါပြီ။ အီးမေးလ်ကို အတည်ပြုပြီး အကောင့်ဝင်ပါ။",
+  "@account_sign_in_verification_sent": {
+    "description": "Sign-in email verification notice.",
+    "placeholders": {
+      "email": {
+        "example": "ada@example.com",
+        "type": "String"
+      }
+    }
+  },
+  "account_verification_sent": "{email} သို့ အတည်ပြုလင့်ခ် ပို့လိုက်ပါပြီ။ အီးမေးလ်စာပုံးကို စစ်ဆေးပြီး အီးမေးလ်ကို အတည်ပြုပါ၊ ထို့နောက် အကောင့်ဝင်ပါ။",
   "@account_verification_sent": {
     "description": "Registration or sign-in email verification notice.",
     "placeholders": {

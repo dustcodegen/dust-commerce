@@ -613,6 +613,16 @@
       }
     }
   },
+  "account_sign_in_verification_sent": "We sent a verification link to {email}. Please verify your email, then sign in.",
+  "@account_sign_in_verification_sent": {
+    "description": "Sign-in email verification notice.",
+    "placeholders": {
+      "email": {
+        "example": "ada@example.com",
+        "type": "String"
+      }
+    }
+  },
   "account_verification_sent": "We sent a verification link to {email}. Please check your inbox to verify your email, then sign in.",
   "@account_verification_sent": {
     "description": "Registration or sign-in email verification notice.",

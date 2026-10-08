@@ -7,19 +7,19 @@ final class AccountVerificationNotice extends StatelessWidget {
   /// Creates the notice for a credential-proven [email].
   const AccountVerificationNotice({
     required this.email,
-    required this.bottomMargin,
+    required this.registering,
     super.key,
   });
-
-  /// Space before the form that follows this notice.
-  final double bottomMargin;
 
   /// Normalized recipient returned by the registration flow.
   final String email;
 
+  /// Whether the notice is rendered inside the registration form.
+  final bool registering;
+
   @override
   Widget build(BuildContext context) => Container(
-        margin: EdgeInsets.only(bottom: bottomMargin),
+        margin: EdgeInsets.only(bottom: registering ? 16 : 24),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: StoreColors.subtle,
@@ -27,12 +27,20 @@ final class AccountVerificationNotice extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
-          context.tr(
-            'shop_account_verification_sent',
-            defaultText: 'We sent a verification link to {email}. Please '
-                'check your inbox to verify your email, then sign in.',
-            args: {'email': email},
-          ),
+          registering
+              ? context.tr(
+                  'shop_account_verification_sent',
+                  defaultText: 'We sent a verification link to {email}. '
+                      'Please check your inbox to verify your email, then '
+                      'sign in.',
+                  args: {'email': email},
+                )
+              : context.tr(
+                  'shop_account_sign_in_verification_sent',
+                  defaultText: 'We sent a verification link to {email}. '
+                      'Please verify your email, then sign in.',
+                  args: {'email': email},
+                ),
           textAlign: TextAlign.center,
         ),
       );
