@@ -65,13 +65,18 @@ class CartSummary extends StatelessWidget {
               const TranslatedText(
                 'shop_cart_total',
                 defaultText: 'Total',
-                style: TextStyle(fontWeight: FontWeight.w500),
+                style: TextStyle(
+                  color: StoreColors.foreground,
+                  fontSize: 14,
+                  height: 20 / 14,
+                ),
               ),
               Text(
                 formatMoney(view.total),
                 style: const TextStyle(
                   fontSize: 20,
-                  fontWeight: FontWeight.w600,
+                  height: 28 / 20,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -113,7 +118,11 @@ class _TotalRow extends StatelessWidget {
             Flexible(
               child: Text(
                 label,
-                style: const TextStyle(color: StoreColors.foregroundSubtle),
+                style: const TextStyle(
+                  color: StoreColors.foregroundSubtle,
+                  fontSize: 14,
+                  height: 20 / 14,
+                ),
               ),
             ),
             const SizedBox(width: 16),
@@ -123,6 +132,8 @@ class _TotalRow extends StatelessWidget {
                 color: discount
                     ? StoreColors.interactive
                     : StoreColors.foregroundSubtle,
+                fontSize: 14,
+                height: 20 / 14,
               ),
             ),
           ],
