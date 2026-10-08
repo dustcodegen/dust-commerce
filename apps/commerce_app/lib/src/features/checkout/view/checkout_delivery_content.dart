@@ -111,19 +111,35 @@ final class CheckoutDeliverySummary extends StatelessWidget {
   Widget build(BuildContext context) {
     final method = selected;
     if (method == null) return const SizedBox.shrink();
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const TranslatedText(
-          'shop_checkout_method',
-          defaultText: 'Method',
-          style: TextStyle(fontWeight: FontWeight.w600),
-        ),
-        Text(
-          '${method.name} ${formatMoney(method.amount)}',
-          style: const TextStyle(color: StoreColors.foregroundSubtle),
-        ),
-      ],
+    return FractionallySizedBox(
+      widthFactor: 1 / 3,
+      alignment: Alignment.centerLeft,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const TranslatedText(
+            'shop_checkout_method',
+            defaultText: 'Method',
+            style: _deliverySummaryTitleStyle,
+          ),
+          Text(
+            '${method.name} ${formatMoney(method.amount)}',
+            style: _deliverySummaryValueStyle,
+          ),
+        ],
+      ),
     );
   }
 }
+
+const _deliverySummaryTitleStyle = TextStyle(
+  fontSize: 14,
+  height: 20 / 14,
+  fontWeight: FontWeight.w600,
+);
+
+const _deliverySummaryValueStyle = TextStyle(
+  color: StoreColors.foregroundSubtle,
+  fontSize: 14,
+  height: 20 / 14,
+);
