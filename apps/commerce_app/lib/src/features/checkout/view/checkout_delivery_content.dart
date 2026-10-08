@@ -33,12 +33,20 @@ final class CheckoutDeliveryChoices extends StatelessWidget {
           const TranslatedText(
             'shop_checkout_shipping_method',
             defaultText: 'Shipping method',
-            style: TextStyle(fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 14,
+              height: 20 / 14,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           const TranslatedText(
             'shop_checkout_delivery_prompt',
             defaultText: 'How would you like your order delivered',
-            style: TextStyle(color: StoreColors.foregroundMuted),
+            style: TextStyle(
+              color: StoreColors.foregroundMuted,
+              fontSize: 14,
+              height: 20 / 14,
+            ),
           ),
           const SizedBox(height: 16),
           if (cart.shippingOptions.isEmpty && state.isBusy)
