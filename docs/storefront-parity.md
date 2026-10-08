@@ -85,9 +85,11 @@ image set.
 The store refinement sidebar also follows Medusa's `OptionsPicker`: filters
 come from `/store/product-options`, every group starts expanded, selections use
 stable value identifiers in repeated `optionValueIds` query keys, and changing
-a selection removes the current page. Option discovery is intentionally
-non-fatal, while collection and category routes retain incoming selections but
-hide the picker exactly as the source templates do.
+a selection removes the current page. Current Store option refinements start
+directly with option groups, without a separate `Options` section label. Option
+discovery is intentionally non-fatal, while collection and category routes
+retain incoming selections but hide the picker exactly as the source templates
+do.
 
 Store search was browser-verified on 2026-09-26 against commit `d89bed8` using
 a fresh seeded SQLite database and the live Store on `127.0.0.1:13001`. The nav

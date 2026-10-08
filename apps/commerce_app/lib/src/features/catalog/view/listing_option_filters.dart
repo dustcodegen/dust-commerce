@@ -51,45 +51,28 @@ class _ListingOptionFiltersState extends State<ListingOptionFilters> {
   }
 
   @override
-  Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 4),
-            child: TranslatedText(
-              'shop_options',
-              defaultText: 'Options',
-              style: TextStyle(
-                color: StoreColors.foregroundSubtle,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(right: 24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final (index, option) in widget.options.indexed) ...[
+              _OptionGroup(
+                option: option,
+                open: _open.contains(option.id),
+                selectedValueIds: widget.selectedValueIds,
+                onOpenChanged: () => setState(() {
+                  _open.contains(option.id)
+                      ? _open.remove(option.id)
+                      : _open.add(option.id);
+                }),
+                onValueChanged: _toggleValue,
               ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.only(right: 24),
-            child: Column(
-              children: [
-                for (final (index, option) in widget.options.indexed) ...[
-                  _OptionGroup(
-                    option: option,
-                    open: _open.contains(option.id),
-                    selectedValueIds: widget.selectedValueIds,
-                    onOpenChanged: () => setState(() {
-                      _open.contains(option.id)
-                          ? _open.remove(option.id)
-                          : _open.add(option.id);
-                    }),
-                    onValueChanged: _toggleValue,
-                  ),
-                  if (index != widget.options.length - 1)
-                    const SizedBox(height: 12),
-                ],
-              ],
-            ),
-          ),
-        ],
+              if (index != widget.options.length - 1)
+                const SizedBox(height: 12),
+            ],
+          ],
+        ),
       );
 }
 
