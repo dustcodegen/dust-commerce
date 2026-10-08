@@ -67,7 +67,7 @@ final class CheckoutAddressForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 28),
+        padding: const EdgeInsets.only(bottom: 32),
         child: Form(
           key: formKey,
           child: Column(
@@ -108,7 +108,7 @@ final class CheckoutAddressForm extends StatelessWidget {
                   includePhone: true,
                 ),
               ],
-              const SizedBox(height: 36),
+              SizedBox(height: sameAsBilling ? 40 : 24),
               Align(
                 alignment: Alignment.centerLeft,
                 child: CheckoutPrimaryAction(
