@@ -134,6 +134,11 @@ saved address into the editable form only when its country belongs to the
 cart's active region. Order detail keeps its loaded order and failure as Dust
 `Option` values, and a missing or foreign order receives the same unavailable
 state so the UI does not disclose whether another customer's id exists.
+The profile email row is a deliberate production adaptation: current Medusa
+renders an email editor with a source TODO and fake success path, while Morrow
+keeps registered sign-in email read-only until the backend has a verified
+email-change flow with current-password confirmation and session-boundary
+semantics.
 Password rotation completes the TODO in the pinned Medusa profile source: it
 requires the current secret, writes a fresh Argon2id PHC value with
 compare-and-swap protection, atomically revokes every session, and signs the
