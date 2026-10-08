@@ -10,6 +10,21 @@ const _orderCardSmallStyle = TextStyle(
   color: StoreColors.foreground,
 );
 
+const _orderCardThumbnailShadow = [
+  BoxShadow(color: Color(0x14000000), spreadRadius: 1),
+  BoxShadow(
+    color: Color(0x14000000),
+    offset: Offset(0, 1),
+    blurRadius: 2,
+    spreadRadius: -1,
+  ),
+  BoxShadow(
+    color: Color(0x0a000000),
+    offset: Offset(0, 2),
+    blurRadius: 4,
+  ),
+];
+
 /// Source-shaped summary for one completed or pending customer order.
 class AccountOrderCard extends StatelessWidget {
   /// Creates an order card.
@@ -79,7 +94,14 @@ class AccountOrderCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          ProductImage(url: item.thumbnail, aspectRatio: 1),
+                          ProductImage(
+                            url: item.thumbnail,
+                            aspectRatio: 9 / 16,
+                            border: false,
+                            boxShadow: _orderCardThumbnailShadow,
+                            transitionDuration:
+                                const Duration(milliseconds: 150),
+                          ),
                           const SizedBox(height: 8),
                           Row(
                             children: [
