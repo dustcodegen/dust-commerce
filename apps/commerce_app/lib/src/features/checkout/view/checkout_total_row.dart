@@ -34,16 +34,24 @@ final class CheckoutTotalRow extends StatelessWidget {
             Text(
               label,
               style: TextStyle(
-                color: StoreColors.foregroundSubtle,
-                fontWeight: strong ? FontWeight.w600 : null,
+                color: strong
+                    ? StoreColors.foreground
+                    : StoreColors.foregroundSubtle,
+                fontSize: 14,
+                height: 20 / 14,
               ),
             ),
             Text(
               '${discount ? '- ' : ''}${formatMoney(money)}',
               style: TextStyle(
-                color:
-                    discount ? StoreColors.interactive : StoreColors.foreground,
-                fontWeight: strong ? FontWeight.w600 : null,
+                color: discount
+                    ? StoreColors.interactive
+                    : strong
+                        ? StoreColors.foreground
+                        : StoreColors.foregroundSubtle,
+                fontSize: strong ? 20 : 14,
+                height: strong ? 28 / 20 : 20 / 14,
+                fontWeight: strong ? FontWeight.w500 : null,
               ),
             ),
           ],
