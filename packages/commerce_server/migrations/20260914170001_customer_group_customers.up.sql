@@ -1,5 +1,5 @@
 -- Records customer membership separately so groups and profiles stay independent.
--- UTC timestamps use ISO-8601 TEXT because SQLite has no native TIMESTAMPTZ.
+-- UTC timestamps use PostgreSQL TIMESTAMPTZ so every writer stores an instant.
 CREATE TABLE customer_group_customers (
   -- One membership event has its own identity for remove and re-add history.
   id                TEXT PRIMARY KEY,
@@ -8,12 +8,12 @@ CREATE TABLE customer_group_customers (
   customer_id       TEXT NOT NULL REFERENCES customers (id) ON DELETE CASCADE,
   -- Admin ownership remains auditable without entering public responses.
   created_by        TEXT REFERENCES admin_users (id) ON DELETE SET NULL,
-  created_at        TEXT NOT NULL DEFAULT
-                    (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-  updated_at        TEXT NOT NULL DEFAULT
-                    (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT
+                    (CURRENT_TIMESTAMP),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT
+                    (CURRENT_TIMESTAMP),
   -- Soft deletion retains change history while excluding inactive memberships.
-  deleted_at        TEXT
+  deleted_at TIMESTAMPTZ
 );
 
 -- A customer can be an active member of the same group only once.
@@ -25,11 +25,12 @@ CREATE INDEX idx_customer_group_customers_customer
 ON customer_group_customers (customer_id, customer_group_id)
 WHERE deleted_at IS NULL;
 
--- SQLite has no automatic ON UPDATE timestamp, so this maintains updated_at.
+-- The PostgreSQL trigger maintains updated_at for every writer.
+
+
+
+-- PostgreSQL owns mutation timestamps at the database boundary.
 CREATE TRIGGER customer_group_customers_touch_updated_at
-AFTER UPDATE ON customer_group_customers
-WHEN NEW.updated_at = OLD.updated_at BEGIN
-  UPDATE customer_group_customers
-  SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-  WHERE id = NEW.id;
-END;
+BEFORE UPDATE ON customer_group_customers
+FOR EACH ROW
+EXECUTE FUNCTION dust_touch_updated_at();

@@ -13,6 +13,7 @@ build/
 **/pubspec.lock
 !pubspec.lock
 **/*.g.dart
+**/.dust_sql/
 
 # Examples & Fixtures
 examples/benchmark_project/lib/generated_models/

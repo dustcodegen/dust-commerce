@@ -1,5 +1,5 @@
 -- Snapshots the single promotion currently applied to a cart.
--- UTC timestamps use ISO-8601 TEXT because SQLite has no native TIMESTAMPTZ.
+-- UTC timestamps use PostgreSQL TIMESTAMPTZ so every writer stores an instant.
 CREATE TABLE cart_promotions (
   cart_id       TEXT PRIMARY KEY REFERENCES carts (id) ON DELETE CASCADE,
   promotion_id  TEXT NOT NULL REFERENCES promotions (id),
@@ -13,10 +13,10 @@ CREATE TABLE cart_promotions (
                        (length(currency_code) = 3
                         AND currency_code = lower(currency_code))),
   amount        INTEGER NOT NULL CHECK (amount >= 0),
-  created_at    TEXT NOT NULL DEFAULT
-                (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-  updated_at    TEXT NOT NULL DEFAULT
-                (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT
+                (CURRENT_TIMESTAMP),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT
+                (CURRENT_TIMESTAMP),
   -- A percentage is currency-free; a fixed value must name its currency.
   CHECK ((type = 'percentage' AND currency_code IS NULL) OR
          (type = 'fixed' AND currency_code IS NOT NULL)),
@@ -24,9 +24,11 @@ CREATE TABLE cart_promotions (
 );
 
 -- Upserts change the applied discount in place, so updated_at must advance.
-CREATE TRIGGER cart_promotions_touch_updated_at AFTER UPDATE ON cart_promotions
-WHEN NEW.updated_at = OLD.updated_at BEGIN
-  UPDATE cart_promotions
-  SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-  WHERE cart_id = NEW.cart_id;
-END;
+
+
+
+-- PostgreSQL owns mutation timestamps at the database boundary.
+CREATE TRIGGER cart_promotions_touch_updated_at
+BEFORE UPDATE ON cart_promotions
+FOR EACH ROW
+EXECUTE FUNCTION dust_touch_updated_at();

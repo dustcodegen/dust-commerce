@@ -1,5 +1,5 @@
 -- Defines merchant-controlled reasons customers can select for returned items.
--- UTC timestamps use ISO-8601 TEXT because SQLite has no native TIMESTAMPTZ.
+-- UTC timestamps use PostgreSQL TIMESTAMPTZ so every writer stores an instant.
 CREATE TABLE return_reasons (
   id                      TEXT PRIMARY KEY,
   -- Stable machine value survives label edits and is safe for analytics.
@@ -11,13 +11,13 @@ CREATE TABLE return_reasons (
   -- Parent reasons support Medusa's nested reason taxonomy without CSV fields.
   parent_return_reason_id TEXT REFERENCES return_reasons (id),
   -- Extension data is private and must remain valid JSON when present.
-  metadata                TEXT CHECK (metadata IS NULL OR json_valid(metadata)),
-  created_at              TEXT NOT NULL DEFAULT
-                          (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-  updated_at              TEXT NOT NULL DEFAULT
-                          (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  metadata                TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT
+                          (CURRENT_TIMESTAMP),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT
+                          (CURRENT_TIMESTAMP),
   -- Soft deletion preserves the meaning of historical return items.
-  deleted_at              TEXT,
+  deleted_at TIMESTAMPTZ,
   CHECK (parent_return_reason_id IS NULL OR parent_return_reason_id <> id)
 );
 
@@ -30,10 +30,12 @@ CREATE INDEX idx_return_reasons_parent
 ON return_reasons (parent_return_reason_id)
 WHERE deleted_at IS NULL;
 
--- SQLite has no automatic ON UPDATE timestamp, so this maintains updated_at.
-CREATE TRIGGER return_reasons_touch_updated_at AFTER UPDATE ON return_reasons
-WHEN NEW.updated_at = OLD.updated_at BEGIN
-  UPDATE return_reasons
-  SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-  WHERE id = NEW.id;
-END;
+-- The PostgreSQL trigger maintains updated_at for every writer.
+
+
+
+-- PostgreSQL owns mutation timestamps at the database boundary.
+CREATE TRIGGER return_reasons_touch_updated_at
+BEFORE UPDATE ON return_reasons
+FOR EACH ROW
+EXECUTE FUNCTION dust_touch_updated_at();

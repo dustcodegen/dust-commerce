@@ -41,6 +41,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
+  buffer:
+    dependency: transitive
+    description:
+      name: buffer
+      sha256: "389da2ec2c16283c8787e0adaede82b1842102f8c8aae2f49003a766c5c6b3d1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.3"
   characters:
     dependency: transitive
     description:
@@ -49,6 +57,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.4.1"
+  charcode:
+    dependency: transitive
+    description:
+      name: charcode
+      sha256: fb0f1107cac15a5ea6ef0a6ef71a807b9e4267c713bb93e00e92d737cc8dbd8a
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.4.0"
   cli_config:
     dependency: transitive
     description:
@@ -165,34 +181,34 @@ packages:
     dependency: transitive
     description:
       name: dust_dart
-      sha256: a022689d8bdfdbe649a1efd82f926334e726efcbf9857d0fd952a11205857c9f
+      sha256: adfacbb3230f9f73469c0bcacf7a260fc524321a97866abfee87a5773810be66
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.4"
-  dust_db_sqlite3:
+    version: "0.3.0"
+  dust_db_postgres:
     dependency: transitive
     description:
-      name: dust_db_sqlite3
-      sha256: "1e82b0b9aa40a6d6846f6b59e08e55d18ccea847870f5ea70ce42270375f3383"
+      name: dust_db_postgres
+      sha256: "87e9d4c96e64ec655db6f79c9de2ec8b0baa703019a24b959d91e1d8c36d4ef7"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.4"
+    version: "0.3.0"
   dust_flutter:
     dependency: transitive
     description:
       name: dust_flutter
-      sha256: "242af76ab29e33ba86fd25696e66acff50161efd3812b193d889548af96b2556"
+      sha256: e9d99bcc5dc5286bd0abfad2e84b8659883619924d328077c84bedd8c6005827
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.4"
+    version: "0.3.0"
   dust_server:
     dependency: transitive
     description:
       name: dust_server
-      sha256: "5f65a677b0799acf746fde559572933746cce548c29c0700cacaddccd4c63da0"
+      sha256: "1730f50735efb1dc354332baa581399d399e7b4b763cefb23eea11c4e1bcbe1d"
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.0-beta.3"
+    version: "0.3.0"
   fake_async:
     dependency: transitive
     description:
@@ -557,14 +573,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.5"
-  native_toolchain_c:
-    dependency: transitive
-    description:
-      name: native_toolchain_c
-      sha256: f9c168717100ae6d9fee9ffb0be379bf1f8b26b0f6bcbd4fdddcd931993a6a72
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.19.2"
   node_preamble:
     dependency: transitive
     description:
@@ -685,6 +693,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.3"
+  postgres:
+    dependency: transitive
+    description:
+      name: postgres
+      sha256: f2571f6f4256e94d87334d7189fcf28407500c34cd0ebcb74cff21fab5f4e988
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.5.20"
   pub_semver:
     dependency: transitive
     description:
@@ -770,14 +786,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.2"
-  sqlite3:
-    dependency: transitive
-    description:
-      name: sqlite3
-      sha256: "4c7fe79840389aaeaf05fd093f795b631b5a98e2bd28d54e555c100f4a9c7a1c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.5.2"
   stack_trace:
     dependency: transitive
     description:

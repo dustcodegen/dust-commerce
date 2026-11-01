@@ -1,5 +1,5 @@
 -- Stores customer-owned return requests independently from immutable orders.
--- UTC timestamps use ISO-8601 TEXT because SQLite has no native TIMESTAMPTZ.
+-- UTC timestamps use PostgreSQL TIMESTAMPTZ so every writer stores an instant.
 CREATE TABLE return_requests (
   id              TEXT PRIMARY KEY,
   -- Short monotonic number is shown to people; opaque ids remain API keys.
@@ -20,17 +20,17 @@ CREATE TABLE return_requests (
   no_notification INTEGER NOT NULL DEFAULT 0 CHECK (no_notification IN (0, 1)),
   -- Refund stays absent until a merchant has accepted a concrete amount.
   refund_amount   INTEGER CHECK (refund_amount IS NULL OR refund_amount >= 0),
-  requested_at    TEXT NOT NULL DEFAULT
-                  (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  requested_at TIMESTAMPTZ NOT NULL DEFAULT
+                  (CURRENT_TIMESTAMP),
   -- Receipt and cancellation times are mutually exclusive final audit facts.
-  received_at     TEXT,
-  canceled_at     TEXT,
-  created_at      TEXT NOT NULL DEFAULT
-                  (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-  updated_at      TEXT NOT NULL DEFAULT
-                  (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  received_at TIMESTAMPTZ,
+  canceled_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT
+                  (CURRENT_TIMESTAMP),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT
+                  (CURRENT_TIMESTAMP),
   -- Soft deletion keeps historical item and refund relationships readable.
-  deleted_at      TEXT,
+  deleted_at TIMESTAMPTZ,
   CHECK (
     (status IN ('open', 'requested')
       AND received_at IS NULL AND canceled_at IS NULL) OR
@@ -53,10 +53,12 @@ CREATE INDEX idx_return_requests_status
 ON return_requests (status, requested_at)
 WHERE deleted_at IS NULL;
 
--- SQLite has no automatic ON UPDATE timestamp, so this maintains updated_at.
-CREATE TRIGGER return_requests_touch_updated_at AFTER UPDATE ON return_requests
-WHEN NEW.updated_at = OLD.updated_at BEGIN
-  UPDATE return_requests
-  SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-  WHERE id = NEW.id;
-END;
+-- The PostgreSQL trigger maintains updated_at for every writer.
+
+
+
+-- PostgreSQL owns mutation timestamps at the database boundary.
+CREATE TRIGGER return_requests_touch_updated_at
+BEFORE UPDATE ON return_requests
+FOR EACH ROW
+EXECUTE FUNCTION dust_touch_updated_at();

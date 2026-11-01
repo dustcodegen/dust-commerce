@@ -1,5 +1,5 @@
 -- Stores requested quantities against immutable order-line snapshots.
--- UTC timestamps use ISO-8601 TEXT because SQLite has no native TIMESTAMPTZ.
+-- UTC timestamps use PostgreSQL TIMESTAMPTZ so every writer stores an instant.
 CREATE TABLE return_items (
   id                TEXT PRIMARY KEY,
   -- Deleting an uncommitted return removes only its owned item requests.
@@ -18,11 +18,11 @@ CREATE TABLE return_items (
   -- Optional item-specific context does not overload the reason label.
   note              TEXT CHECK (note IS NULL OR length(note) <= 1000),
   -- Extension data is private and must remain valid JSON when present.
-  metadata          TEXT CHECK (metadata IS NULL OR json_valid(metadata)),
-  created_at        TEXT NOT NULL DEFAULT
-                    (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-  updated_at        TEXT NOT NULL DEFAULT
-                    (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  metadata          TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT
+                    (CURRENT_TIMESTAMP),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT
+                    (CURRENT_TIMESTAMP),
   UNIQUE (return_id, order_item_id)
 );
 
@@ -32,10 +32,12 @@ ON return_items (order_item_id);
 CREATE INDEX idx_return_items_reason
 ON return_items (reason_id);
 
--- SQLite has no automatic ON UPDATE timestamp, so this maintains updated_at.
-CREATE TRIGGER return_items_touch_updated_at AFTER UPDATE ON return_items
-WHEN NEW.updated_at = OLD.updated_at BEGIN
-  UPDATE return_items
-  SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-  WHERE id = NEW.id;
-END;
+-- The PostgreSQL trigger maintains updated_at for every writer.
+
+
+
+-- PostgreSQL owns mutation timestamps at the database boundary.
+CREATE TRIGGER return_items_touch_updated_at
+BEFORE UPDATE ON return_items
+FOR EACH ROW
+EXECUTE FUNCTION dust_touch_updated_at();

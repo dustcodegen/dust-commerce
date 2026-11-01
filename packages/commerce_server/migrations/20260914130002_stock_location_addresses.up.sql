@@ -1,5 +1,5 @@
 -- Stores reusable warehouse addresses separately from stock-location identity.
--- UTC timestamps use ISO-8601 TEXT because SQLite has no native TIMESTAMPTZ.
+-- UTC timestamps use PostgreSQL TIMESTAMPTZ so every writer stores an instant.
 CREATE TABLE stock_location_addresses (
   -- Opaque address identity lets a location replace its address explicitly.
   id           TEXT PRIMARY KEY,
@@ -35,26 +35,27 @@ CREATE TABLE stock_location_addresses (
     province IS NULL OR length(trim(province)) BETWEEN 1 AND 255
   ),
   -- Merchant extension data remains private and valid JSON when present.
-  metadata     TEXT CHECK (metadata IS NULL OR json_valid(metadata)),
-  -- SQLite owns the creation instant for every address writer.
-  created_at   TEXT NOT NULL DEFAULT
-               (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  metadata     TEXT,
+  -- PostgreSQL owns the creation instant for every address writer.
+  created_at TIMESTAMPTZ NOT NULL DEFAULT
+               (CURRENT_TIMESTAMP),
   -- The trigger below owns mutation time; application code never supplies it.
-  updated_at   TEXT NOT NULL DEFAULT
-               (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT
+               (CURRENT_TIMESTAMP),
   -- Soft deletion retains the origin used by historical fulfillments.
-  deleted_at   TEXT
+  deleted_at TIMESTAMPTZ
 );
 
 CREATE INDEX idx_stock_location_addresses_country_active
 ON stock_location_addresses (country_code, created_at, id)
 WHERE deleted_at IS NULL;
 
--- SQLite has no automatic ON UPDATE timestamp, so this maintains updated_at.
+-- The PostgreSQL trigger maintains updated_at for every writer.
+
+
+
+-- PostgreSQL owns mutation timestamps at the database boundary.
 CREATE TRIGGER stock_location_addresses_touch_updated_at
-AFTER UPDATE ON stock_location_addresses
-WHEN NEW.updated_at = OLD.updated_at BEGIN
-  UPDATE stock_location_addresses
-  SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-  WHERE id = NEW.id;
-END;
+BEFORE UPDATE ON stock_location_addresses
+FOR EACH ROW
+EXECUTE FUNCTION dust_touch_updated_at();

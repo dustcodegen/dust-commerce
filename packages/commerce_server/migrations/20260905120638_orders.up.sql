@@ -1,5 +1,5 @@
 -- Stores the immutable commercial snapshot produced by checkout.
--- UTC timestamps use ISO-8601 TEXT because SQLite has no native TIMESTAMPTZ.
+-- UTC timestamps use PostgreSQL TIMESTAMPTZ so every writer stores an instant.
 CREATE TABLE orders (
   id                 TEXT PRIMARY KEY,
   -- Short monotonic number is shown to people; opaque ids remain API keys.
@@ -8,7 +8,7 @@ CREATE TABLE orders (
   cart_id            TEXT NOT NULL UNIQUE REFERENCES carts (id),
   region_id          TEXT NOT NULL REFERENCES regions (id),
   customer_id        TEXT REFERENCES customers (id),
-  email              TEXT NOT NULL COLLATE NOCASE,
+  email              TEXT NOT NULL,
   currency_code      TEXT NOT NULL
                      CHECK (length(currency_code) = 3
                             AND currency_code = lower(currency_code)),
@@ -29,18 +29,18 @@ CREATE TABLE orders (
   shipping_option_id TEXT,
   shipping_name      TEXT,
   promotion_code     TEXT,
-  metadata           TEXT CHECK (metadata IS NULL OR json_valid(metadata)),
+  metadata           TEXT,
   -- Business event time is explicit; created_at remains the database insert time.
-  placed_at          TEXT NOT NULL,
+  placed_at TIMESTAMPTZ NOT NULL,
   -- Cancellation time makes the irreversible lifecycle event auditable.
-  canceled_at        TEXT,
+  canceled_at TIMESTAMPTZ,
   -- Nullable actor preserves the event if an Admin account is later deleted.
   canceled_by        TEXT REFERENCES admin_users (id) ON DELETE SET NULL,
-  created_at         TEXT NOT NULL DEFAULT
-                     (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-  updated_at         TEXT NOT NULL DEFAULT
-                     (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-  deleted_at         TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT
+                     (CURRENT_TIMESTAMP),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT
+                     (CURRENT_TIMESTAMP),
+  deleted_at TIMESTAMPTZ,
   -- Database checks make a corrupted or contradictory order total impossible.
   CHECK (discount_total <= subtotal + shipping_total),
   CHECK (total = subtotal + shipping_total - discount_total + tax),
@@ -60,9 +60,12 @@ CREATE INDEX idx_orders_email ON orders (email)
 WHERE deleted_at IS NULL;
 CREATE INDEX idx_orders_placed_at ON orders (placed_at);
 
--- SQLite has no automatic ON UPDATE timestamp, so this maintains updated_at.
-CREATE TRIGGER orders_touch_updated_at AFTER UPDATE ON orders
-WHEN NEW.updated_at = OLD.updated_at BEGIN
-  UPDATE orders SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-  WHERE id = NEW.id;
-END;
+-- The PostgreSQL trigger maintains updated_at for every writer.
+
+
+
+-- PostgreSQL owns mutation timestamps at the database boundary.
+CREATE TRIGGER orders_touch_updated_at
+BEFORE UPDATE ON orders
+FOR EACH ROW
+EXECUTE FUNCTION dust_touch_updated_at();

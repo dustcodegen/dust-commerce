@@ -1,4 +1,4 @@
 -- Removes product fulfillment links and their database-owned maintenance.
-DROP TRIGGER IF EXISTS product_shipping_profile_attach_product_after_insert;
-DROP TRIGGER IF EXISTS product_shipping_profile_touch_updated_at;
+DROP TRIGGER IF EXISTS product_shipping_profile_attach_product_after_insert ON product_shipping_profile;
+DROP TRIGGER IF EXISTS product_shipping_profile_touch_updated_at ON product_shipping_profile;
 DROP TABLE IF EXISTS product_shipping_profile;

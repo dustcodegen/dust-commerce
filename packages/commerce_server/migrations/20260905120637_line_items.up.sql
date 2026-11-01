@@ -1,5 +1,5 @@
 -- Stores cart-item snapshots so titles and prices stay stable during checkout.
--- UTC timestamps use ISO-8601 TEXT because SQLite has no native TIMESTAMPTZ.
+-- UTC timestamps use PostgreSQL TIMESTAMPTZ so every writer stores an instant.
 CREATE TABLE line_items (
   id            TEXT PRIMARY KEY,
   cart_id       TEXT NOT NULL REFERENCES carts (id) ON DELETE CASCADE,
@@ -16,21 +16,24 @@ CREATE TABLE line_items (
                 CHECK (length(currency_code) = 3
                        AND currency_code = lower(currency_code)),
   quantity      INTEGER NOT NULL CHECK (quantity > 0),
-  metadata      TEXT CHECK (metadata IS NULL OR json_valid(metadata)),
-  created_at    TEXT NOT NULL DEFAULT
-                (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-  updated_at    TEXT NOT NULL DEFAULT
-                (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  metadata      TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT
+                (CURRENT_TIMESTAMP),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT
+                (CURRENT_TIMESTAMP),
   -- Soft deletion supports removing an item while retaining audit context.
-  deleted_at    TEXT
+  deleted_at TIMESTAMPTZ
 );
 
 CREATE INDEX idx_line_items_cart ON line_items (cart_id)
 WHERE deleted_at IS NULL;
 
--- SQLite has no automatic ON UPDATE timestamp, so this maintains updated_at.
-CREATE TRIGGER line_items_touch_updated_at AFTER UPDATE ON line_items
-WHEN NEW.updated_at = OLD.updated_at BEGIN
-  UPDATE line_items SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-  WHERE id = NEW.id;
-END;
+-- The PostgreSQL trigger maintains updated_at for every writer.
+
+
+
+-- PostgreSQL owns mutation timestamps at the database boundary.
+CREATE TRIGGER line_items_touch_updated_at
+BEFORE UPDATE ON line_items
+FOR EACH ROW
+EXECUTE FUNCTION dust_touch_updated_at();

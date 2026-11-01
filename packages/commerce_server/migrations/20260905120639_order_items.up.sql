@@ -1,5 +1,5 @@
 -- Stores order-time item snapshots independent of mutable catalog records.
--- UTC timestamps use ISO-8601 TEXT because SQLite has no native TIMESTAMPTZ.
+-- UTC timestamps use PostgreSQL TIMESTAMPTZ so every writer stores an instant.
 CREATE TABLE order_items (
   id            TEXT PRIMARY KEY,
   order_id      TEXT NOT NULL REFERENCES orders (id) ON DELETE CASCADE,
@@ -16,18 +16,21 @@ CREATE TABLE order_items (
                 CHECK (length(currency_code) = 3
                        AND currency_code = lower(currency_code)),
   quantity      INTEGER NOT NULL CHECK (quantity > 0),
-  metadata      TEXT CHECK (metadata IS NULL OR json_valid(metadata)),
-  created_at    TEXT NOT NULL DEFAULT
-                (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-  updated_at    TEXT NOT NULL DEFAULT
-                (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
+  metadata      TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT
+                (CURRENT_TIMESTAMP),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT
+                (CURRENT_TIMESTAMP)
 );
 
 CREATE INDEX idx_order_items_order ON order_items (order_id);
 
 -- Maintains audit timestamps if administrative correction is ever required.
-CREATE TRIGGER order_items_touch_updated_at AFTER UPDATE ON order_items
-WHEN NEW.updated_at = OLD.updated_at BEGIN
-  UPDATE order_items SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-  WHERE id = NEW.id;
-END;
+
+
+
+-- PostgreSQL owns mutation timestamps at the database boundary.
+CREATE TRIGGER order_items_touch_updated_at
+BEFORE UPDATE ON order_items
+FOR EACH ROW
+EXECUTE FUNCTION dust_touch_updated_at();

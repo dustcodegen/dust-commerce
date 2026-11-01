@@ -1,5 +1,5 @@
 -- Stores customer-service conversations submitted from the public Store.
--- UTC timestamps use ISO-8601 TEXT because SQLite has no native TIMESTAMPTZ.
+-- UTC timestamps use PostgreSQL TIMESTAMPTZ so every writer stores an instant.
 CREATE TABLE customer_service_requests (
   -- Opaque identity is safe to expose in the submission acknowledgement.
   id              TEXT PRIMARY KEY,
@@ -10,7 +10,7 @@ CREATE TABLE customer_service_requests (
                   CHECK (length(trim(name)) BETWEEN 1 AND 120),
   email           TEXT NOT NULL
                   CHECK (length(trim(email)) BETWEEN 3 AND 254
-                    AND instr(email, '@') > 1),
+                    AND position('@' in email) > 1),
   -- Subject and message retain the exact customer support context.
   subject         TEXT NOT NULL
                   CHECK (length(trim(subject)) BETWEEN 1 AND 160),
@@ -24,11 +24,11 @@ CREATE TABLE customer_service_requests (
   status          TEXT NOT NULL DEFAULT 'open'
                   CHECK (status IN ('open', 'in_progress', 'resolved')),
   -- Resolution time is an audit fact generated only by the status update.
-  resolved_at     TEXT,
-  created_at      TEXT NOT NULL DEFAULT
-                  (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-  updated_at      TEXT NOT NULL DEFAULT
-                  (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  resolved_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT
+                  (CURRENT_TIMESTAMP),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT
+                  (CURRENT_TIMESTAMP),
   CHECK (
     (status = 'resolved' AND resolved_at IS NOT NULL) OR
     (status != 'resolved' AND resolved_at IS NULL)
@@ -43,13 +43,14 @@ ON customer_service_requests (customer_id, created_at DESC)
 WHERE customer_id IS NOT NULL;
 
 CREATE INDEX idx_customer_service_requests_email
-ON customer_service_requests (email COLLATE NOCASE, created_at DESC);
+ON customer_service_requests (email, created_at DESC);
 
--- SQLite has no automatic ON UPDATE timestamp, so this maintains updated_at.
+-- The PostgreSQL trigger maintains updated_at for every writer.
+
+
+
+-- PostgreSQL owns mutation timestamps at the database boundary.
 CREATE TRIGGER customer_service_requests_touch_updated_at
-AFTER UPDATE ON customer_service_requests
-WHEN NEW.updated_at = OLD.updated_at BEGIN
-  UPDATE customer_service_requests
-  SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-  WHERE id = NEW.id;
-END;
+BEFORE UPDATE ON customer_service_requests
+FOR EACH ROW
+EXECUTE FUNCTION dust_touch_updated_at();

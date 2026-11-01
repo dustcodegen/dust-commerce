@@ -1,5 +1,5 @@
 -- Stores purchasable product choices with independent inventory behavior.
--- UTC timestamps use ISO-8601 TEXT because SQLite has no native TIMESTAMPTZ.
+-- UTC timestamps use PostgreSQL TIMESTAMPTZ so every writer stores an instant.
 CREATE TABLE product_variants (
   id                 TEXT PRIMARY KEY,
   product_id         TEXT NOT NULL REFERENCES products (id) ON DELETE CASCADE,
@@ -34,15 +34,15 @@ CREATE TABLE product_variants (
                                   length(trim(hs_code)) BETWEEN 1 AND 255),
   -- Canonical lowercase ISO 3166-1 alpha-2 code supports deterministic filters.
   origin_country     TEXT CHECK (origin_country IS NULL OR
-                                  origin_country GLOB '[a-z][a-z]'),
+                                  origin_country ~ '^[a-z]{2}$'),
   -- Optional extension data must remain valid JSON.
-  metadata           TEXT CHECK (metadata IS NULL OR json_valid(metadata)),
-  created_at         TEXT NOT NULL DEFAULT
-                     (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-  updated_at         TEXT NOT NULL DEFAULT
-                     (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  metadata           TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT
+                     (CURRENT_TIMESTAMP),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT
+                     (CURRENT_TIMESTAMP),
   -- Soft deletion hides a variant without breaking historical items.
-  deleted_at         TEXT
+  deleted_at TIMESTAMPTZ
 );
 
 CREATE INDEX idx_variants_product ON product_variants (product_id)
@@ -50,10 +50,12 @@ WHERE deleted_at IS NULL;
 CREATE UNIQUE INDEX idx_variants_sku ON product_variants (sku)
 WHERE sku IS NOT NULL AND deleted_at IS NULL;
 
--- SQLite has no automatic ON UPDATE timestamp, so this maintains updated_at.
-CREATE TRIGGER variants_touch_updated_at AFTER UPDATE ON product_variants
-WHEN NEW.updated_at = OLD.updated_at BEGIN
-  UPDATE product_variants
-  SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-  WHERE id = NEW.id;
-END;
+-- The PostgreSQL trigger maintains updated_at for every writer.
+
+
+
+-- PostgreSQL owns mutation timestamps at the database boundary.
+CREATE TRIGGER product_variants_touch_updated_at
+BEFORE UPDATE ON product_variants
+FOR EACH ROW
+EXECUTE FUNCTION dust_touch_updated_at();

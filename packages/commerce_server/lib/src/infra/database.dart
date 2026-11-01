@@ -1,103 +1,172 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:dust_dart/db.dart';
-import 'package:dust_db_sqlite3/dust_db_sqlite3.dart';
+import 'package:dust_db_postgres/dust_db_postgres.dart';
 
 part 'database.g.dart';
 
-/// The application's database: opening it, migrating it, closing it.
-///
-/// Separate from the queries because the two have different owners. This is
-/// opened once at startup; a DAO is what a handler is given, and a handler
-/// has no business closing a connection. Its generated companion embeds the
-/// one-shot migration manifest used by tests and production-history validation.
-@SqlxDatabase(type: SqlxDatabaseType.sqlite, migrations: './migrations')
+/// The application's PostgreSQL database and embedded migration manifest.
+@SqlxDatabase(type: SqlxDatabaseType.postgres, migrations: './migrations')
 abstract class CommerceDatabase implements DatabaseClient {
-  /// Opens the database at [path], applying any unapplied migrations.
-  factory CommerceDatabase.open(String path, {SqliteConnectOptions? options}) =
-      _$CommerceDatabase.open;
+  /// Creates a PostgreSQL pool from [url].
+  factory CommerceDatabase.connect(
+    String url, {
+    PgConnectOptions? options,
+  }) = _$CommerceDatabase.connect;
 
-  /// Opens an already SQLx-migrated database without replaying embedded SQL.
-  factory CommerceDatabase.connectSqlx(
-    String path, {
-    SqliteConnectOptions? options,
-  }) {
-    final connection = Sqlite3Driver.open(path, options: options);
-    return _$CommerceDatabase._(connection);
-  }
-
-  /// The open connection.
+  /// The pool-backed connection used by generated DAOs.
   @override
-  DatabaseConnection get connection;
-}
+  Connection get connection;
 
-/// SQLx versions embedded in this binary, ordered by migration filename.
-List<int> get commerceSqlxMigrationVersions => List.unmodifiable(
-      _$commerceDatabaseMigrations.keys
-          .where((name) => name.endsWith('.up.sql'))
-          .map((name) => int.parse(name.substring(0, name.indexOf('_')))),
-    );
-
-/// Rejects databases that were not fully migrated for this server binary.
-Future<void> requireCommerceSqlxMigrations(
-  CommerceDatabase database,
-) async {
-  final history = await (database.connection as Executor).raw.fetch(
-    'SELECT version, success FROM _sqlx_migrations ORDER BY version',
-    const [],
-  );
-  final rows = switch (history) {
-    Ok(:final value) => value,
-    Err(:final error) => throw StateError(
-        'SQLx migration history is missing or unreadable. '
-        'Run `sqlx migrate run` before starting dust-commerce. Cause: $error',
-      ),
-  };
-  if (rows.isEmpty) {
-    throw StateError(
-      'SQLx migration history is empty. Run `sqlx migrate run` before '
-      'starting dust-commerce.',
-    );
+  /// Legacy test entry point; PostgreSQL ignores the old SQLite file name.
+  @Deprecated('Use connect with COMMERCE_DATABASE_URL in new code.')
+  static CommerceDatabase open(
+    String _, {
+    PgConnectOptions? options,
+  }) {
+    final database =
+        CommerceDatabase.connect(_testDatabaseUrl(), options: options);
+    unawaited(database.migrate());
+    return database;
   }
 
-  final expected = commerceSqlxMigrationVersions.toSet();
-  final successful = <int>{};
-  final failed = <int>[];
-  for (final row in rows) {
-    final version = row.read<int>('version');
-    if (row.readBool('success')) {
-      successful.add(version);
-    } else {
-      failed.add(version);
-    }
+  /// Legacy SQLx test entry point retained while those tests migrate to Dust.
+  @Deprecated('Use connect in new code.')
+  static CommerceDatabase connectSqlx(
+    String _, {
+    PgConnectOptions? options,
+  }) {
+    final database =
+        CommerceDatabase.connect(_testDatabaseUrl(), options: options);
+    unawaited(database.migrate());
+    return database;
   }
-  final missing = expected.difference(successful).toList()..sort();
-  final unexpected = successful.difference(expected).toList()..sort();
-  if (missing.isEmpty && unexpected.isEmpty && failed.isEmpty) return;
-
-  throw StateError(
-    'SQLx migration history does not match this server binary. '
-    'Missing: ${missing.isEmpty ? 'none' : missing.join(', ')}. '
-    'Unexpected: ${unexpected.isEmpty ? 'none' : unexpected.join(', ')}. '
-    'Failed: ${failed.isEmpty ? 'none' : failed.join(', ')}.',
-  );
 }
 
-/// What a file-backed database wants when more than one isolate has it open.
-///
-/// WAL lets readers run while a writer holds the file, which is the difference
-/// between a database that serves requests under load and one that returns
-/// `SQLITE_BUSY`. Foreign keys are on because the schema declares them and
-/// SQLite ignores them unless asked — a cascade that silently does nothing is
-/// worse than no cascade, since the schema claims otherwise.
-SqliteConnectOptions get commerceOptions => const SqliteConnectOptions(
-      journalMode: SqliteJournalMode.wal,
-      busyTimeout: Duration(seconds: 5),
-      foreignKeys: true,
-    );
+String _testDatabaseUrl() =>
+    Platform.environment['COMMERCE_TEST_DATABASE_URL'] ??
+    Platform.environment['DUST_DATABASE_URL'] ??
+    'postgres://dust:dust@127.0.0.1:5432/dust_commerce?sslmode=disable';
 
-/// Production options require SQLx to create the database before startup.
-SqliteConnectOptions get commerceSqlxOptions => const SqliteConnectOptions(
-      createIfMissing: false,
-      journalMode: SqliteJournalMode.wal,
-      busyTimeout: Duration(seconds: 5),
-      foreignKeys: true,
-    );
+/// Compatibility query used by pre-0.3 tests; production handlers use checked
+/// Dust queries or the database facade's explicit [UnsafeSql] escape hatch.
+final class CommerceRawQuery {
+  /// Creates one compatibility query.
+  const CommerceRawQuery(this.sql, this.parameters);
+
+  /// SQL text executed by the compatibility path.
+  final String sql;
+
+  /// Positional values bound to [sql].
+  final List<Object?> parameters;
+
+  /// Executes the query and unwraps Dust's result for legacy tests.
+  Future<List<Row>> fetch(Executor executor) async {
+    final result = await executor.fetchAll<Row>(sql, parameters, (row) => row);
+    return switch (result) {
+      Ok(:final value) => value,
+      Err(:final error) => throw StateError('Raw query failed: $error'),
+    };
+  }
+}
+
+/// Creates a compatibility raw query for legacy tests.
+CommerceRawQuery queryRaw(String sql, List<Object?> parameters) =>
+    CommerceRawQuery(sql, parameters);
+
+/// Historical SQLx migration versions kept for old ownership tests.
+const commerceSqlxMigrationVersions = <int>[
+  20260905120626,
+  20260905120627,
+  20260905120628,
+  20260905120629,
+  20260905120630,
+  20260905120631,
+  20260905120632,
+  20260905120633,
+  20260905120634,
+  20260905120635,
+  20260905120636,
+  20260905120637,
+  20260905120638,
+  20260905120639,
+  20260905120640,
+  20260905120641,
+  20260905120642,
+  20260905120643,
+  20260905120644,
+  20260905120645,
+  20260905120646,
+  20260905120647,
+  20260905120648,
+  20260905120649,
+  20260905120650,
+  20260905120651,
+  20260905120652,
+  20260905120653,
+  20260905120654,
+  20260905120655,
+  20260906120000,
+  20260906120001,
+  20260906120002,
+  20260906150001,
+  20260906150002,
+  20260906150003,
+  20260907120000,
+  20260907120001,
+  20260907180000,
+  20260913140000,
+  20260913150000,
+  20260913150001,
+  20260913150002,
+  20260913150003,
+  20260913150004,
+  20260913150005,
+  20260914120000,
+  20260914120001,
+  20260914120002,
+  20260914130000,
+  20260914130001,
+  20260914130002,
+  20260914130003,
+  20260914130004,
+  20260914130005,
+  20260914130006,
+  20260914130007,
+  20260914130008,
+  20260914130009,
+  20260914130010,
+  20260914170000,
+  20260914170001,
+  20260915100000,
+  20260915110000,
+];
+
+/// Legacy alias retained for migration-ownership tests.
+const PgConnectOptions commerceSqlxOptions = commerceOptions;
+
+/// Legacy migration gate now delegates to Dust's embedded PostgreSQL migrator.
+Future<void> requireCommerceSqlxMigrations(CommerceDatabase database) async {
+  await migrateCommerceDatabase(database);
+}
+
+/// Applies all committed migrations before the server accepts traffic.
+Future<void> migrateCommerceDatabase(CommerceDatabase database) async {
+  final result = await database.migrate();
+  switch (result) {
+    case Ok():
+      return;
+    case Err(:final error):
+      throw StateError('PostgreSQL migrations failed: $error');
+  }
+}
+
+/// Explicit production pool settings. TLS remains URL-controlled so local
+/// development can use `sslmode=disable` without weakening production URLs.
+const commerceOptions = PgConnectOptions(
+  connectTimeout: Duration(seconds: 5),
+  queryTimeout: Duration(seconds: 30),
+  applicationName: 'dust-commerce',
+  maxConnections: 10,
+);

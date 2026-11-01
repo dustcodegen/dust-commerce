@@ -1,5 +1,5 @@
 -- Defines merchant stock locations used to source physical fulfillments.
--- UTC timestamps use ISO-8601 TEXT because SQLite has no native TIMESTAMPTZ.
+-- UTC timestamps use PostgreSQL TIMESTAMPTZ so every writer stores an instant.
 CREATE TABLE stock_locations (
   -- Opaque location identity is stored on fulfillments and inventory levels.
   id         TEXT PRIMARY KEY,
@@ -8,15 +8,15 @@ CREATE TABLE stock_locations (
   -- Address is optional for digital/manual operations and owned separately.
   address_id TEXT REFERENCES stock_location_addresses (id) ON DELETE SET NULL,
   -- Merchant extension data remains private and valid JSON when present.
-  metadata   TEXT CHECK (metadata IS NULL OR json_valid(metadata)),
-  -- SQLite owns the creation instant for every location writer.
-  created_at TEXT NOT NULL DEFAULT
-             (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  metadata   TEXT,
+  -- PostgreSQL owns the creation instant for every location writer.
+  created_at TIMESTAMPTZ NOT NULL DEFAULT
+             (CURRENT_TIMESTAMP),
   -- The trigger below owns mutation time; application code never supplies it.
-  updated_at TEXT NOT NULL DEFAULT
-             (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT
+             (CURRENT_TIMESTAMP),
   -- Soft deletion hides retired locations without rewriting fulfillment history.
-  deleted_at TEXT
+  deleted_at TIMESTAMPTZ
 );
 
 CREATE INDEX idx_stock_locations_name_active
@@ -28,10 +28,12 @@ CREATE UNIQUE INDEX idx_stock_locations_address_active
 ON stock_locations (address_id)
 WHERE deleted_at IS NULL AND address_id IS NOT NULL;
 
--- SQLite has no automatic ON UPDATE timestamp, so this maintains updated_at.
-CREATE TRIGGER stock_locations_touch_updated_at AFTER UPDATE ON stock_locations
-WHEN NEW.updated_at = OLD.updated_at BEGIN
-  UPDATE stock_locations
-  SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-  WHERE id = NEW.id;
-END;
+-- The PostgreSQL trigger maintains updated_at for every writer.
+
+
+
+-- PostgreSQL owns mutation timestamps at the database boundary.
+CREATE TRIGGER stock_locations_touch_updated_at
+BEFORE UPDATE ON stock_locations
+FOR EACH ROW
+EXECUTE FUNCTION dust_touch_updated_at();

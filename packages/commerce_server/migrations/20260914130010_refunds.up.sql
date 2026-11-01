@@ -1,5 +1,5 @@
 -- Records money returned from a captured payment as its own audit event.
--- UTC timestamps use ISO-8601 TEXT because SQLite has no native TIMESTAMPTZ.
+-- UTC timestamps use PostgreSQL TIMESTAMPTZ so every writer stores an instant.
 CREATE TABLE refunds (
   -- Opaque identifier keeps refund retries separate from provider references.
   id                    TEXT PRIMARY KEY,
@@ -21,12 +21,12 @@ CREATE TABLE refunds (
   -- Authenticated Admin ownership is retained while allowing staff deletion.
   created_by            TEXT REFERENCES admin_users (id) ON DELETE SET NULL,
   -- Provider-private response data remains valid JSON and outside Store DTOs.
-  metadata              TEXT CHECK (metadata IS NULL OR json_valid(metadata)),
+  metadata              TEXT,
   -- SQLite owns the actual refund event time for every writer.
-  created_at            TEXT NOT NULL DEFAULT
-                        (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT
+                        (CURRENT_TIMESTAMP),
   -- Soft deletion retains reconciliation history without presenting it active.
-  deleted_at            TEXT
+  deleted_at TIMESTAMPTZ
 );
 
 CREATE INDEX idx_refunds_payment_active

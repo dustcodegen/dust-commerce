@@ -1,28 +1,31 @@
 -- Stores a mutable shopping session before it becomes an immutable order.
--- UTC timestamps use ISO-8601 TEXT because SQLite has no native TIMESTAMPTZ.
+-- UTC timestamps use PostgreSQL TIMESTAMPTZ so every writer stores an instant.
 CREATE TABLE carts (
   id           TEXT PRIMARY KEY,
   region_id    TEXT NOT NULL REFERENCES regions (id),
   -- Nullable because guest checkout must work before account association.
   customer_id  TEXT REFERENCES customers (id),
-  email        TEXT COLLATE NOCASE,
-  metadata     TEXT CHECK (metadata IS NULL OR json_valid(metadata)),
+  email        TEXT,
+  metadata     TEXT,
   -- Set once checkout succeeds so completed carts cannot be treated as active.
-  completed_at TEXT,
-  created_at   TEXT NOT NULL DEFAULT
-               (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-  updated_at   TEXT NOT NULL DEFAULT
-               (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  completed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT
+               (CURRENT_TIMESTAMP),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT
+               (CURRENT_TIMESTAMP),
   -- Soft deletion retains recovery/audit context.
-  deleted_at   TEXT
+  deleted_at TIMESTAMPTZ
 );
 
 CREATE INDEX idx_carts_customer ON carts (customer_id)
 WHERE deleted_at IS NULL;
 
--- SQLite has no automatic ON UPDATE timestamp, so this maintains updated_at.
-CREATE TRIGGER carts_touch_updated_at AFTER UPDATE ON carts
-WHEN NEW.updated_at = OLD.updated_at BEGIN
-  UPDATE carts SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-  WHERE id = NEW.id;
-END;
+-- The PostgreSQL trigger maintains updated_at for every writer.
+
+
+
+-- PostgreSQL owns mutation timestamps at the database boundary.
+CREATE TRIGGER carts_touch_updated_at
+BEFORE UPDATE ON carts
+FOR EACH ROW
+EXECUTE FUNCTION dust_touch_updated_at();

@@ -1,5 +1,5 @@
 -- Assigns one exact minor-unit price to a variant in each currency.
--- UTC timestamps use ISO-8601 TEXT because SQLite has no native TIMESTAMPTZ.
+-- UTC timestamps use PostgreSQL TIMESTAMPTZ so every writer stores an instant.
 CREATE TABLE variant_prices (
   variant_id    TEXT NOT NULL REFERENCES product_variants (id)
                 ON DELETE CASCADE,
@@ -8,18 +8,20 @@ CREATE TABLE variant_prices (
                        AND currency_code = lower(currency_code)),
   -- Integer minor units avoid floating-point money errors.
   amount        INTEGER NOT NULL CHECK (amount >= 0),
-  created_at    TEXT NOT NULL DEFAULT
-                (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
-  updated_at    TEXT NOT NULL DEFAULT
-                (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT
+                (CURRENT_TIMESTAMP),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT
+                (CURRENT_TIMESTAMP),
   -- A variant cannot have two competing prices for the same currency.
   PRIMARY KEY (variant_id, currency_code)
 );
 
 -- Composite keys identify the exact price whose timestamp must advance.
-CREATE TRIGGER variant_prices_touch_updated_at AFTER UPDATE ON variant_prices
-WHEN NEW.updated_at = OLD.updated_at BEGIN
-  UPDATE variant_prices
-  SET updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
-  WHERE variant_id = NEW.variant_id AND currency_code = NEW.currency_code;
-END;
+
+
+
+-- PostgreSQL owns mutation timestamps at the database boundary.
+CREATE TRIGGER variant_prices_touch_updated_at
+BEFORE UPDATE ON variant_prices
+FOR EACH ROW
+EXECUTE FUNCTION dust_touch_updated_at();
