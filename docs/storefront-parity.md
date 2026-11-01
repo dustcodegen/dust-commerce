@@ -12,7 +12,7 @@ Medusa DTC adds storefront search in the nav, `/store` page and right-side
 drawer; this repository tracks that as a tested slice instead of treating the
 older rendered-comparison pins as frozen truth.
 
-Progress is tracked in [GitHub issue #29](https://github.com/y3l1n4ung/dust-commerce/issues/29)
+Progress is tracked in [GitHub issue #29](https://github.com/dustcodegen/dust-commerce/issues/29)
 and the `Medusa DTC storefront parity` milestone.
 
 The functional Customer Service route is documented in
@@ -121,7 +121,7 @@ stays readable (`/categories/clothing/shirts`). Dust Flutter 0.1.4 currently
 supports one segment per typed path parameter, so the generated route preserves
 the same handle as `/categories/clothing%2Fshirts`. Exact parse-and-restore
 support is tracked upstream in
-[`dust#542`](https://github.com/y3l1n4ung/dust/issues/542); generated files are
+[`dust#542`](https://github.com/dustcodegen/dust/issues/542); generated files are
 not hand-edited around that limitation.
 
 ## Customer session boundary

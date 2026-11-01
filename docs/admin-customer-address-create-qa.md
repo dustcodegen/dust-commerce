@@ -3,7 +3,7 @@
 ## Scope
 
 This slice implements Medusa-compatible address creation under issue
-[#33](https://github.com/y3l1n4ung/dust-commerce/issues/33). It does not add
+[#33](https://github.com/dustcodegen/dust-commerce/issues/33). It does not add
 address update/delete, customer groups, RBAC, or widget tests.
 
 Stacked commits keep each responsibility independently reviewable:

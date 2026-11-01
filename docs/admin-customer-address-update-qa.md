@@ -4,7 +4,7 @@
 
 This vertical slice implements Medusa-compatible partial customer-address
 updates under issue
-[#33](https://github.com/y3l1n4ung/dust-commerce/issues/33). It adds a standalone
+[#33](https://github.com/dustcodegen/dust-commerce/issues/33). It adds a standalone
 tri-state request contract, an authenticated atomic server operation, and a
 generated Dio client. It adds no migration, visible Edit control, ViewModel, or
 widget test.

@@ -3,7 +3,7 @@
 ## Scope
 
 This vertical slice implements Medusa-compatible customer-group detail under
-issue [#33](https://github.com/y3l1n4ung/dust-commerce/issues/33). It includes
+issue [#33](https://github.com/dustcodegen/dust-commerce/issues/33). It includes
 the standalone Admin contract, guarded server read, group-scoped customer query,
 generated Dio and Dust state, source-shaped Flutter route and release-browser
 QA. No widget test or schema migration was added.

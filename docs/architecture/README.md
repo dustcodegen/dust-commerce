@@ -97,13 +97,13 @@ forgotten by a caller.
 
 Three Dust behaviours shaped the code and are reported upstream:
 
-- [dust#536](https://github.com/y3l1n4ung/dust/issues/536) — an enum used across
+- [dust#536](https://github.com/dustcodegen/dust/issues/536) — an enum used across
   library boundaries serialises to a scalar and deserialises expecting a map.
   `ProductStatus` therefore lives beside `Product` rather than in its own file.
-- [dust#537](https://github.com/y3l1n4ung/dust/issues/537) — a `@Query` whose
+- [dust#537](https://github.com/dustcodegen/dust/issues/537) — a `@Query` whose
   SQL ends on a quote generates uncompilable Dart while the build reports
   clean. `countPublished` is written across several lines to avoid it.
-- [dust#538](https://github.com/y3l1n4ung/dust/issues/538) — `validate()` does
+- [dust#538](https://github.com/dustcodegen/dust/issues/538) — `validate()` does
   not cascade into nested annotated objects, so an address with an empty
   recipient passed the outer check and produced an unshippable order.
   `checkout/validation.dart` cascades by hand.

@@ -3,7 +3,7 @@
 ## Scope
 
 This vertical slice implements Medusa-compatible customer-group editing under
-issue [#33](https://github.com/y3l1n4ung/dust-commerce/issues/33). It includes a
+issue [#33](https://github.com/dustcodegen/dust-commerce/issues/33). It includes a
 standalone Admin input, guarded server mutation, generated Dio and Dust command
 state, source-shaped Flutter drawer and live release-browser QA. It adds no
 schema migration or widget test.

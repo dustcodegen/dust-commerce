@@ -13,16 +13,16 @@ rm -f "$archive"
 
 if command -v gh >/dev/null 2>&1; then
   gh release download "$DUST_VERSION" \
-    --repo y3l1n4ung/dust \
+    --repo dustcodegen/dust \
     --pattern "$asset" \
     --dir "$work_root" \
     --clobber ||
     curl --fail --location --retry 8 --retry-all-errors --retry-delay 5 \
-      "https://github.com/y3l1n4ung/dust/releases/download/$DUST_VERSION/$asset" \
+      "https://github.com/dustcodegen/dust/releases/download/$DUST_VERSION/$asset" \
       --output "$archive"
 else
   curl --fail --location --retry 8 --retry-all-errors --retry-delay 5 \
-    "https://github.com/y3l1n4ung/dust/releases/download/$DUST_VERSION/$asset" \
+    "https://github.com/dustcodegen/dust/releases/download/$DUST_VERSION/$asset" \
     --output "$archive"
 fi
 

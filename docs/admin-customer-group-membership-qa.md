@@ -4,7 +4,7 @@
 
 This vertical slice implements Medusa-compatible customer-group membership
 changes under issue
-[#33](https://github.com/y3l1n4ung/dust-commerce/issues/33). It includes one
+[#33](https://github.com/dustcodegen/dust-commerce/issues/33). It includes one
 strict batch contract, an authenticated atomic server operation, generated Dio
 and Dust state, a full-screen Add Customers selector, selected-row and per-row
 removal, and live release-browser QA. It adds no migration or widget test.

@@ -85,7 +85,7 @@ class StoreFooterLinks extends StatelessWidget {
             children: [
               FooterTextLink(
                 label: 'GitHub',
-                onPressed: () => _open('https://github.com/y3l1n4ung/dust'),
+                onPressed: () => _open('https://github.com/dustcodegen/dust'),
               ),
               FooterTextLink(
                 label: context.tr(
@@ -93,7 +93,7 @@ class StoreFooterLinks extends StatelessWidget {
                   defaultText: 'Documentation',
                 ),
                 onPressed: () => _open(
-                  'https://github.com/y3l1n4ung/dust/tree/main/docs',
+                  'https://github.com/dustcodegen/dust/tree/main/docs',
                 ),
               ),
               FooterTextLink(
@@ -102,7 +102,7 @@ class StoreFooterLinks extends StatelessWidget {
                   defaultText: 'Source code',
                 ),
                 onPressed: () => _open(
-                  'https://github.com/y3l1n4ung/dust-commerce',
+                  'https://github.com/dustcodegen/dust-commerce',
                 ),
               ),
             ],
@@ -196,7 +196,7 @@ class PoweredByDustLink extends StatelessWidget {
           defaultText: 'Powered by dust',
         ),
         onPressed: () => StoreFooterLinks._open(
-          'https://github.com/y3l1n4ung/dust',
+          'https://github.com/dustcodegen/dust',
         ),
       );
 }

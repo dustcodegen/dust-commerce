@@ -3,7 +3,7 @@
 ## Scope
 
 This slice implements Medusa-compatible customer-address deletion under issue
-[#33](https://github.com/y3l1n4ung/dust-commerce/issues/33). It does not invent
+[#33](https://github.com/dustcodegen/dust-commerce/issues/33). It does not invent
 an address edit screen absent from the pinned Admin source, add customer groups
 or RBAC, or add widget tests.
 

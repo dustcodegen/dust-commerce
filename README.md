@@ -1,7 +1,7 @@
 # dust-commerce
 
 A headless commerce backend and storefront, written in Dart end to end, built to
-show what [Dust](https://github.com/y3l1n4ung/dust) generates in a real
+show what [Dust](https://github.com/dustcodegen/dust) generates in a real
 application rather than in a snippet.
 
 ## What this is a clone of

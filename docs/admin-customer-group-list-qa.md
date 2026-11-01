@@ -3,7 +3,7 @@
 ## Scope
 
 This slice implements Medusa-compatible customer-group discovery under issue
-[#33](https://github.com/y3l1n4ung/dust-commerce/issues/33). It does not add
+[#33](https://github.com/dustcodegen/dust-commerce/issues/33). It does not add
 group creation, detail, edit, deletion, membership mutation, address update or
 widget tests. Unsupported actions are absent instead of appearing functional.
 

@@ -3,7 +3,7 @@
 ## Scope
 
 This vertical slice implements Medusa-compatible customer-group creation under
-issue [#33](https://github.com/y3l1n4ung/dust-commerce/issues/33). It adds the
+issue [#33](https://github.com/dustcodegen/dust-commerce/issues/33). It adds the
 standalone Admin request and response contracts, guarded server operation,
 generated Dio command state, source-matched focus form and live browser QA.
 
