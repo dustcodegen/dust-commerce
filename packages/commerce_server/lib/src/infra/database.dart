@@ -27,7 +27,7 @@ abstract class CommerceDatabase implements DatabaseClient {
   }) {
     final database =
         CommerceDatabase.connect(_testDatabaseUrl(), options: options);
-    unawaited(database.migrate());
+    unawaited(migrateCommerceDatabase(database));
     return database;
   }
 
@@ -39,7 +39,7 @@ abstract class CommerceDatabase implements DatabaseClient {
   }) {
     final database =
         CommerceDatabase.connect(_testDatabaseUrl(), options: options);
-    unawaited(database.migrate());
+    unawaited(migrateCommerceDatabase(database));
     return database;
   }
 }
@@ -152,7 +152,50 @@ Future<void> requireCommerceSqlxMigrations(CommerceDatabase database) async {
 }
 
 /// Applies all committed migrations before the server accepts traffic.
+///
+/// Existing deployments may already have SQLx's `_sqlx_migrations` table. In
+/// that case the validated SQLx history remains authoritative and Dust does
+/// not replay the same DDL into an already-populated PostgreSQL schema.
 Future<void> migrateCommerceDatabase(CommerceDatabase database) async {
+  final tableResult = await database.unsafe.fetch(
+    "SELECT EXISTS (SELECT 1 FROM information_schema.tables "
+    "WHERE table_schema = 'public' AND table_name = '_sqlx_migrations') "
+    'AS present',
+    const [],
+  );
+  final tableRows = switch (tableResult) {
+    Ok(:final value) => value,
+    Err(:final error) => throw StateError(
+        'Could not inspect PostgreSQL migration history: $error',
+      ),
+  };
+  final sqlxHistoryExists = tableRows.single.readBool('present');
+  if (sqlxHistoryExists) {
+    final historyResult = await database.unsafe.fetch(
+      'SELECT version, success FROM _sqlx_migrations ORDER BY version',
+      const [],
+    );
+    final historyRows = switch (historyResult) {
+      Ok(:final value) => value,
+      Err(:final error) => throw StateError(
+          'Could not read PostgreSQL migration history: $error',
+        ),
+    };
+    final versions = [
+      for (final row in historyRows)
+        if (row.readBool('success')) row.read<int>('version'),
+    ];
+    if (versions.length != commerceSqlxMigrationVersions.length ||
+        versions.any(
+            (version) => !commerceSqlxMigrationVersions.contains(version))) {
+      throw StateError(
+        'PostgreSQL migration history is incomplete or contains a failed '
+        'migration; run `sqlx migrate run` before starting dust-commerce.',
+      );
+    }
+    return;
+  }
+
   final result = await database.migrate();
   switch (result) {
     case Ok():
