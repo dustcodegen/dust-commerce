@@ -12,15 +12,30 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DUST_VERSION: v0.1.4
-  DUST_LINUX_X64_SHA256: daa13df76f2370fa5a41fb092ed2e1c6942c51ce748fc617622374af61313b77
+  DUST_VERSION: v0.3.0
+  DUST_LINUX_X64_SHA256: dd9cc1bdd44a282a4f1eeea9ae5c6f60da61b5e3d543c66d093cce1b35eca115
   FLUTTER_VERSION: 3.44.1
+  DUST_DATABASE_URL: postgres://dust:dust@127.0.0.1:5432/dust_commerce?sslmode=disable
 
 jobs:
   verify:
     name: Verify
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: dust
+          POSTGRES_PASSWORD: dust
+          POSTGRES_DB: dust_commerce
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U dust -d dust_commerce"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -37,7 +52,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install --yes ripgrep
+          sudo apt-get install --yes postgresql-client ripgrep
           rg --version
 
       - name: Download the verified Dust CLI
@@ -47,7 +62,7 @@ jobs:
         run: |
           set -euo pipefail
           cargo install sqlx-cli --locked --version 0.8.6 \
-            --no-default-features --features sqlite
+            --no-default-features --features postgres
           sqlx --version
 
       - name: Resolve Dart and Dust package dependencies
@@ -69,15 +84,14 @@ jobs:
       - name: SQLx migrations run up and down
         run: |
           set -euo pipefail
-          export DATABASE_URL="sqlite://$RUNNER_TEMP/reversible.db"
-          sqlx database create
+          export DATABASE_URL="$DUST_DATABASE_URL"
           sqlx migrate run --source packages/commerce_server/migrations
           for _migration in packages/commerce_server/migrations/*.down.sql; do
             sqlx migrate revert --source packages/commerce_server/migrations
           done
-          remaining="$(sqlite3 "$RUNNER_TEMP/reversible.db" \
-            "SELECT count(*) FROM sqlite_master WHERE type = 'table' \
-             AND name != '_sqlx_migrations';")"
+          remaining="$(psql "$DATABASE_URL" --tuples-only --no-align \
+            --command="SELECT count(*) FROM pg_tables WHERE schemaname = 'public' \
+             AND tablename != '_sqlx_migrations';")"
           test "$remaining" = "0"
 
       - name: Analyze

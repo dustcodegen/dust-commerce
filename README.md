@@ -14,7 +14,7 @@ used, and its licence puts no constraints on studying it.
 **This is a source-guided reimplementation, not a runtime port.** The Flutter
 storefront translates the MIT-licensed Medusa DTC Starter screen structure and
 interaction flow into Dust patterns; it does not embed React, Next.js, or the
-Medusa SDK. The backend remains an independent Dart and SQLite implementation.
+Medusa SDK. The backend remains an independent Dart and PostgreSQL implementation.
 See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for the pinned source and
 attribution.
 
@@ -72,7 +72,7 @@ database, and i18n output before compiling its consumers.
 ```
 packages/commerce_shared         customer storefront contracts
 packages/commerce_admin_shared   merchant-only admin contracts
-packages/commerce_server         dust_server API on SQLite
+packages/commerce_server         dust_server API on PostgreSQL
 apps/commerce_app                Flutter storefront (port 13001)
 apps/admin_app                   Flutter merchant admin (port 13002)
 ```
@@ -83,7 +83,7 @@ to its Medusa source areas and GitHub delivery issues.
 
 ## Running it
 
-Requires the Dust CLI at 0.1.4 or newer:
+Requires the Dust CLI at 0.3.0 or newer:
 
 ```bash
 dust --version
@@ -97,18 +97,17 @@ flutter pub get
 Start a local API with the deterministic development catalogue:
 
 ```bash
-mkdir -p .data
-DATABASE_URL='sqlite://.data/commerce.db?mode=rwc' \
+DATABASE_URL='postgres://dust:dust@127.0.0.1:5432/dust_commerce?sslmode=disable' \
   sqlx migrate run --source packages/commerce_server/migrations
 COMMERCE_SEED=true \
   COMMERCE_ALLOWED_ORIGINS=http://127.0.0.1:13001,http://127.0.0.1:13002 \
-  COMMERCE_DATABASE_PATH=.data/commerce.db \
+  COMMERCE_DATABASE_URL='postgres://dust:dust@127.0.0.1:5432/dust_commerce?sslmode=disable' \
   dart run packages/commerce_server/bin/server.dart
 ```
 
 The seed is opt-in and idempotent. Production startup never creates merchant or
-customer records. Bind address, port, database path, and browser origins are
-configured with `COMMERCE_BIND`, `COMMERCE_PORT`, `COMMERCE_DATABASE_PATH`, and
+customer records. Bind address, port, database URL, and browser origins are
+configured with `COMMERCE_BIND`, `COMMERCE_PORT`, `COMMERCE_DATABASE_URL`, and
 comma-separated `COMMERCE_ALLOWED_ORIGINS`. The API defaults to port `3878`
 (`DUST` on a telephone keypad); override it explicitly for each deployment.
 Product images default to `.data/media`. Set `COMMERCE_MEDIA_PATH` to a durable
@@ -126,9 +125,9 @@ disabled the client requires STARTTLS rather than permitting plaintext. Keep
 all SMTP credentials on the server; the storefront URL is used only to build
 the emailed decision link.
 
-To reset development data safely, stop the API and point
-`COMMERCE_DATABASE_PATH` at a new file. Keep the old database as a backup until
-the replacement stack has started and passed `/health`.
+To reset development data safely, stop the API and use a disposable PostgreSQL
+database. Keep the old database available as a backup until the replacement
+stack has started and passed `/health`.
 
 In a second terminal, start the Flutter web storefront:
 
@@ -147,7 +146,7 @@ secret through the deployment environment in production.
 ```bash
 COMMERCE_ADMIN_EMAIL=owner@example.com \
   COMMERCE_ADMIN_PASSWORD='replace-with-a-long-secret' \
-  COMMERCE_DATABASE_PATH=.data/commerce.db \
+  COMMERCE_DATABASE_URL='postgres://dust:dust@127.0.0.1:5432/dust_commerce?sslmode=disable' \
   dart run packages/commerce_server/bin/create_admin.dart
 ```
 
@@ -197,9 +196,9 @@ dart test packages/commerce_server/test/server_entrypoint_test.dart
 
 ### Database migrations
 
-The server uses SQLite, so UTC instants are stored as sortable ISO-8601 `TEXT`
-with database defaults and update triggers. SQLite has no native PostgreSQL
-`TIMESTAMPTZ`; no timestamp column is generated.
+The server uses PostgreSQL. UTC instants are stored in native `TIMESTAMPTZ`
+columns with database defaults and update triggers; application code receives
+UTC `DateTime` values.
 
 The baseline is intentionally one final table per timestamped reversible SQLx
 pair. Create another pair with:
@@ -216,18 +215,16 @@ pre-release database, or ship a separately designed bridge migration instead.
 Use SQLx for explicit forward/reverse operation:
 
 ```bash
-DATABASE_URL=sqlite://commerce.db sqlx migrate run \
+DATABASE_URL='postgres://dust:dust@127.0.0.1:5432/dust_commerce?sslmode=disable' sqlx migrate run \
   --source packages/commerce_server/migrations
-DATABASE_URL=sqlite://commerce.db sqlx migrate revert \
+DATABASE_URL='postgres://dust:dust@127.0.0.1:5432/dust_commerce?sslmode=disable' sqlx migrate revert \
   --source packages/commerce_server/migrations
 ```
 
-SQLx is the only migration owner for the production server and admin bootstrap.
-Both entrypoints verify that `_sqlx_migrations` exactly matches the migrations
-embedded in the binary, require the database file to already exist, then connect
-without replaying SQL. Dust's embedded migrator remains available only to
-isolated tests. The baseline contains no appended `ALTER TABLE` steps: each
-table's up file is its complete definition.
+Dust embeds the same reversible migrations for application startup; SQLx remains
+the operator tool for explicit forward/reverse checks. The server applies
+pending migrations before accepting traffic. The baseline contains no appended
+`ALTER TABLE` steps: each table's up file is its complete definition.
 
 ## Licence
 
