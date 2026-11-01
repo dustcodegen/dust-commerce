@@ -7,7 +7,7 @@ part 'update.g.dart';
 @SqlxDao()
 abstract final class AccountUpdateRepository {
   /// Binds the queries to [db].
-  const factory AccountUpdateRepository(DatabaseExecutor db) =
+  const factory AccountUpdateRepository(Executor db) =
       _$AccountUpdateRepository;
 
   /// Consumes one live capability and removes its reusable fingerprint.

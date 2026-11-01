@@ -30,7 +30,7 @@ const _shippingOptionProviderStatements = <_Statement>[
 INSERT OR IGNORE INTO shipping_option_fulfillment_provider (
   shipping_option_id, fulfillment_provider_id, data
 )
-SELECT id, 'manual', json_object('service_code', id)
+SELECT id, 'manual', json_build_object('service_code', id)
 FROM shipping_options
 WHERE id IN (
   'ship_free', 'ship_standard', 'ship_express',

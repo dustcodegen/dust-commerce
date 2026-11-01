@@ -6,7 +6,7 @@ part 'update.g.dart';
 @SqlxDao()
 abstract final class OrderTransferUpdateRepository {
   /// Binds transfer updates to [db].
-  const factory OrderTransferUpdateRepository(DatabaseExecutor db) =
+  const factory OrderTransferUpdateRepository(Executor db) =
       _$OrderTransferUpdateRepository;
 
   /// Expires an undecided request and destroys any unsent raw capability.

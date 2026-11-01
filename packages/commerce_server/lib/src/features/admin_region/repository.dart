@@ -7,8 +7,7 @@ part 'repository.g.dart';
 @SqlxDao()
 abstract final class AdminRegionRepository {
   /// Binds region list queries to [db].
-  const factory AdminRegionRepository(DatabaseExecutor db) =
-      _$AdminRegionRepository;
+  const factory AdminRegionRepository(Executor db) = _$AdminRegionRepository;
 
   /// Counts the same active region search result.
   @Query(r'''

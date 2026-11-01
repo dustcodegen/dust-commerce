@@ -57,7 +57,7 @@ final class AdminSalesChannelDetailResponse
     required this.updatedAt,
   });
 
-  /// Database-generated creation instant decoded from SQLite UTC text.
+  /// Database-generated creation instant decoded from PostgreSQL TIMESTAMPTZ.
   @Sqlx(rename: 'created_at', tryFrom: _AdminSalesChannelUtcDateTime())
   final DateTime createdAt;
 
@@ -74,7 +74,7 @@ final class AdminSalesChannelDetailResponse
   /// Merchant-facing sales-channel name.
   final String name;
 
-  /// Database-generated last mutation instant decoded from SQLite UTC text.
+  /// Database-generated last mutation instant decoded from PostgreSQL TIMESTAMPTZ.
   @Sqlx(rename: 'updated_at', tryFrom: _AdminSalesChannelUtcDateTime())
   final DateTime updatedAt;
 }

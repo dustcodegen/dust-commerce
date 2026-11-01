@@ -7,7 +7,7 @@ part 'read.g.dart';
 @SqlxDao()
 abstract final class AdminCustomerGroupDetailRepository {
   /// Binds customer-group detail retrieval to [db].
-  const factory AdminCustomerGroupDetailRepository(DatabaseExecutor db) =
+  const factory AdminCustomerGroupDetailRepository(Executor db) =
       _$AdminCustomerGroupDetailRepository;
 
   /// Selects only the fields consumed by Medusa's group detail route.
@@ -15,7 +15,7 @@ abstract final class AdminCustomerGroupDetailRepository {
 SELECT customer_group.id,
        customer_group.name,
        coalesce((
-         SELECT json_group_array(json_object('id', member.customer_id))
+         SELECT json_agg(json_build_object('id', member.customer_id))
          FROM (
            SELECT membership.customer_id
            FROM customer_group_customers membership

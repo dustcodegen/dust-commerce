@@ -22,10 +22,9 @@ Future<void> main() async {
       'SMTP settings are required when email verification is enabled.',
     );
   }
-  await File(config.databasePath).parent.create(recursive: true);
-  final database = CommerceDatabase.connectSqlx(
-    config.databasePath,
-    options: commerceSqlxOptions,
+  final database = CommerceDatabase.connect(
+    config.databaseUrl,
+    options: commerceOptions,
   );
   final mediaStorage = LocalAdminMediaStorage(
     root: Directory(config.mediaPath),
@@ -35,7 +34,7 @@ Future<void> main() async {
   await mediaStorage.prepare();
 
   try {
-    await requireCommerceSqlxMigrations(database);
+    await migrateCommerceDatabase(database);
     if (config.seed) {
       await seedDevelopmentStore(database);
       await seedDevelopmentDemoCatalog(database);
@@ -90,7 +89,7 @@ final class _ServerConfig {
   const _ServerConfig({
     required this.address,
     required this.port,
-    required this.databasePath,
+    required this.databaseUrl,
     required this.mediaPath,
     required this.publicBaseUrl,
     required this.requireEmailVerification,
@@ -109,7 +108,7 @@ final class _ServerConfig {
     return _ServerConfig(
       address: InternetAddress(bind),
       port: port,
-      databasePath: environment['COMMERCE_DATABASE_PATH'] ?? 'commerce.db',
+      databaseUrl: _databaseUrl(environment),
       mediaPath: environment['COMMERCE_MEDIA_PATH'] ?? '.data/media',
       publicBaseUrl: _publicBaseUrl(
         environment['COMMERCE_PUBLIC_BASE_URL'],
@@ -131,12 +130,29 @@ final class _ServerConfig {
 
   final InternetAddress address;
   final Set<String> allowedOrigins;
-  final String databasePath;
+  final String databaseUrl;
   final String mediaPath;
   final int port;
   final Uri publicBaseUrl;
   final bool requireEmailVerification;
   final bool seed;
+
+  static String _databaseUrl(Map<String, String> environment) {
+    final value = environment['COMMERCE_DATABASE_URL']?.trim();
+    if (value == null || value.isEmpty) {
+      throw const FormatException(
+        'COMMERCE_DATABASE_URL must be set to a PostgreSQL connection URL.',
+      );
+    }
+    final uri = Uri.tryParse(value);
+    if (uri == null ||
+        (uri.scheme != 'postgres' && uri.scheme != 'postgresql')) {
+      throw const FormatException(
+        'COMMERCE_DATABASE_URL must use postgres:// or postgresql://.',
+      );
+    }
+    return value;
+  }
 
   static bool _boolean(Map<String, String> source, String key) =>
       switch (source[key]) {

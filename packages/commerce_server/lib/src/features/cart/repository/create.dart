@@ -7,8 +7,7 @@ part 'create.g.dart';
 @SqlxDao()
 abstract final class CartCreateRepository {
   /// Binds the queries to [db].
-  const factory CartCreateRepository(DatabaseExecutor db) =
-      _$CartCreateRepository;
+  const factory CartCreateRepository(Executor db) = _$CartCreateRepository;
 
   /// Starts a cart in [regionId].
   @Query(r'''

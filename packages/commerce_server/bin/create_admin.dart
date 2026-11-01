@@ -28,14 +28,18 @@ Future<void> main() async {
     return;
   }
 
-  final databasePath = environment['COMMERCE_DATABASE_PATH'] ?? 'commerce.db';
-  await File(databasePath).parent.create(recursive: true);
-  final database = CommerceDatabase.connectSqlx(
-    databasePath,
-    options: commerceSqlxOptions,
+  final databaseUrl = environment['COMMERCE_DATABASE_URL'];
+  if (databaseUrl == null || databaseUrl.trim().isEmpty) {
+    stderr.writeln('Set COMMERCE_DATABASE_URL to a PostgreSQL connection URL.');
+    exitCode = 64;
+    return;
+  }
+  final database = CommerceDatabase.connect(
+    databaseUrl,
+    options: commerceOptions,
   );
   try {
-    await requireCommerceSqlxMigrations(database);
+    await migrateCommerceDatabase(database);
     final result = await bootstrapAdmin(
       database,
       credentials,

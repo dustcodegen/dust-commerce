@@ -7,7 +7,7 @@ part 'repository.g.dart';
 @SqlxDao()
 abstract final class AdminCustomerRepository {
   /// Binds immutable customer reads to [db].
-  const factory AdminCustomerRepository(DatabaseExecutor db) =
+  const factory AdminCustomerRepository(Executor db) =
       _$AdminCustomerRepository;
 
   /// Lists the exact columns consumed by Medusa's merchant customer table.
@@ -30,14 +30,14 @@ WHERE customer.deleted_at IS NULL
                      coalesce(customer.last_name, '')))
           LIKE '%' || lower($1) || '%')
   AND ($2 = -1 OR customer.has_account = $2)
-  AND ($3 = '' OR customer.created_at > $3)
-  AND ($4 = '' OR customer.created_at >= $4)
-  AND ($5 = '' OR customer.created_at < $5)
-  AND ($6 = '' OR customer.created_at <= $6)
-  AND ($7 = '' OR customer.updated_at > $7)
-  AND ($8 = '' OR customer.updated_at >= $8)
-  AND ($9 = '' OR customer.updated_at < $9)
-  AND ($10 = '' OR customer.updated_at <= $10)
+  AND (NULLIF($3, '') IS NULL OR customer.created_at > NULLIF($3, '')::timestamptz)
+  AND (NULLIF($4, '') IS NULL OR customer.created_at >= NULLIF($4, '')::timestamptz)
+  AND (NULLIF($5, '') IS NULL OR customer.created_at < NULLIF($5, '')::timestamptz)
+  AND (NULLIF($6, '') IS NULL OR customer.created_at <= NULLIF($6, '')::timestamptz)
+  AND (NULLIF($7, '') IS NULL OR customer.updated_at > NULLIF($7, '')::timestamptz)
+  AND (NULLIF($8, '') IS NULL OR customer.updated_at >= NULLIF($8, '')::timestamptz)
+  AND (NULLIF($9, '') IS NULL OR customer.updated_at < NULLIF($9, '')::timestamptz)
+  AND (NULLIF($10, '') IS NULL OR customer.updated_at <= NULLIF($10, '')::timestamptz)
   AND ($11 = '' OR EXISTS (
     SELECT 1
     FROM customer_group_customers membership
@@ -96,14 +96,14 @@ WHERE customer.deleted_at IS NULL
                      coalesce(customer.last_name, '')))
           LIKE '%' || lower($1) || '%')
   AND ($2 = -1 OR customer.has_account = $2)
-  AND ($3 = '' OR customer.created_at > $3)
-  AND ($4 = '' OR customer.created_at >= $4)
-  AND ($5 = '' OR customer.created_at < $5)
-  AND ($6 = '' OR customer.created_at <= $6)
-  AND ($7 = '' OR customer.updated_at > $7)
-  AND ($8 = '' OR customer.updated_at >= $8)
-  AND ($9 = '' OR customer.updated_at < $9)
-  AND ($10 = '' OR customer.updated_at <= $10)
+  AND (NULLIF($3, '') IS NULL OR customer.created_at > NULLIF($3, '')::timestamptz)
+  AND (NULLIF($4, '') IS NULL OR customer.created_at >= NULLIF($4, '')::timestamptz)
+  AND (NULLIF($5, '') IS NULL OR customer.created_at < NULLIF($5, '')::timestamptz)
+  AND (NULLIF($6, '') IS NULL OR customer.created_at <= NULLIF($6, '')::timestamptz)
+  AND (NULLIF($7, '') IS NULL OR customer.updated_at > NULLIF($7, '')::timestamptz)
+  AND (NULLIF($8, '') IS NULL OR customer.updated_at >= NULLIF($8, '')::timestamptz)
+  AND (NULLIF($9, '') IS NULL OR customer.updated_at < NULLIF($9, '')::timestamptz)
+  AND (NULLIF($10, '') IS NULL OR customer.updated_at <= NULLIF($10, '')::timestamptz)
   AND ($11 = '' OR EXISTS (
     SELECT 1
     FROM customer_group_customers membership

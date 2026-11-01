@@ -7,7 +7,7 @@ part 'reason_repository.g.dart';
 @SqlxDao()
 abstract final class AdminRefundReasonRepository {
   /// Binds reason discovery to [db].
-  const factory AdminRefundReasonRepository(DatabaseExecutor db) =
+  const factory AdminRefundReasonRepository(Executor db) =
       _$AdminRefundReasonRepository;
 
   /// Counts active reasons matching the merchant query.

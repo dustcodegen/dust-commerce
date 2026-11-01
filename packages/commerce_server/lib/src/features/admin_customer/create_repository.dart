@@ -7,7 +7,7 @@ part 'create_repository.g.dart';
 @SqlxDao()
 abstract final class AdminCustomerCreateRepository {
   /// Binds customer creation to [db].
-  const factory AdminCustomerCreateRepository(DatabaseExecutor db) =
+  const factory AdminCustomerCreateRepository(Executor db) =
       _$AdminCustomerCreateRepository;
 
   /// Inserts one guest profile unless that active guest email already exists.

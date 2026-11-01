@@ -7,7 +7,7 @@ part 'repository.g.dart';
 @SqlxDao()
 abstract final class SellingRegionRepository {
   /// Binds the queries to [db].
-  const factory SellingRegionRepository(DatabaseExecutor db) =
+  const factory SellingRegionRepository(Executor db) =
       _$SellingRegionRepository;
 
   /// Lists active regions in stable display order.

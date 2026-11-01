@@ -7,7 +7,7 @@ part 'option.g.dart';
 @SqlxDao()
 abstract final class AdminProductOptionUpdateRepository {
   /// Binds option mutations to [db].
-  const factory AdminProductOptionUpdateRepository(DatabaseExecutor db) =
+  const factory AdminProductOptionUpdateRepository(Executor db) =
       _$AdminProductOptionUpdateRepository;
 
   /// Counts variants that would lose their selected value if it were removed.

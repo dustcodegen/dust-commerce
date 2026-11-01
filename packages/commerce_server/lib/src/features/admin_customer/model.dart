@@ -18,7 +18,7 @@ final class AdminCustomerResponse with _$AdminCustomerResponse {
     required this.updatedAt,
   });
 
-  /// Database-generated first-seen instant decoded from SQLite UTC text.
+  /// Database-generated first-seen instant decoded from PostgreSQL TIMESTAMPTZ.
   @Sqlx(rename: 'created_at', tryFrom: _AdminCustomerUtcDateTime())
   final DateTime createdAt;
 
@@ -40,7 +40,7 @@ final class AdminCustomerResponse with _$AdminCustomerResponse {
   @Sqlx(rename: 'last_name')
   final String? lastName;
 
-  /// Database-generated last mutation instant decoded from SQLite UTC text.
+  /// Database-generated last mutation instant decoded from PostgreSQL TIMESTAMPTZ.
   @Sqlx(rename: 'updated_at', tryFrom: _AdminCustomerUtcDateTime())
   final DateTime updatedAt;
 }

@@ -6,7 +6,7 @@ part 'detail_repository.g.dart';
 @SqlxDao()
 abstract final class AdminOrderDetailRepository {
   /// Binds immutable order-detail reads to [db].
-  const factory AdminOrderDetailRepository(DatabaseExecutor db) =
+  const factory AdminOrderDetailRepository(Executor db) =
       _$AdminOrderDetailRepository;
 
   /// Selects only the fields required by the read-only Admin detail screen.
@@ -46,10 +46,10 @@ SELECT order_row.id, order_row.region_id, order_row.display_id, order_row.email,
        coalesce((SELECT sum(refund.amount) FROM refunds refund
                  WHERE refund.payment_collection_id = payment.id
                    AND refund.deleted_at IS NULL), 0) AS payment_refunded_amount,
-       coalesce((SELECT json_group_array(json_object(
+       coalesce((SELECT json_agg(json_build_object(
          'id', refund.id, 'amount', refund.amount,
          'refund_reason', CASE WHEN refund.reason_id IS NULL THEN NULL ELSE
-           json_object('id', refund.reason_id, 'label', refund.reason_label,
+           json_build_object('id', refund.reason_id, 'label', refund.reason_label,
              'code', refund.reason_code, 'description', refund.reason_description) END,
          'note', refund.note, 'created_by', refund.created_by, 'created_at', refund.created_at
        )) FROM (
@@ -62,7 +62,7 @@ SELECT order_row.id, order_row.region_id, order_row.display_id, order_row.email,
          ORDER BY record.created_at, record.id
        ) refund), '[]') AS payment_refunds_json,
        coalesce((
-         SELECT json_group_array(json_object(
+         SELECT json_agg(json_build_object(
            'id', item.id, 'variant_id', item.variant_id, 'product_id', item.product_id,
            'shipping_profile_id', item.shipping_profile_id,
            'product_handle', item.product_handle, 'thumbnail', item.thumbnail,
@@ -81,26 +81,26 @@ SELECT order_row.id, order_row.region_id, order_row.display_id, order_row.email,
          ) item
        ), '[]') AS items_json,
        coalesce((
-         SELECT json_group_array(json_object(
+         SELECT json_agg(json_build_object(
            'id', fulfillment.id, 'location_id', fulfillment.location_id,
            'provider_id', fulfillment.provider_id,
            'shipping_option_id', fulfillment.shipping_option_id,
-           'requires_shipping', json(iif(
+           'requires_shipping', dust_json_value(iif(
              fulfillment.requires_shipping = 1, 'true', 'false'
            )),
            'packed_at', fulfillment.packed_at, 'shipped_at', fulfillment.shipped_at,
            'delivered_at', fulfillment.delivered_at, 'canceled_at', fulfillment.canceled_at,
            'data', CASE WHEN fulfillment.data IS NULL THEN NULL
-                        ELSE json(fulfillment.data) END,
+                        ELSE dust_json_value(fulfillment.data) END,
            'metadata', CASE WHEN fulfillment.metadata IS NULL THEN NULL
-                            ELSE json(fulfillment.metadata) END,
+                            ELSE dust_json_value(fulfillment.metadata) END,
            'created_by', fulfillment.created_by, 'marked_shipped_by', fulfillment.marked_shipped_by,
            'created_at', fulfillment.created_at, 'updated_at', fulfillment.updated_at,
-           'items', json(fulfillment.items_json), 'labels', json(fulfillment.labels_json)
+           'items', dust_json_value(fulfillment.items_json), 'labels', dust_json_value(fulfillment.labels_json)
          ))
          FROM (
            SELECT record.*, coalesce((
-             SELECT json_group_array(json_object(
+             SELECT json_agg(json_build_object(
                'id', item.id,
                'fulfillment_id', item.fulfillment_id,
                'title', item.title,
@@ -119,7 +119,7 @@ SELECT order_row.id, order_row.region_id, order_row.display_id, order_row.email,
              ) item
            ), '[]') AS items_json,
            coalesce((
-             SELECT json_group_array(json_object(
+             SELECT json_agg(json_build_object(
                'id', label.id, 'fulfillment_id', label.fulfillment_id,
                'tracking_number', label.tracking_number,
                'tracking_url', label.tracking_url, 'label_url', label.label_url,
@@ -136,7 +136,7 @@ SELECT order_row.id, order_row.region_id, order_row.display_id, order_row.email,
            ORDER BY record.created_at, record.id
          ) fulfillment
        ), '[]') AS fulfillments_json,
-       CASE WHEN shipping.order_id IS NULL THEN NULL ELSE json_object(
+       CASE WHEN shipping.order_id IS NULL THEN NULL ELSE json_build_object(
          'first_name', shipping.first_name, 'last_name', shipping.last_name,
          'company', shipping.company, 'line1', shipping.line1,
          'line2', shipping.line2, 'city', shipping.city,
@@ -144,7 +144,7 @@ SELECT order_row.id, order_row.region_id, order_row.display_id, order_row.email,
          'country_code', shipping.country_code,
          'phone', shipping.phone
        ) END AS shipping_address_json,
-       CASE WHEN billing.order_id IS NULL THEN NULL ELSE json_object(
+       CASE WHEN billing.order_id IS NULL THEN NULL ELSE json_build_object(
          'first_name', billing.first_name, 'last_name', billing.last_name,
          'company', billing.company, 'line1', billing.line1,
          'line2', billing.line2, 'city', billing.city,

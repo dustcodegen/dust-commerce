@@ -7,7 +7,7 @@ part 'repository.g.dart';
 @SqlxDao()
 abstract final class AdminSalesChannelRepository {
   /// Binds sales-channel list queries to [db].
-  const factory AdminSalesChannelRepository(DatabaseExecutor db) =
+  const factory AdminSalesChannelRepository(Executor db) =
       _$AdminSalesChannelRepository;
 
   /// Counts the same non-deleted sales-channel search result.

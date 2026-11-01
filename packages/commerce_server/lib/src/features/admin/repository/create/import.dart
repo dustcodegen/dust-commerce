@@ -6,7 +6,7 @@ part 'import.g.dart';
 @SqlxDao()
 abstract final class AdminProductImportRepository {
   /// Binds import staging to [db].
-  const factory AdminProductImportRepository(DatabaseExecutor db) =
+  const factory AdminProductImportRepository(Executor db) =
       _$AdminProductImportRepository;
 
   /// Counts unique incoming identities already present in the active catalogue.

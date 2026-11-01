@@ -85,7 +85,7 @@ final class OptionalPaymentSessionFromJson
       value == 'null' ? null : CartPaymentSession.fromJson(_object(value));
 }
 
-/// Keeps SQLite's TEXT transport explicit to the local FromRow resolver.
+/// Keeps PostgreSQL JSON transport explicit to the local FromRow resolver.
 final class CartPromotionsSqlxJson
     implements SqlxTryFrom<List<AppliedPromotionResponse>, String> {
   /// Creates the stateless adapter.

@@ -6,7 +6,7 @@ part 'image_variants.g.dart';
 @SqlxDao()
 abstract final class AdminProductImageVariantRepository {
   /// Binds association operations to [db].
-  const factory AdminProductImageVariantRepository(DatabaseExecutor db) =
+  const factory AdminProductImageVariantRepository(Executor db) =
       _$AdminProductImageVariantRepository;
 
   /// Returns the active product that owns [imageId].

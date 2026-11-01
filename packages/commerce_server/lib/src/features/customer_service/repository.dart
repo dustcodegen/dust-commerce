@@ -7,7 +7,7 @@ part 'repository.g.dart';
 @SqlxDao()
 abstract final class CustomerServiceRepository {
   /// Binds request creation to [db].
-  const factory CustomerServiceRepository(DatabaseExecutor db) =
+  const factory CustomerServiceRepository(Executor db) =
       _$CustomerServiceRepository;
 
   /// Persists one bounded message and returns only Store-safe fields.

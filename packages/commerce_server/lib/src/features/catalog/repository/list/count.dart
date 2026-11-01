@@ -6,8 +6,7 @@ part 'count.g.dart';
 @SqlxDao()
 abstract final class CatalogCountRepository {
   /// Binds the query to [db].
-  const factory CatalogCountRepository(DatabaseExecutor db) =
-      _$CatalogCountRepository;
+  const factory CatalogCountRepository(Executor db) = _$CatalogCountRepository;
 
   /// How many published products match the active refinements.
   @Query(r'''
@@ -33,9 +32,9 @@ WHERE product.status = 'published' AND product.deleted_at IS NULL
              ORDER BY id LIMIT 1
            )
        ))
-  AND ($2 IS NULL OR lower(product.title) LIKE '%' || lower($2) || '%'
+  AND (CAST($2 AS TEXT) IS NULL OR lower(product.title) LIKE '%' || lower($2) || '%'
        OR lower(product.handle) LIKE '%' || lower($2) || '%')
-  AND ($3 IS NULL OR collection.handle = $3)
+  AND (CAST($3 AS TEXT) IS NULL OR collection.handle = $3)
   AND (json_array_length($4) = 0 OR EXISTS (
     SELECT 1
     FROM product_category_products filter_link
@@ -56,8 +55,8 @@ WHERE product.status = 'published' AND product.deleted_at IS NULL
       )
       AND filter_tag.deleted_at IS NULL
   ))
-  AND ($6 IS NULL OR priced.min_price >= $6)
-  AND ($7 IS NULL OR priced.min_price <= $7)
+  AND (CAST($6 AS INTEGER) IS NULL OR priced.min_price >= $6)
+  AND (CAST($7 AS INTEGER) IS NULL OR priced.min_price <= $7)
   AND ($8 = 0 OR EXISTS (
     SELECT 1
     FROM product_variants sale_variant

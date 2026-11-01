@@ -6,7 +6,7 @@ part 'update.g.dart';
 @SqlxDao()
 abstract final class AdminCustomerGroupUpdateRepository {
   /// Binds customer-group updates to [db].
-  const factory AdminCustomerGroupUpdateRepository(DatabaseExecutor db) =
+  const factory AdminCustomerGroupUpdateRepository(Executor db) =
       _$AdminCustomerGroupUpdateRepository;
 
   /// Replaces the name only while the group remains active.

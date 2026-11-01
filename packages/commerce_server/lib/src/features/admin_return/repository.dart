@@ -7,8 +7,7 @@ part 'repository.g.dart';
 @SqlxDao()
 abstract final class AdminReturnRepository {
   /// Binds return reads to [db].
-  const factory AdminReturnRepository(DatabaseExecutor db) =
-      _$AdminReturnRepository;
+  const factory AdminReturnRepository(Executor db) = _$AdminReturnRepository;
 
   /// Lists the exact fields consumed by Medusa's order-detail return action.
   @Query(r'''
@@ -24,7 +23,7 @@ SELECT request.id,
        request.created_at,
        request.updated_at,
        coalesce((
-         SELECT json_group_array(json_object(
+         SELECT json_agg(json_build_object(
            'id', item.id,
            'order_item_id', item.order_item_id,
            'quantity', item.quantity,

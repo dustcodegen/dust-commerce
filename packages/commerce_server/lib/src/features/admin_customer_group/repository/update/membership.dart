@@ -6,7 +6,7 @@ part 'membership.g.dart';
 @SqlxDao()
 abstract final class AdminCustomerGroupMembershipRepository {
   /// Binds membership operations to [db].
-  const factory AdminCustomerGroupMembershipRepository(DatabaseExecutor db) =
+  const factory AdminCustomerGroupMembershipRepository(Executor db) =
       _$AdminCustomerGroupMembershipRepository;
 
   /// Confirms that the route owns one active customer group.

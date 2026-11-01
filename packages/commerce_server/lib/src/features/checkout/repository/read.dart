@@ -7,8 +7,7 @@ part 'read.g.dart';
 @SqlxDao()
 abstract final class CheckoutReadRepository {
   /// Binds the queries to [db].
-  const factory CheckoutReadRepository(DatabaseExecutor db) =
-      _$CheckoutReadRepository;
+  const factory CheckoutReadRepository(Executor db) = _$CheckoutReadRepository;
 
   /// One complete order, including frozen lines and addresses.
   @Query(r'''
@@ -55,15 +54,15 @@ SELECT o.id, o.display_id, o.email, o.customer_id, o.currency_code, o.subtotal,
        payment.created_at AS payment_created_at,
        r.name AS region_name, r.tax_rate, r.tax_inclusive, r.countries,
        coalesce((
-         SELECT json_group_array(json_object(
+         SELECT json_agg(json_build_object(
            'id', i.id, 'variant_id', i.variant_id,
            'product_id', i.product_id, 'product_handle', i.product_handle,
            'thumbnail', i.thumbnail, 'title', i.title,
            'variant_title', i.variant_title,
-           'unit_price', json_object('amount', i.unit_amount,
+           'unit_price', json_build_object('amount', i.unit_amount,
                                      'currency_code', i.currency_code),
            'quantity', i.quantity,
-           'detail', json_object(
+           'detail', json_build_object(
              'delivered_quantity', coalesce((
                SELECT sum(delivered_item.quantity)
                FROM fulfillment_items delivered_item
@@ -97,9 +96,9 @@ SELECT o.id, o.display_id, o.email, o.customer_id, o.currency_code, o.subtotal,
            WHERE request.status <> 'canceled' AND request.deleted_at IS NULL
            GROUP BY item.order_item_id
          ) returned ON returned.order_item_id = i.id
-         WHERE i.order_id = o.id ORDER BY i.rowid
+         WHERE i.order_id = o.id
        ), '[]') AS items_json,
-       json_object(
+       json_build_object(
          'first_name', shipping.first_name, 'last_name', shipping.last_name,
          'company', shipping.company,
          'line1', shipping.line1, 'line2', shipping.line2,
@@ -107,7 +106,7 @@ SELECT o.id, o.display_id, o.email, o.customer_id, o.currency_code, o.subtotal,
          'postal_code', shipping.postal_code,
          'country_code', shipping.country_code, 'phone', shipping.phone
        ) AS shipping_address_json,
-       json_object(
+       json_build_object(
          'first_name', coalesce(billing.first_name, shipping.first_name),
          'last_name', coalesce(billing.last_name, shipping.last_name),
          'company', CASE WHEN billing.order_id IS NULL

@@ -6,8 +6,7 @@ part 'read.g.dart';
 @SqlxDao()
 abstract final class PaymentReadRepository {
   /// Binds the queries to [db].
-  const factory PaymentReadRepository(DatabaseExecutor db) =
-      _$PaymentReadRepository;
+  const factory PaymentReadRepository(Executor db) = _$PaymentReadRepository;
 
   /// The payment on an order, if one has been started.
   @Query(r'''

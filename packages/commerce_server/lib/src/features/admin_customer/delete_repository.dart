@@ -7,7 +7,7 @@ part 'delete_repository.g.dart';
 @SqlxDao()
 abstract final class AdminCustomerDeleteRepository {
   /// Binds customer deletion statements to [db].
-  const factory AdminCustomerDeleteRepository(DatabaseExecutor db) =
+  const factory AdminCustomerDeleteRepository(Executor db) =
       _$AdminCustomerDeleteRepository;
 
   /// Reads the active profile and its auth-identity ownership boundary.

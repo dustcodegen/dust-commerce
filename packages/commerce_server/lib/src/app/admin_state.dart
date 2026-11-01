@@ -20,7 +20,7 @@ extension AdminStateRegistration on Router {
   /// Attaches every dependency consumed beneath the authenticated Admin router.
   void attachAdminState({
     required CommerceDatabase database,
-    required DatabaseExecutor executor,
+    required Executor executor,
     required Clock clock,
     required PasswordWorkLimiter passwordWork,
     required Future<String> dummyPasswordHash,

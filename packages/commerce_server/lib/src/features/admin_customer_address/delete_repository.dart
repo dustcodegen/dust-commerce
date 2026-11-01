@@ -6,7 +6,7 @@ part 'delete_repository.g.dart';
 @SqlxDao()
 abstract final class AdminCustomerAddressDeleteRepository {
   /// Binds the deletion statement to [db].
-  const factory AdminCustomerAddressDeleteRepository(DatabaseExecutor db) =
+  const factory AdminCustomerAddressDeleteRepository(Executor db) =
       _$AdminCustomerAddressDeleteRepository;
 
   /// Soft-deletes only an active address owned by an active customer.

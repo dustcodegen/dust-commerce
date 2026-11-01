@@ -6,7 +6,7 @@ part 'update_repository.g.dart';
 @SqlxDao()
 abstract final class AdminCustomerAddressUpdateRepository {
   /// Binds the update statement to [db].
-  const factory AdminCustomerAddressUpdateRepository(DatabaseExecutor db) =
+  const factory AdminCustomerAddressUpdateRepository(Executor db) =
       _$AdminCustomerAddressUpdateRepository;
 
   /// Applies only present JSON fields to an active, customer-owned address.
@@ -37,11 +37,11 @@ SET address_name = CASE WHEN json_type($3, '$.address_name') IS NULL
     is_default_shipping = CASE
       WHEN json_type($3, '$.is_default_shipping') IS NULL
       THEN is_default_shipping
-      ELSE json_extract($3, '$.is_default_shipping') END,
+      ELSE json_extract($3, '$.is_default_shipping')::integer END,
     is_default_billing = CASE
       WHEN json_type($3, '$.is_default_billing') IS NULL
       THEN is_default_billing
-      ELSE json_extract($3, '$.is_default_billing') END
+      ELSE json_extract($3, '$.is_default_billing')::integer END
 WHERE id = $1 AND customer_id = $2 AND deleted_at IS NULL
   AND EXISTS (
     SELECT 1 FROM customers WHERE id = $2 AND deleted_at IS NULL

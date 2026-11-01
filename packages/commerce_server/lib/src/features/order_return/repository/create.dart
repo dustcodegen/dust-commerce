@@ -6,7 +6,7 @@ part 'create.g.dart';
 @SqlxDao()
 abstract final class OrderReturnCreateRepository {
   /// Binds return inserts to [db].
-  const factory OrderReturnCreateRepository(DatabaseExecutor db) =
+  const factory OrderReturnCreateRepository(Executor db) =
       _$OrderReturnCreateRepository;
 
   /// Persists the request root after all items pass validation.

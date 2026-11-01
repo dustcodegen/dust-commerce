@@ -7,7 +7,7 @@ part 'complete_order_repository.g.dart';
 @SqlxDao()
 abstract final class AdminCompleteOrderRepository {
   /// Binds lifecycle reads and writes to [db].
-  const factory AdminCompleteOrderRepository(DatabaseExecutor db) =
+  const factory AdminCompleteOrderRepository(Executor db) =
       _$AdminCompleteOrderRepository;
 
   /// Reads only the lifecycle fact required by Medusa's completion rule.

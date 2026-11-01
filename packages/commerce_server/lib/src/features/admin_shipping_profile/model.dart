@@ -20,7 +20,7 @@ final class AdminShippingProfileResponse with _$AdminShippingProfileResponse {
   factory AdminShippingProfileResponse.fromJson(Map<String, Object?> json) =>
       _$AdminShippingProfileResponseFromJson(json);
 
-  /// Database-generated creation instant decoded from SQLite UTC text.
+  /// Database-generated creation instant decoded from PostgreSQL TIMESTAMPTZ.
   @Sqlx(rename: 'created_at', tryFrom: _AdminShippingProfileUtcDateTime())
   final DateTime createdAt;
 
@@ -33,7 +33,7 @@ final class AdminShippingProfileResponse with _$AdminShippingProfileResponse {
   /// Open fulfillment behavior classification matching Medusa.
   final String type;
 
-  /// Database-generated last mutation instant decoded from SQLite UTC text.
+  /// Database-generated last mutation instant decoded from PostgreSQL TIMESTAMPTZ.
   @Sqlx(rename: 'updated_at', tryFrom: _AdminShippingProfileUtcDateTime())
   final DateTime updatedAt;
 }

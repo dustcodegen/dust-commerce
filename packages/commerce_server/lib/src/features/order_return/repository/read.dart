@@ -7,7 +7,7 @@ part 'read.g.dart';
 @SqlxDao()
 abstract final class OrderReturnReadRepository {
   /// Binds return reads to [db].
-  const factory OrderReturnReadRepository(DatabaseExecutor db) =
+  const factory OrderReturnReadRepository(Executor db) =
       _$OrderReturnReadRepository;
 
   /// Payment facts scoped to the authenticated customer in SQL.

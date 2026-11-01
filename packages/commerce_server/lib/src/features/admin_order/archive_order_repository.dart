@@ -7,7 +7,7 @@ part 'archive_order_repository.g.dart';
 @SqlxDao()
 abstract final class AdminArchiveOrderRepository {
   /// Binds lifecycle reads and writes to [db].
-  const factory AdminArchiveOrderRepository(DatabaseExecutor db) =
+  const factory AdminArchiveOrderRepository(Executor db) =
       _$AdminArchiveOrderRepository;
 
   /// Reads only the lifecycle fact required by Medusa's archival rule.

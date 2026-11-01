@@ -7,7 +7,7 @@ part 'product.g.dart';
 @SqlxDao()
 abstract final class AdminProductReadRepository {
   /// Binds one-shot product detail reads to [db].
-  const factory AdminProductReadRepository(DatabaseExecutor db) =
+  const factory AdminProductReadRepository(Executor db) =
       _$AdminProductReadRepository;
 
   /// Reads every currently modeled Medusa detail section in one SQL row.
@@ -20,7 +20,7 @@ SELECT product.id, product.title, product.subtitle, product.handle,
        product.weight, product.length, product.width,
        product.height, product.status, collection.title AS collection_title,
        coalesce((
-         SELECT json_object(
+         SELECT json_build_object(
            'id', profile.id,
            'name', profile.name,
            'type', profile.type,
@@ -36,16 +36,15 @@ SELECT product.id, product.title, product.subtitle, product.handle,
          LIMIT 1
        ), 'null') AS shipping_profile,
        coalesce((
-         SELECT json_group_array(json(ordered.image_json))
+         SELECT json_agg(dust_json_value(ordered.image_json))
          FROM (
-           SELECT json_object(
+           SELECT json_build_object(
              'id', image.id,
              'url', image.url,
-             'variant_ids', json(coalesce((
-               SELECT json_group_array(link.variant_id)
+             'variant_ids', dust_json_value(coalesce((
+               SELECT json_agg(link.variant_id ORDER BY link.variant_id)
                FROM product_image_variants link
                WHERE link.image_id = image.id
-               ORDER BY link.variant_id
              ), '[]'))
            ) AS image_json
            FROM product_images image
@@ -54,12 +53,12 @@ SELECT product.id, product.title, product.subtitle, product.handle,
          ) ordered
        ), '[]') AS images,
        coalesce((
-         SELECT json_group_array(json(ordered.option_json))
+         SELECT json_agg(dust_json_value(ordered.option_json))
          FROM (
-           SELECT json_object(
+           SELECT json_build_object(
              'id', option.id, 'title', option.title,
-             'values', json(coalesce((
-               SELECT json_group_array(value_ordered.value)
+             'values', dust_json_value(coalesce((
+               SELECT json_agg(value_ordered.value)
                FROM (
                  SELECT value.value
                  FROM product_product_option_values availability
@@ -77,13 +76,13 @@ SELECT product.id, product.title, product.subtitle, product.handle,
            WHERE link.product_id = product.id
              AND link.deleted_at IS NULL
              AND option.deleted_at IS NULL
-           ORDER BY link.rowid
+           ORDER BY link.id
          ) ordered
        ), '[]') AS options,
        coalesce((
-         SELECT json_group_array(json(ordered.variant_json))
+         SELECT json_agg(dust_json_value(ordered.variant_json))
          FROM (
-           SELECT json_object(
+           SELECT json_build_object(
              'id', variant.id, 'title', variant.title, 'sku', variant.sku,
              'material', variant.material, 'ean', variant.ean,
              'upc', variant.upc,
@@ -93,14 +92,14 @@ SELECT product.id, product.title, product.subtitle, product.handle,
              'mid_code', variant.mid_code, 'hs_code', variant.hs_code,
              'origin_country', variant.origin_country,
              'inventory_quantity', variant.inventory_quantity,
-             'manage_inventory', json(iif(variant.manage_inventory = 1,
+             'manage_inventory', dust_json_value(iif(variant.manage_inventory = 1,
                                           'true', 'false')),
-             'allow_backorder', json(iif(variant.allow_backorder = 1,
+             'allow_backorder', dust_json_value(iif(variant.allow_backorder = 1,
                                          'true', 'false')),
-             'prices', json(coalesce((
-               SELECT json_group_array(json(price_ordered.price_json))
+             'prices', dust_json_value(coalesce((
+               SELECT json_agg(dust_json_value(price_ordered.price_json))
                FROM (
-                 SELECT json_object(
+                 SELECT json_build_object(
                    'currency_code', price.currency_code,
                    'amount', price.amount
                  ) AS price_json
@@ -109,8 +108,8 @@ SELECT product.id, product.title, product.subtitle, product.handle,
                  ORDER BY price.currency_code
                ) price_ordered
              ), '[]')),
-             'option_values', json(coalesce((
-               SELECT json_group_object(choice.option_id, value.value)
+             'option_values', dust_json_value(coalesce((
+               SELECT jsonb_object_agg(choice.option_id, value.value)
                FROM variant_option_values choice
                JOIN product_option_values value
                  ON value.id = choice.option_value_id
@@ -126,7 +125,7 @@ SELECT product.id, product.title, product.subtitle, product.handle,
          ) ordered
        ), '[]') AS variants,
        coalesce((
-         SELECT json_group_array(ordered.name)
+         SELECT json_agg(ordered.name)
          FROM (
            SELECT category.name
            FROM product_category_products link
@@ -135,9 +134,9 @@ SELECT product.id, product.title, product.subtitle, product.handle,
              AND category.deleted_at IS NULL
            ORDER BY link.rank, category.name
          ) ordered
-       ), '[]') AS categories,
+       ), '[]')::text AS categories,
        coalesce((
-         SELECT json_group_array(ordered.value)
+         SELECT json_agg(ordered.value)
          FROM (
            SELECT tag.value
            FROM product_tag_products link
@@ -145,7 +144,7 @@ SELECT product.id, product.title, product.subtitle, product.handle,
            WHERE link.product_id = product.id AND tag.deleted_at IS NULL
            ORDER BY tag.value
          ) ordered
-       ), '[]') AS tags
+       ), '[]')::text AS tags
 FROM products product
 LEFT JOIN product_collections collection
   ON collection.id = product.collection_id AND collection.deleted_at IS NULL

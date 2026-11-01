@@ -12,7 +12,7 @@ import 'package:dust_dart/db.dart';
 
 /// Persists one validated checkout inside the caller-owned transaction.
 Future<Result<CheckoutPlacementOutcome, SqlxError>> persistOrder(
-  DatabaseExecutor tx, {
+  Executor tx, {
   required String cartId,
   required String email,
   required Option<String> customerId,

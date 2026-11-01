@@ -10,7 +10,7 @@ part 'read.g.dart';
 @SqlxDao()
 abstract final class CartReadRepository {
   /// Binds the queries to [db].
-  const factory CartReadRepository(DatabaseExecutor db) = _$CartReadRepository;
+  const factory CartReadRepository(Executor db) = _$CartReadRepository;
 
   /// Whether the cart's retained provider is still enabled for its region.
   @Query(r'''
@@ -35,7 +35,7 @@ SELECT EXISTS (
   /// without the other.
   @Query(r'''
 SELECT c.id, c.customer_id, c.email,
-       json_object(
+       json_build_object(
          'id', r.id,
          'name', r.name,
          'currency_code', r.currency_code,
@@ -44,9 +44,9 @@ SELECT c.id, c.customer_id, c.email,
          'countries', r.countries
        ) AS region,
        coalesce((
-         SELECT json_group_array(json(ordered.line_json))
+         SELECT json_agg(dust_json_value(ordered.line_json))
          FROM (
-           SELECT json_object(
+           SELECT json_build_object(
              'id', line.id,
              'variant_id', line.variant_id,
              'product_id', line.product_id,
@@ -54,7 +54,7 @@ SELECT c.id, c.customer_id, c.email,
              'thumbnail', line.thumbnail,
              'title', line.title,
              'variant_title', line.variant_title,
-             'unit_price', json_object(
+             'unit_price', json_build_object(
                'amount', line.unit_amount,
                'currency_code', line.currency_code
              ),
@@ -62,14 +62,14 @@ SELECT c.id, c.customer_id, c.email,
            ) AS line_json
            FROM line_items line
            WHERE line.cart_id = c.id
-           ORDER BY line.rowid
+           ORDER BY line.id
          ) ordered
        ), '[]') AS items,
        coalesce((
-         SELECT json_object(
+         SELECT json_build_object(
            'option_id', method.option_id,
            'name', method.name,
-           'amount', json_object(
+           'amount', json_build_object(
              'amount', method.amount,
              'currency_code', r.currency_code
            )
@@ -78,12 +78,12 @@ SELECT c.id, c.customer_id, c.email,
          WHERE method.cart_id = c.id
        ), 'null') AS shipping_method,
        coalesce((
-         SELECT json_object('provider_id', session.provider_id)
+         SELECT json_build_object('provider_id', session.provider_id)
          FROM cart_payment_sessions session
          WHERE session.cart_id = c.id
        ), 'null') AS payment_session,
        coalesce((
-         SELECT json_object(
+         SELECT json_build_object(
            'first_name', address.first_name,
            'last_name', address.last_name,
            'company', address.company,
@@ -99,7 +99,7 @@ SELECT c.id, c.customer_id, c.email,
          WHERE address.cart_id = c.id AND address.kind = 'shipping'
        ), 'null') AS shipping_address,
        coalesce((
-         SELECT json_object(
+         SELECT json_build_object(
            'first_name', address.first_name,
            'last_name', address.last_name,
            'company', address.company,
@@ -115,22 +115,22 @@ SELECT c.id, c.customer_id, c.email,
          WHERE address.cart_id = c.id AND address.kind = 'billing'
        ), 'null') AS billing_address,
        coalesce((
-         SELECT json_group_array(json(ordered.promotion_json))
+         SELECT json_agg(dust_json_value(ordered.promotion_json))
          FROM (
-           SELECT json_object(
+           SELECT json_build_object(
              'id', promotion.promotion_id,
              'code', promotion.code,
              'type', promotion.type,
              'value', promotion.value,
              'currency_code', promotion.currency_code,
-             'amount', json_object(
+             'amount', json_build_object(
                'amount', promotion.amount,
                'currency_code', r.currency_code
              )
            ) AS promotion_json
            FROM cart_promotions promotion
            WHERE promotion.cart_id = c.id
-           ORDER BY promotion.rowid
+           ORDER BY promotion.promotion_id
          ) ordered
        ), '[]') AS promotions
 FROM carts c
@@ -142,18 +142,18 @@ WHERE c.id = $1
   /// The lines of [cartId], in insertion order.
   @Query(r'''
 SELECT id, variant_id, product_id, product_handle, thumbnail, title, variant_title,
-       json_object('amount', unit_amount, 'currency_code', currency_code) AS unit_price,
+       json_build_object('amount', unit_amount, 'currency_code', currency_code) AS unit_price,
        quantity
 FROM line_items
 WHERE cart_id = $1
-ORDER BY rowid
+ORDER BY id
 ''')
   Future<Result<List<LineItemResponse>, SqlxError>> linesOf(String cartId);
 
   /// The method [cartId] chose, if it has chosen one.
   @Query(r'''
 SELECT method.option_id, method.name,
-       json_object(
+       json_build_object(
          'amount', method.amount,
          'currency_code', region.currency_code
        ) AS amount
@@ -170,7 +170,7 @@ WHERE method.cart_id = $1
   @Query(r'''
 SELECT promotion.promotion_id AS id, promotion.code, promotion.type,
        promotion.value, promotion.currency_code,
-       json_object(
+       json_build_object(
          'amount', amount,
          'currency_code', region.currency_code
        ) AS amount
@@ -198,7 +198,7 @@ WHERE code = UPPER($1)
   /// The line for [variantId] in [cartId], if the cart already holds one.
   @Query(r'''
 SELECT id, variant_id, product_id, product_handle, thumbnail, title, variant_title,
-       json_object('amount', unit_amount, 'currency_code', currency_code)
+       json_build_object('amount', unit_amount, 'currency_code', currency_code)
          AS unit_price,
        quantity
 FROM line_items
@@ -213,7 +213,7 @@ WHERE cart_id = $1 AND variant_id = $2
   @Query(r'''
 SELECT id, variant_id, product_id, product_handle, thumbnail, title,
        variant_title,
-       json_object('amount', unit_amount, 'currency_code', currency_code)
+       json_build_object('amount', unit_amount, 'currency_code', currency_code)
          AS unit_price,
        quantity
 FROM line_items

@@ -7,7 +7,7 @@ part 'create.g.dart';
 @SqlxDao()
 abstract final class AdminCustomerGroupCreateRepository {
   /// Binds customer-group creation to [db].
-  const factory AdminCustomerGroupCreateRepository(DatabaseExecutor db) =
+  const factory AdminCustomerGroupCreateRepository(Executor db) =
       _$AdminCustomerGroupCreateRepository;
 
   /// Inserts one group and returns only the explicit Admin response columns.

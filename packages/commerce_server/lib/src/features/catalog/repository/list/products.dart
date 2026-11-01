@@ -7,29 +7,28 @@ part 'products.g.dart';
 @SqlxDao()
 abstract final class CatalogListRepository {
   /// Binds the queries to [db].
-  const factory CatalogListRepository(DatabaseExecutor db) =
-      _$CatalogListRepository;
+  const factory CatalogListRepository(Executor db) = _$CatalogListRepository;
 
   /// Published products with complete currency-scoped storefront data.
   @Query(r'''
 SELECT product.id, product.title, product.handle, product.description,
        product.thumbnail, product.status,
-       CASE WHEN collection.id IS NULL THEN 'null' ELSE json_object('id', collection.id, 'title', collection.title, 'handle', collection.handle) END AS collection,
-       json_object('material', product.material, 'origin_country', product.origin_country, 'product_type', product_type.value,
+       CASE WHEN collection.id IS NULL THEN 'null' ELSE json_build_object('id', collection.id, 'title', collection.title, 'handle', collection.handle) END AS collection,
+       json_build_object('material', product.material, 'origin_country', product.origin_country, 'product_type', product_type.value,
          'weight', product.weight, 'length', product.length, 'width', product.width, 'height', product.height) AS details,
        coalesce((
-         SELECT json_group_array(json(ordered.image_json))
+         SELECT json_agg(dust_json_value(ordered.image_json))
          FROM (
-           SELECT json_object('id', image.id, 'url', image.url, 'rank', image.rank) AS image_json
+           SELECT json_build_object('id', image.id, 'url', image.url, 'rank', image.rank) AS image_json
            FROM product_images image
            WHERE image.product_id = product.id AND image.deleted_at IS NULL
            ORDER BY image.rank, image.id
          ) ordered
        ), '[]') AS images,
        coalesce((
-         SELECT json_group_array(json(ordered.category_json))
+         SELECT json_agg(dust_json_value(ordered.category_json))
          FROM (
-           SELECT json_object('id', category.id, 'name', category.name,
+           SELECT json_build_object('id', category.id, 'name', category.name,
              'description', category.description, 'handle', category.handle,
              'parent_id', category.parent_category_id) AS category_json
            FROM product_category_products link
@@ -41,9 +40,9 @@ SELECT product.id, product.title, product.handle, product.description,
          ) ordered
        ), '[]') AS categories,
        coalesce((
-         SELECT json_group_array(json(ordered.tag_json))
+         SELECT json_agg(dust_json_value(ordered.tag_json))
          FROM (
-           SELECT json_object('id', tag.id, 'value', tag.value) AS tag_json
+           SELECT json_build_object('id', tag.id, 'value', tag.value) AS tag_json
            FROM product_tag_products link
            JOIN product_tags tag ON tag.id = link.tag_id
            WHERE link.product_id = product.id AND tag.deleted_at IS NULL
@@ -51,11 +50,11 @@ SELECT product.id, product.title, product.handle, product.description,
          ) ordered
        ), '[]') AS tags,
        coalesce((
-         SELECT json_group_array(json(ordered.option_json))
+         SELECT json_agg(dust_json_value(ordered.option_json))
          FROM (
-          SELECT json_object('id', option.id, 'title', option.title,
-            'values', json(coalesce((
-               SELECT json_group_array(ordered_value.value)
+          SELECT json_build_object('id', option.id, 'title', option.title,
+            'values', dust_json_value(coalesce((
+               SELECT json_agg(ordered_value.value)
                FROM (
                 SELECT option_value.value FROM product_product_option_values availability
                 JOIN product_option_values option_value ON option_value.id = availability.product_option_value_id
@@ -67,26 +66,26 @@ SELECT product.id, product.title, product.handle, product.description,
            FROM product_product_options link
            JOIN product_options option ON option.id = link.product_option_id
            WHERE link.product_id = product.id AND link.deleted_at IS NULL AND option.deleted_at IS NULL
-           ORDER BY link.rowid
+           ORDER BY link.id
          ) ordered
        ), '[]') AS options,
        coalesce((
-         SELECT json_group_array(json(ordered.variant_json))
+         SELECT json_agg(dust_json_value(ordered.variant_json))
          FROM (
-          SELECT json_object('id', variant.id, 'title', variant.title, 'sku', variant.sku,
+          SELECT json_build_object('id', variant.id, 'title', variant.title, 'sku', variant.sku,
              'inventory_quantity', variant.inventory_quantity, 'manage_inventory', variant.manage_inventory,
              'allow_backorder', variant.allow_backorder, 'amount', price.amount,
              'currency_code', price.currency_code,
              'original_amount', original_price.amount,
-             'option_values', json(coalesce((
-              SELECT json_group_object(choice.option_id, option_value.value) FROM variant_option_values choice
+             'option_values', dust_json_value(coalesce((
+              SELECT jsonb_object_agg(choice.option_id, option_value.value) FROM variant_option_values choice
               JOIN product_option_values option_value ON option_value.id = choice.option_value_id AND option_value.option_id = choice.option_id
               WHERE choice.variant_id = variant.id AND option_value.deleted_at IS NULL
              ), '{}')),
-             'images', json(coalesce((
-               SELECT json_group_array(json(ordered_image.image_json))
+             'images', dust_json_value(coalesce((
+               SELECT json_agg(dust_json_value(ordered_image.image_json))
                FROM (
-                SELECT json_object('id', image.id, 'url', image.url, 'rank', image.rank) AS image_json FROM product_image_variants image_variant
+                SELECT json_build_object('id', image.id, 'url', image.url, 'rank', image.rank) AS image_json FROM product_image_variants image_variant
                 JOIN product_images image ON image.id = image_variant.image_id WHERE image_variant.variant_id = variant.id AND image.deleted_at IS NULL
                  ORDER BY image.rank, image.id
                ) ordered_image
@@ -119,8 +118,8 @@ WHERE product.status = 'published' AND product.deleted_at IS NULL
         SELECT id FROM sales_channels WHERE is_disabled = 0 AND deleted_at IS NULL ORDER BY id LIMIT 1
       )
   ))
-  AND ($4 IS NULL OR lower(product.title) LIKE '%' || lower($4) || '%' OR lower(product.handle) LIKE '%' || lower($4) || '%')
-  AND ($5 IS NULL OR collection.handle = $5)
+  AND (CAST($4 AS TEXT) IS NULL OR lower(product.title) LIKE '%' || lower($4) || '%' OR lower(product.handle) LIKE '%' || lower($4) || '%')
+  AND (CAST($5 AS TEXT) IS NULL OR collection.handle = $5)
   AND (json_array_length($6) = 0 OR EXISTS (
     SELECT 1 FROM product_category_products filter_link
     JOIN product_categories filter_category ON filter_category.id = filter_link.category_id
@@ -133,8 +132,8 @@ WHERE product.status = 'published' AND product.deleted_at IS NULL
     WHERE filter_link.product_id = product.id AND lower(filter_tag.value) IN (SELECT lower(value) FROM json_each($7))
       AND filter_tag.deleted_at IS NULL
   ))
-  AND ($9 IS NULL OR priced.min_price >= $9)
-  AND ($10 IS NULL OR priced.min_price <= $10)
+  AND (CAST($9 AS INTEGER) IS NULL OR priced.min_price >= $9)
+  AND (CAST($10 AS INTEGER) IS NULL OR priced.min_price <= $10)
   AND ($11 = 0 OR EXISTS (
     SELECT 1 FROM product_variants sale_variant
     JOIN variant_prices sale_price ON sale_price.variant_id = sale_variant.id

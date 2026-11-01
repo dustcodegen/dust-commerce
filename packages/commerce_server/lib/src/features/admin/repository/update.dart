@@ -6,7 +6,7 @@ part 'update.g.dart';
 @SqlxDao()
 abstract final class AdminProductUpdateRepository {
   /// Binds product mutations to [db].
-  const factory AdminProductUpdateRepository(DatabaseExecutor db) =
+  const factory AdminProductUpdateRepository(Executor db) =
       _$AdminProductUpdateRepository;
 
   /// Replaces supported general fields when no active product owns [handle].
@@ -48,7 +48,7 @@ WHERE id = $1
 UPDATE products
 SET type_id = $2
 WHERE id = $1 AND deleted_at IS NULL
-  AND ($2 IS NULL OR EXISTS (
+  AND (CAST($2 AS TEXT) IS NULL OR EXISTS (
     SELECT 1 FROM product_types
     WHERE id = $2 AND deleted_at IS NULL
   ))
@@ -128,7 +128,7 @@ WHERE id = $1 AND deleted_at IS NULL
 @SqlxDao()
 abstract final class AdminProductTypeUpdateRepository {
   /// Binds product-type replacement to [db].
-  const factory AdminProductTypeUpdateRepository(DatabaseExecutor db) =
+  const factory AdminProductTypeUpdateRepository(Executor db) =
       _$AdminProductTypeUpdateRepository;
 
   /// Renames one active type unless another active type owns the value.

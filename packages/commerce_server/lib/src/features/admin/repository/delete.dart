@@ -6,8 +6,7 @@ part 'delete.g.dart';
 @SqlxDao()
 abstract final class AdminDeleteRepository {
   /// Binds the query to [db].
-  const factory AdminDeleteRepository(DatabaseExecutor db) =
-      _$AdminDeleteRepository;
+  const factory AdminDeleteRepository(Executor db) = _$AdminDeleteRepository;
 
   /// Revokes one bearer token by its fingerprint.
   @Query(r'DELETE FROM auth_tokens WHERE token_hash = $1')
@@ -18,7 +17,7 @@ abstract final class AdminDeleteRepository {
 @SqlxDao()
 abstract final class AdminProductTypeDeleteRepository {
   /// Binds product-type retirement to [db].
-  const factory AdminProductTypeDeleteRepository(DatabaseExecutor db) =
+  const factory AdminProductTypeDeleteRepository(Executor db) =
       _$AdminProductTypeDeleteRepository;
 
   /// Soft-deletes one active type using a database-generated UTC instant.

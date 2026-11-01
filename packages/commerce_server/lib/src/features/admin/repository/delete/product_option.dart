@@ -6,7 +6,7 @@ part 'product_option.g.dart';
 @SqlxDao()
 abstract final class AdminProductOptionDeleteRepository {
   /// Binds product-option retirement to [db].
-  const factory AdminProductOptionDeleteRepository(DatabaseExecutor db) =
+  const factory AdminProductOptionDeleteRepository(Executor db) =
       _$AdminProductOptionDeleteRepository;
 
   /// Counts active products that still expose this option.

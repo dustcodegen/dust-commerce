@@ -31,7 +31,7 @@ part 'repository.g.dart';
 @SqlxDao()
 abstract final class AdminProductOptionRepository {
   /// Binds product-option statements to [db].
-  const factory AdminProductOptionRepository(DatabaseExecutor db) =
+  const factory AdminProductOptionRepository(Executor db) =
       _$AdminProductOptionRepository;
 
   /// Creates a global option unless its active title is already owned.
@@ -54,7 +54,7 @@ SELECT option.id, option.title, option.is_exclusive,
 FROM product_options option
 WHERE option.deleted_at IS NULL AND option.is_exclusive = 0
   AND ($1 = '' OR lower(option.title) LIKE '%' || lower($1) || '%')
-ORDER BY option.created_at DESC, option.rowid
+ORDER BY option.created_at DESC, option.id
 LIMIT $2 OFFSET $3
 ''')
   Future<Result<List<AdminProductOptionSummaryResponse>, SqlxError>> list(
@@ -76,9 +76,9 @@ WHERE option.deleted_at IS NULL AND option.is_exclusive = 0
   @Query(r'''
 SELECT option.id, option.title, option.is_exclusive,
        coalesce((
-         SELECT json_group_array(json(ordered.value_json))
+         SELECT json_agg(dust_json_value(ordered.value_json))
          FROM (
-           SELECT json_object('id', value.id, 'value', value.value,
+           SELECT json_build_object('id', value.id, 'value', value.value,
                               'rank', value.rank) AS value_json
            FROM product_option_values value
            WHERE value.option_id = option.id AND value.deleted_at IS NULL
@@ -86,16 +86,16 @@ SELECT option.id, option.title, option.is_exclusive,
          ) ordered
        ), '[]') AS "values",
        coalesce((
-         SELECT json_group_array(json(ordered.product_json))
+         SELECT json_agg(dust_json_value(ordered.product_json))
          FROM (
-           SELECT json_object(
+           SELECT json_build_object(
              'id', product.id, 'title', product.title,
              'thumbnail', coalesce(product.thumbnail, ''),
              'collection_title', coalesce(collection.title, ''),
-             'sales_channels', json(coalesce((
-               SELECT json_group_array(json(ordered_channel.channel_json))
+             'sales_channels', dust_json_value(coalesce((
+               SELECT json_agg(dust_json_value(ordered_channel.channel_json))
                FROM (
-                 SELECT json_object('id', channel.id, 'name', channel.name)
+                 SELECT json_build_object('id', channel.id, 'name', channel.name)
                           AS channel_json
                  FROM product_sales_channels channel_link
                  JOIN sales_channels channel

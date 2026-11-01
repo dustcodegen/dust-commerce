@@ -7,7 +7,7 @@ part 'export_repository.g.dart';
 @SqlxDao()
 abstract final class AdminOrderExportRepository {
   /// Binds order export reads to [db].
-  const factory AdminOrderExportRepository(DatabaseExecutor db) =
+  const factory AdminOrderExportRepository(Executor db) =
       _$AdminOrderExportRepository;
 
   /// Reads every matching order and frozen item in stable table order.
@@ -67,14 +67,14 @@ WHERE order_row.deleted_at IS NULL
   AND ($3='' OR instr(','||$3||',', ','||order_row.region_id||',')>0)
   AND ($4='' OR instr(','||$4||',',
                       ','||channel_link.sales_channel_id||',')>0)
-  AND ($5='' OR order_row.created_at>$5)
-  AND ($6='' OR order_row.created_at>=$6)
-  AND ($7='' OR order_row.created_at<$7)
-  AND ($8='' OR order_row.created_at<=$8)
-  AND ($9='' OR order_row.updated_at>$9)
-  AND ($10='' OR order_row.updated_at>=$10)
-  AND ($11='' OR order_row.updated_at<$11)
-  AND ($12='' OR order_row.updated_at<=$12)
+  AND (NULLIF($5, '') IS NULL OR order_row.created_at > NULLIF($5, '')::timestamptz)
+  AND (NULLIF($6, '') IS NULL OR order_row.created_at >= NULLIF($6, '')::timestamptz)
+  AND (NULLIF($7, '') IS NULL OR order_row.created_at < NULLIF($7, '')::timestamptz)
+  AND (NULLIF($8, '') IS NULL OR order_row.created_at <= NULLIF($8, '')::timestamptz)
+  AND (NULLIF($9, '') IS NULL OR order_row.updated_at > NULLIF($9, '')::timestamptz)
+  AND (NULLIF($10, '') IS NULL OR order_row.updated_at >= NULLIF($10, '')::timestamptz)
+  AND (NULLIF($11, '') IS NULL OR order_row.updated_at < NULLIF($11, '')::timestamptz)
+  AND (NULLIF($12, '') IS NULL OR order_row.updated_at <= NULLIF($12, '')::timestamptz)
 ORDER BY
   CASE WHEN $13='display_id' THEN order_row.display_id END ASC,
   CASE WHEN $13='-display_id' THEN order_row.display_id END DESC,

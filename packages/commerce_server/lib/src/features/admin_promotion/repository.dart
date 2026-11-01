@@ -7,7 +7,7 @@ part 'repository.g.dart';
 @SqlxDao()
 abstract final class AdminPromotionRepository {
   /// Binds promotion queries to [db].
-  const factory AdminPromotionRepository(DatabaseExecutor db) =
+  const factory AdminPromotionRepository(Executor db) =
       _$AdminPromotionRepository;
 
   /// Lists active promotions with Medusa's table columns.
@@ -27,14 +27,14 @@ SELECT id, code, type, value, currency_code, starts_at, ends_at, usage_limit,
 FROM promotions
 WHERE deleted_at IS NULL
   AND ($1 = '' OR lower(code) LIKE '%' || lower($1) || '%')
-  AND ($2 = '' OR created_at > $2)
-  AND ($3 = '' OR created_at >= $3)
-  AND ($4 = '' OR created_at < $4)
-  AND ($5 = '' OR created_at <= $5)
-  AND ($6 = '' OR updated_at > $6)
-  AND ($7 = '' OR updated_at >= $7)
-  AND ($8 = '' OR updated_at < $8)
-  AND ($9 = '' OR updated_at <= $9)
+  AND (NULLIF($2, '') IS NULL OR created_at > NULLIF($2, '')::timestamptz)
+  AND (NULLIF($3, '') IS NULL OR created_at >= NULLIF($3, '')::timestamptz)
+  AND (NULLIF($4, '') IS NULL OR created_at < NULLIF($4, '')::timestamptz)
+  AND (NULLIF($5, '') IS NULL OR created_at <= NULLIF($5, '')::timestamptz)
+  AND (NULLIF($6, '') IS NULL OR updated_at > NULLIF($6, '')::timestamptz)
+  AND (NULLIF($7, '') IS NULL OR updated_at >= NULLIF($7, '')::timestamptz)
+  AND (NULLIF($8, '') IS NULL OR updated_at < NULLIF($8, '')::timestamptz)
+  AND (NULLIF($9, '') IS NULL OR updated_at <= NULLIF($9, '')::timestamptz)
 ORDER BY
   CASE WHEN $10 = 'created_at' THEN created_at END ASC,
   CASE WHEN $10 = '-created_at' THEN created_at END DESC,
@@ -64,14 +64,14 @@ SELECT count(*)
 FROM promotions
 WHERE deleted_at IS NULL
   AND ($1 = '' OR lower(code) LIKE '%' || lower($1) || '%')
-  AND ($2 = '' OR created_at > $2)
-  AND ($3 = '' OR created_at >= $3)
-  AND ($4 = '' OR created_at < $4)
-  AND ($5 = '' OR created_at <= $5)
-  AND ($6 = '' OR updated_at > $6)
-  AND ($7 = '' OR updated_at >= $7)
-  AND ($8 = '' OR updated_at < $8)
-  AND ($9 = '' OR updated_at <= $9)
+  AND (NULLIF($2, '') IS NULL OR created_at > NULLIF($2, '')::timestamptz)
+  AND (NULLIF($3, '') IS NULL OR created_at >= NULLIF($3, '')::timestamptz)
+  AND (NULLIF($4, '') IS NULL OR created_at < NULLIF($4, '')::timestamptz)
+  AND (NULLIF($5, '') IS NULL OR created_at <= NULLIF($5, '')::timestamptz)
+  AND (NULLIF($6, '') IS NULL OR updated_at > NULLIF($6, '')::timestamptz)
+  AND (NULLIF($7, '') IS NULL OR updated_at >= NULLIF($7, '')::timestamptz)
+  AND (NULLIF($8, '') IS NULL OR updated_at < NULLIF($8, '')::timestamptz)
+  AND (NULLIF($9, '') IS NULL OR updated_at <= NULLIF($9, '')::timestamptz)
 ''')
   Future<Result<int, SqlxError>> count(
     String query,

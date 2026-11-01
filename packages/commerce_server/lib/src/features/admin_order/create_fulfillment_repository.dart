@@ -7,7 +7,7 @@ part 'create_fulfillment_repository.g.dart';
 @SqlxDao()
 abstract final class AdminCreateFulfillmentRepository {
   /// Binds fulfillment validation and writes to [db].
-  const factory AdminCreateFulfillmentRepository(DatabaseExecutor db) =
+  const factory AdminCreateFulfillmentRepository(Executor db) =
       _$AdminCreateFulfillmentRepository;
 
   /// Distinguishes an unavailable order from invalid fulfillment selections.

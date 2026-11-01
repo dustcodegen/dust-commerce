@@ -6,7 +6,7 @@ part 'stock.g.dart';
 @SqlxDao()
 abstract final class AdminProductStockRepository {
   /// Binds stock mutations to [db].
-  const factory AdminProductStockRepository(DatabaseExecutor db) =
+  const factory AdminProductStockRepository(Executor db) =
       _$AdminProductStockRepository;
 
   /// Confirms that one active variant belongs to the routed product.

@@ -8,8 +8,7 @@ part 'create.g.dart';
 @SqlxDao()
 abstract final class AdminCreateRepository {
   /// Binds the queries to [db].
-  const factory AdminCreateRepository(DatabaseExecutor db) =
-      _$AdminCreateRepository;
+  const factory AdminCreateRepository(Executor db) = _$AdminCreateRepository;
 
   /// Creates one active admin profile and returns only its public fields.
   @Query(r'''
@@ -61,7 +60,7 @@ VALUES ($1, $2, $3)
 @SqlxDao()
 abstract final class AdminProductTypeCreateRepository {
   /// Binds product-type creation to [db].
-  const factory AdminProductTypeCreateRepository(DatabaseExecutor db) =
+  const factory AdminProductTypeCreateRepository(Executor db) =
       _$AdminProductTypeCreateRepository;
 
   /// Inserts one active value unless its normalized label is already owned.

@@ -7,7 +7,7 @@ part 'cancel_order_repository.g.dart';
 @SqlxDao()
 abstract final class AdminCancelOrderRepository {
   /// Binds validation, refund, inventory, and lifecycle writes to [db].
-  const factory AdminCancelOrderRepository(DatabaseExecutor db) =
+  const factory AdminCancelOrderRepository(Executor db) =
       _$AdminCancelOrderRepository;
 
   /// Reads every fact required before the first irreversible local write.

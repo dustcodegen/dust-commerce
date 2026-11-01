@@ -33,7 +33,7 @@ final class AdminOrderResponse with _$AdminOrderResponse {
   @Sqlx(rename: 'sales_channel_name')
   final String? salesChannelName;
 
-  /// Database-generated creation instant decoded from SQLite UTC text.
+  /// Database-generated creation instant decoded from PostgreSQL TIMESTAMPTZ.
   @Sqlx(rename: 'created_at', tryFrom: _AdminOrderUtcDateTime())
   final DateTime createdAt;
 
@@ -76,7 +76,7 @@ final class AdminOrderResponse with _$AdminOrderResponse {
   /// Exact frozen total in minor units.
   final int total;
 
-  /// Database-generated mutation instant decoded from SQLite UTC text.
+  /// Database-generated mutation instant decoded from PostgreSQL TIMESTAMPTZ.
   @Sqlx(rename: 'updated_at', tryFrom: _AdminOrderUtcDateTime())
   final DateTime updatedAt;
 }

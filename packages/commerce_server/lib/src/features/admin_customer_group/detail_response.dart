@@ -21,7 +21,7 @@ final class AdminCustomerGroupDetailResponse
     required this.updatedAt,
   });
 
-  /// Database-generated creation instant decoded from SQLite UTC text.
+  /// Database-generated creation instant decoded from PostgreSQL TIMESTAMPTZ.
   @Sqlx(rename: 'created_at', tryFrom: _AdminCustomerGroupDetailDateTime())
   final DateTime createdAt;
 
@@ -46,7 +46,7 @@ final class AdminCustomerGroupDetailResponse
   /// Merchant-facing segment name.
   final String name;
 
-  /// Database-generated last mutation instant decoded from SQLite UTC text.
+  /// Database-generated last mutation instant decoded from PostgreSQL TIMESTAMPTZ.
   @Sqlx(rename: 'updated_at', tryFrom: _AdminCustomerGroupDetailDateTime())
   final DateTime updatedAt;
 }

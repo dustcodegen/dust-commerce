@@ -7,7 +7,7 @@ part 'list.g.dart';
 @SqlxDao()
 abstract final class CartListRepository {
   /// Binds the queries to [db].
-  const factory CartListRepository(DatabaseExecutor db) = _$CartListRepository;
+  const factory CartListRepository(Executor db) = _$CartListRepository;
 
   /// The delivery options [regionId] offers, cheapest first.
   ///
@@ -16,14 +16,14 @@ abstract final class CartListRepository {
   /// remember to check.
   @Query(r'''
 SELECT option.id AS option_id, option.name,
-       json_object(
+       json_build_object(
          'amount', option.amount,
          'currency_code', option.currency_code
        ) AS amount,
        coalesce((
-         SELECT json_group_array(json(ordered.rule_json))
+         SELECT json_agg(dust_json_value(ordered.rule_json))
          FROM (
-           SELECT json_object(
+           SELECT json_build_object(
              'attribute', rule.attribute,
              'operator', rule.operator,
              'value', rule.value
@@ -45,14 +45,14 @@ ORDER BY option.amount, option.id
   /// One option, checked against the region that is allowed to use it.
   @Query(r'''
 SELECT option.id AS option_id, option.name,
-       json_object(
+       json_build_object(
          'amount', option.amount,
          'currency_code', option.currency_code
        ) AS amount,
        coalesce((
-         SELECT json_group_array(json(ordered.rule_json))
+         SELECT json_agg(dust_json_value(ordered.rule_json))
          FROM (
-           SELECT json_object(
+           SELECT json_build_object(
              'attribute', rule.attribute,
              'operator', rule.operator,
              'value', rule.value

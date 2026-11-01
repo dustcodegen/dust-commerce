@@ -6,7 +6,7 @@ part 'create_repository.g.dart';
 @SqlxDao()
 abstract final class AdminCustomerAddressCreateRepository {
   /// Binds address creation to [db].
-  const factory AdminCustomerAddressCreateRepository(DatabaseExecutor db) =
+  const factory AdminCustomerAddressCreateRepository(Executor db) =
       _$AdminCustomerAddressCreateRepository;
 
   /// Inserts beneath one active customer and lets SQLite own audit timestamps.

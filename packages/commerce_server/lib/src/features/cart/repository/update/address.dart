@@ -6,8 +6,7 @@ part 'address.g.dart';
 @SqlxDao()
 abstract final class CartAddressRepository {
   /// Binds the address writes to [db].
-  const factory CartAddressRepository(DatabaseExecutor db) =
-      _$CartAddressRepository;
+  const factory CartAddressRepository(Executor db) = _$CartAddressRepository;
 
   /// Inserts or replaces one active cart destination.
   @Query(r'''

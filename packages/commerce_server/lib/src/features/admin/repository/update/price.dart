@@ -7,7 +7,7 @@ part 'price.g.dart';
 @SqlxDao()
 abstract final class AdminVariantPriceRepository {
   /// Binds price mutations to [db].
-  const factory AdminVariantPriceRepository(DatabaseExecutor db) =
+  const factory AdminVariantPriceRepository(Executor db) =
       _$AdminVariantPriceRepository;
 
   /// Lists every currency backed by a selling region.

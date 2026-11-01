@@ -7,7 +7,7 @@ part 'repository.g.dart';
 @SqlxDao()
 abstract final class AdminFulfillmentContextRepository {
   /// Binds fulfillment choice reads to [db].
-  const factory AdminFulfillmentContextRepository(DatabaseExecutor db) =
+  const factory AdminFulfillmentContextRepository(Executor db) =
       _$AdminFulfillmentContextRepository;
 
   /// Counts active stock locations matching a merchant search.

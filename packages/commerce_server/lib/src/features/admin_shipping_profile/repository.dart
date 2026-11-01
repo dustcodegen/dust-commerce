@@ -7,7 +7,7 @@ part 'repository.g.dart';
 @SqlxDao()
 abstract final class AdminShippingProfileRepository {
   /// Binds shipping-profile operations to [db].
-  const factory AdminShippingProfileRepository(DatabaseExecutor db) =
+  const factory AdminShippingProfileRepository(Executor db) =
       _$AdminShippingProfileRepository;
 
   /// Lists active profiles after applying the Admin query boundary.
@@ -19,14 +19,14 @@ WHERE deleted_at IS NULL
        OR lower(type) LIKE '%' || lower($1) || '%')
   AND ($2 = '' OR lower(name) LIKE '%' || lower($2) || '%')
   AND ($3 = '' OR lower(type) LIKE '%' || lower($3) || '%')
-  AND ($4 = '' OR created_at > $4)
-  AND ($5 = '' OR created_at >= $5)
-  AND ($6 = '' OR created_at < $6)
-  AND ($7 = '' OR created_at <= $7)
-  AND ($8 = '' OR updated_at > $8)
-  AND ($9 = '' OR updated_at >= $9)
-  AND ($10 = '' OR updated_at < $10)
-  AND ($11 = '' OR updated_at <= $11)
+  AND (NULLIF($4, '') IS NULL OR created_at > NULLIF($4, '')::timestamptz)
+  AND (NULLIF($5, '') IS NULL OR created_at >= NULLIF($5, '')::timestamptz)
+  AND (NULLIF($6, '') IS NULL OR created_at < NULLIF($6, '')::timestamptz)
+  AND (NULLIF($7, '') IS NULL OR created_at <= NULLIF($7, '')::timestamptz)
+  AND (NULLIF($8, '') IS NULL OR updated_at > NULLIF($8, '')::timestamptz)
+  AND (NULLIF($9, '') IS NULL OR updated_at >= NULLIF($9, '')::timestamptz)
+  AND (NULLIF($10, '') IS NULL OR updated_at < NULLIF($10, '')::timestamptz)
+  AND (NULLIF($11, '') IS NULL OR updated_at <= NULLIF($11, '')::timestamptz)
 ORDER BY
   CASE WHEN $12 = 'name' THEN lower(name) END ASC,
   CASE WHEN $12 = '-name' THEN lower(name) END DESC,
@@ -65,14 +65,14 @@ WHERE deleted_at IS NULL
        OR lower(type) LIKE '%' || lower($1) || '%')
   AND ($2 = '' OR lower(name) LIKE '%' || lower($2) || '%')
   AND ($3 = '' OR lower(type) LIKE '%' || lower($3) || '%')
-  AND ($4 = '' OR created_at > $4)
-  AND ($5 = '' OR created_at >= $5)
-  AND ($6 = '' OR created_at < $6)
-  AND ($7 = '' OR created_at <= $7)
-  AND ($8 = '' OR updated_at > $8)
-  AND ($9 = '' OR updated_at >= $9)
-  AND ($10 = '' OR updated_at < $10)
-  AND ($11 = '' OR updated_at <= $11)
+  AND (NULLIF($4, '') IS NULL OR created_at > NULLIF($4, '')::timestamptz)
+  AND (NULLIF($5, '') IS NULL OR created_at >= NULLIF($5, '')::timestamptz)
+  AND (NULLIF($6, '') IS NULL OR created_at < NULLIF($6, '')::timestamptz)
+  AND (NULLIF($7, '') IS NULL OR created_at <= NULLIF($7, '')::timestamptz)
+  AND (NULLIF($8, '') IS NULL OR updated_at > NULLIF($8, '')::timestamptz)
+  AND (NULLIF($9, '') IS NULL OR updated_at >= NULLIF($9, '')::timestamptz)
+  AND (NULLIF($10, '') IS NULL OR updated_at < NULLIF($10, '')::timestamptz)
+  AND (NULLIF($11, '') IS NULL OR updated_at <= NULLIF($11, '')::timestamptz)
 ''')
   Future<Result<int, SqlxError>> count(
     String query,

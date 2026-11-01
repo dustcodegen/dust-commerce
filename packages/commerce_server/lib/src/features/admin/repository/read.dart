@@ -10,8 +10,7 @@ part 'read.g.dart';
 @SqlxDao()
 abstract final class AdminReadRepository {
   /// Binds the queries to [db].
-  const factory AdminReadRepository(DatabaseExecutor db) =
-      _$AdminReadRepository;
+  const factory AdminReadRepository(Executor db) = _$AdminReadRepository;
 
   /// Resolves an active admin credential without exposing provider metadata.
   @Query(r'''
@@ -23,7 +22,7 @@ JOIN auth_identity a ON a.id = p.auth_identity_id
 JOIN admin_users u
   ON u.id = CAST(json_extract(a.app_metadata, '$.admin_user_id') AS TEXT)
 WHERE p.provider = 'emailpass_admin'
-  AND p.entity_id COLLATE NOCASE = $1
+  AND LOWER(p.entity_id) = LOWER($1)
   AND p.deleted_at IS NULL
   AND a.deleted_at IS NULL
   AND u.deleted_at IS NULL
@@ -55,7 +54,7 @@ WHERE t.token_hash = $1
 @SqlxDao()
 abstract final class AdminProductTypeReadRepository {
   /// Binds product-type reads to [db].
-  const factory AdminProductTypeReadRepository(DatabaseExecutor db) =
+  const factory AdminProductTypeReadRepository(Executor db) =
       _$AdminProductTypeReadRepository;
 
   /// Reads one active direct response row by stable identifier.

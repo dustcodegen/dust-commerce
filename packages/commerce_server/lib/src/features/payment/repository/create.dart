@@ -6,7 +6,7 @@ part 'create.g.dart';
 @SqlxDao()
 abstract final class PaymentCreateRepository {
   /// Binds the queries to [db].
-  const factory PaymentCreateRepository(DatabaseExecutor db) =
+  const factory PaymentCreateRepository(Executor db) =
       _$PaymentCreateRepository;
 
   /// Authorises [amount] against an order.

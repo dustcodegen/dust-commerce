@@ -7,7 +7,7 @@ part 'product_create.g.dart';
 @SqlxDao()
 abstract final class AdminProductCreateRepository {
   /// Binds creation queries to [db].
-  const factory AdminProductCreateRepository(DatabaseExecutor db) =
+  const factory AdminProductCreateRepository(Executor db) =
       _$AdminProductCreateRepository;
 
   /// Returns currencies that can make a published product visible in-store.

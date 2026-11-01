@@ -7,7 +7,7 @@ part 'import_relations.g.dart';
 @SqlxDao()
 abstract final class AdminProductImportRelationRepository {
   /// Binds imported child-graph writes to [db].
-  const factory AdminProductImportRelationRepository(DatabaseExecutor db) =
+  const factory AdminProductImportRelationRepository(Executor db) =
       _$AdminProductImportRelationRepository;
 
   /// Moves active ranks out of the way and retires the previous gallery.
@@ -50,6 +50,7 @@ WHERE lower(value) = lower($1) AND deleted_at IS NULL
   /// Attaches one reusable tag to a product.
   @Query(r'''
 INSERT INTO product_tag_products (product_id, tag_id) VALUES ($1, $2)
+ON CONFLICT DO NOTHING
 ''')
   Future<Result<ExecResult, SqlxError>> linkTag(
     String productId,
@@ -127,7 +128,7 @@ VALUES ($1, $2, $3, $4)
 
   /// Makes one option value available to the product.
   @Query(r'''
-INSERT OR IGNORE INTO product_product_option_values
+INSERT INTO product_product_option_values
   (id, product_product_option_id, product_option_value_id)
 VALUES ($1, $2, $3)
 ''')

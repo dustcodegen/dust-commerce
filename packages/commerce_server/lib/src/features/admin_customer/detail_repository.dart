@@ -7,7 +7,7 @@ part 'detail_repository.g.dart';
 @SqlxDao()
 abstract final class AdminCustomerDetailRepository {
   /// Binds immutable customer-detail reads to [db].
-  const factory AdminCustomerDetailRepository(DatabaseExecutor db) =
+  const factory AdminCustomerDetailRepository(Executor db) =
       _$AdminCustomerDetailRepository;
 
   /// Selects the profile and active address fields used by Medusa's detail.
@@ -22,7 +22,7 @@ SELECT customer.id,
        customer.created_at,
        customer.updated_at,
        coalesce((
-         SELECT json_group_array(json_object(
+         SELECT json_agg(json_build_object(
            'id', address.id,
            'address_name', address.address_name,
            'first_name', address.first_name,
@@ -35,10 +35,10 @@ SELECT customer.id,
            'province', address.province,
            'postal_code', address.postal_code,
            'country_code', address.country_code,
-           'is_default_shipping', json(iif(
+           'is_default_shipping', dust_json_value(iif(
              address.is_default_shipping = 1, 'true', 'false'
            )),
-           'is_default_billing', json(iif(
+           'is_default_billing', dust_json_value(iif(
              address.is_default_billing = 1, 'true', 'false'
            ))
          ))

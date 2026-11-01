@@ -7,7 +7,7 @@ part 'management_repository.g.dart';
 @SqlxDao()
 abstract final class AdminShippingProfileManagementRepository {
   /// Binds settings operations to [db].
-  const factory AdminShippingProfileManagementRepository(DatabaseExecutor db) =
+  const factory AdminShippingProfileManagementRepository(Executor db) =
       _$AdminShippingProfileManagementRepository;
 
   /// Reads one active direct response row.

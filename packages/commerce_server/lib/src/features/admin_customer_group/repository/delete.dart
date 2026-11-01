@@ -6,7 +6,7 @@ part 'delete.g.dart';
 @SqlxDao()
 abstract final class AdminCustomerGroupDeleteRepository {
   /// Binds customer-group deletion statements to [db].
-  const factory AdminCustomerGroupDeleteRepository(DatabaseExecutor db) =
+  const factory AdminCustomerGroupDeleteRepository(Executor db) =
       _$AdminCustomerGroupDeleteRepository;
 
   /// Soft-deletes one active group while retaining its audit history.

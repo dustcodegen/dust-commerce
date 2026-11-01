@@ -6,7 +6,7 @@ part 'update_variant.g.dart';
 @SqlxDao()
 abstract final class AdminVariantUpdateRepository {
   /// Binds variant mutations to [db].
-  const factory AdminVariantUpdateRepository(DatabaseExecutor db) =
+  const factory AdminVariantUpdateRepository(Executor db) =
       _$AdminVariantUpdateRepository;
 
   /// Resolves an active option value owned by the requested product.
@@ -57,7 +57,7 @@ SET title = trim($3),
 WHERE id = $1
   AND product_id = $2
   AND deleted_at IS NULL
-  AND ($4 IS NULL OR trim($4) = '' OR NOT EXISTS (
+  AND (CAST($4 AS TEXT) IS NULL OR trim($4) = '' OR NOT EXISTS (
     SELECT 1
     FROM product_variants other
     WHERE other.sku = trim($4)

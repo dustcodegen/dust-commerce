@@ -6,7 +6,7 @@ part 'product.g.dart';
 @SqlxDao()
 abstract final class AdminProductDeleteRepository {
   /// Binds product retirement statements to [db].
-  const factory AdminProductDeleteRepository(DatabaseExecutor db) =
+  const factory AdminProductDeleteRepository(Executor db) =
       _$AdminProductDeleteRepository;
 
   /// Retires one active product and lets its trigger advance `updated_at`.

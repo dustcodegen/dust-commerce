@@ -7,7 +7,7 @@ part 'mark_delivered_repository.g.dart';
 @SqlxDao()
 abstract final class AdminMarkDeliveredRepository {
   /// Binds lifecycle validation and writes to [db].
-  const factory AdminMarkDeliveredRepository(DatabaseExecutor db) =
+  const factory AdminMarkDeliveredRepository(Executor db) =
       _$AdminMarkDeliveredRepository;
 
   /// Reads route ownership and final lifecycle state without exposing a record.

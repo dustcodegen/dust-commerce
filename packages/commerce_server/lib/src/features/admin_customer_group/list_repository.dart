@@ -7,7 +7,7 @@ part 'list_repository.g.dart';
 @SqlxDao()
 abstract final class AdminCustomerGroupListRepository {
   /// Binds immutable customer-group reads to [db].
-  const factory AdminCustomerGroupListRepository(DatabaseExecutor db) =
+  const factory AdminCustomerGroupListRepository(Executor db) =
       _$AdminCustomerGroupListRepository;
 
   /// Lists exact columns requested by Medusa's customer-group table.
@@ -15,7 +15,7 @@ abstract final class AdminCustomerGroupListRepository {
 SELECT customer_group.id,
        customer_group.name,
        COALESCE((
-         SELECT json_group_array(json_object('id', member.customer_id))
+         SELECT json_agg(json_build_object('id', member.customer_id))
          FROM (
            SELECT membership.customer_id
            FROM customer_group_customers membership
@@ -32,14 +32,14 @@ FROM customer_groups customer_group
 WHERE customer_group.deleted_at IS NULL
   AND ($1 = '' OR lower(customer_group.id) LIKE '%' || lower($1) || '%'
        OR lower(customer_group.name) LIKE '%' || lower($1) || '%')
-  AND ($2 = '' OR customer_group.created_at > $2)
-  AND ($3 = '' OR customer_group.created_at >= $3)
-  AND ($4 = '' OR customer_group.created_at < $4)
-  AND ($5 = '' OR customer_group.created_at <= $5)
-  AND ($6 = '' OR customer_group.updated_at > $6)
-  AND ($7 = '' OR customer_group.updated_at >= $7)
-  AND ($8 = '' OR customer_group.updated_at < $8)
-  AND ($9 = '' OR customer_group.updated_at <= $9)
+  AND (NULLIF($2, '') IS NULL OR customer_group.created_at > NULLIF($2, '')::timestamptz)
+  AND (NULLIF($3, '') IS NULL OR customer_group.created_at >= NULLIF($3, '')::timestamptz)
+  AND (NULLIF($4, '') IS NULL OR customer_group.created_at < NULLIF($4, '')::timestamptz)
+  AND (NULLIF($5, '') IS NULL OR customer_group.created_at <= NULLIF($5, '')::timestamptz)
+  AND (NULLIF($6, '') IS NULL OR customer_group.updated_at > NULLIF($6, '')::timestamptz)
+  AND (NULLIF($7, '') IS NULL OR customer_group.updated_at >= NULLIF($7, '')::timestamptz)
+  AND (NULLIF($8, '') IS NULL OR customer_group.updated_at < NULLIF($8, '')::timestamptz)
+  AND (NULLIF($9, '') IS NULL OR customer_group.updated_at <= NULLIF($9, '')::timestamptz)
 ORDER BY
   CASE WHEN $10 = 'name' THEN lower(customer_group.name) END ASC,
   CASE WHEN $10 = '-name' THEN lower(customer_group.name) END DESC,
@@ -73,14 +73,14 @@ FROM customer_groups customer_group
 WHERE customer_group.deleted_at IS NULL
   AND ($1 = '' OR lower(customer_group.id) LIKE '%' || lower($1) || '%'
        OR lower(customer_group.name) LIKE '%' || lower($1) || '%')
-  AND ($2 = '' OR customer_group.created_at > $2)
-  AND ($3 = '' OR customer_group.created_at >= $3)
-  AND ($4 = '' OR customer_group.created_at < $4)
-  AND ($5 = '' OR customer_group.created_at <= $5)
-  AND ($6 = '' OR customer_group.updated_at > $6)
-  AND ($7 = '' OR customer_group.updated_at >= $7)
-  AND ($8 = '' OR customer_group.updated_at < $8)
-  AND ($9 = '' OR customer_group.updated_at <= $9)
+  AND (NULLIF($2, '') IS NULL OR customer_group.created_at > NULLIF($2, '')::timestamptz)
+  AND (NULLIF($3, '') IS NULL OR customer_group.created_at >= NULLIF($3, '')::timestamptz)
+  AND (NULLIF($4, '') IS NULL OR customer_group.created_at < NULLIF($4, '')::timestamptz)
+  AND (NULLIF($5, '') IS NULL OR customer_group.created_at <= NULLIF($5, '')::timestamptz)
+  AND (NULLIF($6, '') IS NULL OR customer_group.updated_at > NULLIF($6, '')::timestamptz)
+  AND (NULLIF($7, '') IS NULL OR customer_group.updated_at >= NULLIF($7, '')::timestamptz)
+  AND (NULLIF($8, '') IS NULL OR customer_group.updated_at < NULLIF($8, '')::timestamptz)
+  AND (NULLIF($9, '') IS NULL OR customer_group.updated_at <= NULLIF($9, '')::timestamptz)
 ''')
   Future<Result<int, SqlxError>> count(
     String query,

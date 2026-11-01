@@ -7,7 +7,7 @@ part 'read.g.dart';
 @SqlxDao()
 abstract final class OrderTransferReadRepository {
   /// Binds transfer reads to [db].
-  const factory OrderTransferReadRepository(DatabaseExecutor db) =
+  const factory OrderTransferReadRepository(Executor db) =
       _$OrderTransferReadRepository;
 
   /// Order facts needed to decide whether a request is valid.

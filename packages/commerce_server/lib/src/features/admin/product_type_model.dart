@@ -15,14 +15,14 @@ final class AdminProductTypeResponse with _$AdminProductTypeResponse {
     required this.updatedAt,
   });
 
-  /// Database-generated creation instant converted from SQLite UTC text.
+  /// Database-generated creation instant converted from PostgreSQL TIMESTAMPTZ.
   @Sqlx(rename: 'created_at', tryFrom: _AdminUtcDateTime())
   final DateTime createdAt;
 
   /// Stable type identifier accepted by `type_id` filters.
   final String id;
 
-  /// Database-generated mutation instant converted from SQLite UTC text.
+  /// Database-generated mutation instant converted from PostgreSQL TIMESTAMPTZ.
   @Sqlx(rename: 'updated_at', tryFrom: _AdminUtcDateTime())
   final DateTime updatedAt;
 

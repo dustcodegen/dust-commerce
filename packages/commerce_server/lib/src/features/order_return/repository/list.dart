@@ -7,7 +7,7 @@ part 'list.g.dart';
 @SqlxDao()
 abstract final class OrderReturnListRepository {
   /// Binds reason discovery to [db].
-  const factory OrderReturnListRepository(DatabaseExecutor db) =
+  const factory OrderReturnListRepository(Executor db) =
       _$OrderReturnListRepository;
 
   /// Counts every active reason independently from page size.

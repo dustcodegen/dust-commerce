@@ -6,8 +6,7 @@ part 'payment.g.dart';
 @SqlxDao()
 abstract final class CartPaymentRepository {
   /// Binds payment-session writes to [db].
-  const factory CartPaymentRepository(DatabaseExecutor db) =
-      _$CartPaymentRepository;
+  const factory CartPaymentRepository(Executor db) = _$CartPaymentRepository;
 
   /// Retains one enabled regional provider choice while the cart is active.
   @Query(r'''

@@ -9,8 +9,7 @@ part 'list.g.dart';
 @SqlxDao()
 abstract final class AdminProductRepository {
   /// Binds product queries to [db].
-  const factory AdminProductRepository(DatabaseExecutor db) =
-      _$AdminProductRepository;
+  const factory AdminProductRepository(Executor db) = _$AdminProductRepository;
 
   /// Lists active products with the exact columns used by Medusa's table.
   @Query(r'''
@@ -19,9 +18,9 @@ SELECT product.id,
        coalesce(product.thumbnail, '') AS thumbnail,
        coalesce(collection.title, '') AS collection_title,
        coalesce((
-         SELECT json_group_array(json(ordered.channel_json))
+         SELECT json_agg(dust_json_value(ordered.channel_json))
          FROM (
-           SELECT json_object('id', channel.id, 'name', channel.name)
+           SELECT json_build_object('id', channel.id, 'name', channel.name)
                     AS channel_json
            FROM product_sales_channels link
            JOIN sales_channels channel ON channel.id = link.sales_channel_id
@@ -49,14 +48,14 @@ WHERE product.deleted_at IS NULL
       AND instr(',' || $3 || ',', ',' || tag_link.tag_id || ',') > 0
   ))
   AND ($4 = '' OR instr(',' || $4 || ',', ',' || product.type_id || ',') > 0)
-  AND ($5 = '' OR product.created_at > $5)
-  AND ($6 = '' OR product.created_at >= $6)
-  AND ($7 = '' OR product.created_at < $7)
-  AND ($8 = '' OR product.created_at <= $8)
-  AND ($9 = '' OR product.updated_at > $9)
-  AND ($10 = '' OR product.updated_at >= $10)
-  AND ($11 = '' OR product.updated_at < $11)
-  AND ($12 = '' OR product.updated_at <= $12)
+  AND (NULLIF($5, '') IS NULL OR product.created_at > NULLIF($5, '')::timestamptz)
+  AND (NULLIF($6, '') IS NULL OR product.created_at >= NULLIF($6, '')::timestamptz)
+  AND (NULLIF($7, '') IS NULL OR product.created_at < NULLIF($7, '')::timestamptz)
+  AND (NULLIF($8, '') IS NULL OR product.created_at <= NULLIF($8, '')::timestamptz)
+  AND (NULLIF($9, '') IS NULL OR product.updated_at > NULLIF($9, '')::timestamptz)
+  AND (NULLIF($10, '') IS NULL OR product.updated_at >= NULLIF($10, '')::timestamptz)
+  AND (NULLIF($11, '') IS NULL OR product.updated_at < NULLIF($11, '')::timestamptz)
+  AND (NULLIF($12, '') IS NULL OR product.updated_at <= NULLIF($12, '')::timestamptz)
 GROUP BY product.id, product.title, product.thumbnail, collection.title,
          product.status, product.created_at, product.updated_at
 ORDER BY
@@ -103,14 +102,14 @@ WHERE product.deleted_at IS NULL
       AND instr(',' || $3 || ',', ',' || tag_link.tag_id || ',') > 0
   ))
   AND ($4 = '' OR instr(',' || $4 || ',', ',' || product.type_id || ',') > 0)
-  AND ($5 = '' OR product.created_at > $5)
-  AND ($6 = '' OR product.created_at >= $6)
-  AND ($7 = '' OR product.created_at < $7)
-  AND ($8 = '' OR product.created_at <= $8)
-  AND ($9 = '' OR product.updated_at > $9)
-  AND ($10 = '' OR product.updated_at >= $10)
-  AND ($11 = '' OR product.updated_at < $11)
-  AND ($12 = '' OR product.updated_at <= $12)
+  AND (NULLIF($5, '') IS NULL OR product.created_at > NULLIF($5, '')::timestamptz)
+  AND (NULLIF($6, '') IS NULL OR product.created_at >= NULLIF($6, '')::timestamptz)
+  AND (NULLIF($7, '') IS NULL OR product.created_at < NULLIF($7, '')::timestamptz)
+  AND (NULLIF($8, '') IS NULL OR product.created_at <= NULLIF($8, '')::timestamptz)
+  AND (NULLIF($9, '') IS NULL OR product.updated_at > NULLIF($9, '')::timestamptz)
+  AND (NULLIF($10, '') IS NULL OR product.updated_at >= NULLIF($10, '')::timestamptz)
+  AND (NULLIF($11, '') IS NULL OR product.updated_at < NULLIF($11, '')::timestamptz)
+  AND (NULLIF($12, '') IS NULL OR product.updated_at <= NULLIF($12, '')::timestamptz)
 ''')
   Future<Result<int, SqlxError>> count(
     String query,
@@ -132,7 +131,7 @@ WHERE product.deleted_at IS NULL
 @SqlxDao()
 abstract final class AdminProductTypeRepository {
   /// Binds product-type list queries to [db].
-  const factory AdminProductTypeRepository(DatabaseExecutor db) =
+  const factory AdminProductTypeRepository(Executor db) =
       _$AdminProductTypeRepository;
 
   /// Lists active product types with Medusa's default allowlist.
@@ -164,7 +163,7 @@ WHERE deleted_at IS NULL
 @SqlxDao()
 abstract final class AdminProductTagRepository {
   /// Binds product-tag list queries to [db].
-  const factory AdminProductTagRepository(DatabaseExecutor db) =
+  const factory AdminProductTagRepository(Executor db) =
       _$AdminProductTagRepository;
 
   /// Lists active product tags with Medusa's default allowlist.

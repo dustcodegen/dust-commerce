@@ -28,7 +28,7 @@ final class AdminPromotionResponse with _$AdminPromotionResponse {
   /// Merchant-entered promotion code.
   final String code;
 
-  /// Database-generated creation instant decoded from SQLite UTC text.
+  /// Database-generated creation instant decoded from PostgreSQL TIMESTAMPTZ.
   @Sqlx(rename: 'created_at', tryFrom: _AdminPromotionUtcDateTime())
   final DateTime createdAt;
 
@@ -69,7 +69,7 @@ final class AdminPromotionResponse with _$AdminPromotionResponse {
   /// Current supported policy kind.
   final String type;
 
-  /// Database-generated mutation instant decoded from SQLite UTC text.
+  /// Database-generated mutation instant decoded from PostgreSQL TIMESTAMPTZ.
   @Sqlx(rename: 'updated_at', tryFrom: _AdminPromotionUtcDateTime())
   final DateTime updatedAt;
 

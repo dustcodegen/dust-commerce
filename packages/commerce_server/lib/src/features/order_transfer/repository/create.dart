@@ -6,7 +6,7 @@ part 'create.g.dart';
 @SqlxDao()
 abstract final class OrderTransferCreateRepository {
   /// Binds transfer inserts to [db].
-  const factory OrderTransferCreateRepository(DatabaseExecutor db) =
+  const factory OrderTransferCreateRepository(Executor db) =
       _$OrderTransferCreateRepository;
 
   /// Creates a queued request after the service checks active ownership.

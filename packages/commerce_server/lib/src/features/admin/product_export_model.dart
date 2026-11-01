@@ -30,7 +30,7 @@ final class AdminProductExportRow {
     this.typeId,
   });
 
-  /// Stable required product values and SQLite-owned JSON child graphs.
+  /// Stable required product values and PostgreSQL JSON child graphs.
   // Grouped because these fields share one database representation.
   // ignore: public_member_api_docs, avoid_multiple_declarations_per_line
   final String productId, handle, title, status;
@@ -44,7 +44,7 @@ final class AdminProductExportRow {
   // ignore: public_member_api_docs, avoid_multiple_declarations_per_line
   final String? material, collectionId, typeId;
 
-  /// SQLite boolean used without an intermediate ORM model.
+  /// PostgreSQL integer flag used without an intermediate ORM model.
   final int discountable;
 
   /// Optional physical values represented in the store's configured unit.

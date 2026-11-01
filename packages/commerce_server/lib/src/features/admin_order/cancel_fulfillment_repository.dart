@@ -7,7 +7,7 @@ part 'cancel_fulfillment_repository.g.dart';
 @SqlxDao()
 abstract final class AdminCancelFulfillmentRepository {
   /// Binds lifecycle validation and writes to [db].
-  const factory AdminCancelFulfillmentRepository(DatabaseExecutor db) =
+  const factory AdminCancelFulfillmentRepository(Executor db) =
       _$AdminCancelFulfillmentRepository;
 
   /// Reads route ownership, provider, and terminal lifecycle facts.

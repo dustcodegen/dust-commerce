@@ -79,7 +79,7 @@ final class ProductResponse with _$ProductResponse {
   final List<ProductVariantResponse> variants;
 }
 
-// These adapters keep SQLite's TEXT transport visible to Dust's FromRow
+// These adapters keep PostgreSQL JSON transport visible to Dust's FromRow
 // resolver while the reusable JSON decoding stays in its focused library.
 final class _ProductDetailsSqlxJson
     implements SqlxTryFrom<ProductDetails, String> {

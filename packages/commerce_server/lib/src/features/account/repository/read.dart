@@ -7,8 +7,7 @@ part 'read.g.dart';
 @SqlxDao()
 abstract final class AccountReadRepository {
   /// Binds the queries to [db].
-  const factory AccountReadRepository(DatabaseExecutor db) =
-      _$AccountReadRepository;
+  const factory AccountReadRepository(Executor db) = _$AccountReadRepository;
 
   /// Resolves email/password credentials without exposing provider metadata.
   @Query(r'''
@@ -23,7 +22,7 @@ JOIN customers c
   ON c.id = CAST(json_extract(a.app_metadata, '$.customer_id') AS TEXT)
 LEFT JOIN email_verifications v ON v.auth_identity_id = a.id
 WHERE p.provider = 'emailpass'
-  AND p.entity_id COLLATE NOCASE = $1
+  AND LOWER(p.entity_id) = LOWER($1)
   AND p.deleted_at IS NULL
   AND a.deleted_at IS NULL
   AND c.deleted_at IS NULL

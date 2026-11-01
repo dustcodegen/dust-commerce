@@ -6,8 +6,7 @@ part 'shipping.g.dart';
 @SqlxDao()
 abstract final class CartShippingRepository {
   /// Binds shipping writes to [db].
-  const factory CartShippingRepository(DatabaseExecutor db) =
-      _$CartShippingRepository;
+  const factory CartShippingRepository(Executor db) = _$CartShippingRepository;
 
   /// Chooses a delivery method only while every rule matches the current cart.
   @Query(r'''
@@ -24,14 +23,14 @@ WHERE NOT EXISTS (
   FROM shipping_option_price_rules rule
   WHERE rule.shipping_option_id = $2
     AND rule.deleted_at IS NULL
-    AND NOT CASE rule.operator
+    AND NOT (CASE rule.operator
       WHEN 'gt' THEN cart_value.item_total > rule.value
       WHEN 'gte' THEN cart_value.item_total >= rule.value
       WHEN 'lt' THEN cart_value.item_total < rule.value
       WHEN 'lte' THEN cart_value.item_total <= rule.value
       WHEN 'eq' THEN cart_value.item_total = rule.value
-      ELSE 0
-    END
+      ELSE FALSE
+    END)
 )
 ON CONFLICT (cart_id) DO UPDATE
 SET option_id = excluded.option_id,
@@ -59,14 +58,14 @@ WHERE method.cart_id = $1
     FROM shipping_option_price_rules rule, cart_value
     WHERE rule.shipping_option_id = method.option_id
       AND rule.deleted_at IS NULL
-      AND NOT CASE rule.operator
+      AND NOT (CASE rule.operator
         WHEN 'gt' THEN cart_value.item_total > rule.value
         WHEN 'gte' THEN cart_value.item_total >= rule.value
         WHEN 'lt' THEN cart_value.item_total < rule.value
         WHEN 'lte' THEN cart_value.item_total <= rule.value
         WHEN 'eq' THEN cart_value.item_total = rule.value
-        ELSE 0
-      END
+        ELSE FALSE
+      END)
   )
 ''')
   Future<Result<ExecResult, SqlxError>> clearIneligibleMethod(String cartId);

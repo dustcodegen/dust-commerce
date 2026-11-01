@@ -15,14 +15,14 @@ final class AdminProductTagResponse with _$AdminProductTagResponse {
     required this.updatedAt,
   });
 
-  /// Database-generated creation instant converted from SQLite UTC text.
+  /// Database-generated creation instant converted from PostgreSQL TIMESTAMPTZ.
   @Sqlx(rename: 'created_at', tryFrom: _AdminUtcDateTime())
   final DateTime createdAt;
 
   /// Stable tag identifier accepted by `tag_id` filters.
   final String id;
 
-  /// Database-generated mutation instant converted from SQLite UTC text.
+  /// Database-generated mutation instant converted from PostgreSQL TIMESTAMPTZ.
   @Sqlx(rename: 'updated_at', tryFrom: _AdminUtcDateTime())
   final DateTime updatedAt;
 

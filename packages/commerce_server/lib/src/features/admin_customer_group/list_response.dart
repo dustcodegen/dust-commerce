@@ -35,7 +35,7 @@ final class AdminCustomerGroupResponse with _$AdminCustomerGroupResponse {
     required this.updatedAt,
   });
 
-  /// Database-generated creation instant decoded from SQLite UTC text.
+  /// Database-generated creation instant decoded from PostgreSQL TIMESTAMPTZ.
   @Sqlx(rename: 'created_at', tryFrom: _AdminCustomerGroupDateTime())
   final DateTime createdAt;
 
@@ -50,7 +50,7 @@ final class AdminCustomerGroupResponse with _$AdminCustomerGroupResponse {
   /// Merchant-facing segment name.
   final String name;
 
-  /// Database-generated last mutation instant decoded from SQLite UTC text.
+  /// Database-generated last mutation instant decoded from PostgreSQL TIMESTAMPTZ.
   @Sqlx(rename: 'updated_at', tryFrom: _AdminCustomerGroupDateTime())
   final DateTime updatedAt;
 }

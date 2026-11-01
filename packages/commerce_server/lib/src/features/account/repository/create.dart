@@ -7,7 +7,7 @@ part 'create.g.dart';
 @SqlxDao()
 abstract final class AccountCreateRepository {
   /// Binds the queries to [db].
-  const factory AccountCreateRepository(DatabaseExecutor db) =
+  const factory AccountCreateRepository(Executor db) =
       _$AccountCreateRepository;
 
   /// Creates the customer actor. A uniqueness race becomes zero rows.

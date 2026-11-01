@@ -6,7 +6,7 @@ part 'import_variant.g.dart';
 @SqlxDao()
 abstract final class AdminProductImportVariantRepository {
   /// Binds imported variant writes to [db].
-  const factory AdminProductImportVariantRepository(DatabaseExecutor db) =
+  const factory AdminProductImportVariantRepository(Executor db) =
       _$AdminProductImportVariantRepository;
 
   /// Creates one fully described variant with zero initial inventory.
@@ -47,17 +47,17 @@ UPDATE product_variants SET
   barcode = CASE WHEN json_type($3, '$.barcode') IS NULL
     THEN barcode ELSE json_extract($3, '$.barcode') END,
   manage_inventory = CASE WHEN json_type($3, '$.manage_inventory') IS NULL
-    THEN manage_inventory ELSE json_extract($3, '$.manage_inventory') END,
+    THEN manage_inventory ELSE json_extract($3, '$.manage_inventory')::integer END,
   allow_backorder = CASE WHEN json_type($3, '$.allow_backorder') IS NULL
-    THEN allow_backorder ELSE json_extract($3, '$.allow_backorder') END,
+    THEN allow_backorder ELSE json_extract($3, '$.allow_backorder')::integer END,
   weight = CASE WHEN json_type($3, '$.weight') IS NULL
-    THEN weight ELSE json_extract($3, '$.weight') END,
+    THEN weight ELSE json_extract($3, '$.weight')::double precision END,
   width = CASE WHEN json_type($3, '$.width') IS NULL
-    THEN width ELSE json_extract($3, '$.width') END,
+    THEN width ELSE json_extract($3, '$.width')::double precision END,
   length = CASE WHEN json_type($3, '$.length') IS NULL
-    THEN length ELSE json_extract($3, '$.length') END,
+    THEN length ELSE json_extract($3, '$.length')::double precision END,
   height = CASE WHEN json_type($3, '$.height') IS NULL
-    THEN height ELSE json_extract($3, '$.height') END,
+    THEN height ELSE json_extract($3, '$.height')::double precision END,
   mid_code = CASE WHEN json_type($3, '$.mid_code') IS NULL
     THEN mid_code ELSE json_extract($3, '$.mid_code') END,
   hs_code = CASE WHEN json_type($3, '$.hs_code') IS NULL

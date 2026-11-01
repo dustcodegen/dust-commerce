@@ -7,16 +7,16 @@ part 'options.g.dart';
 @SqlxDao()
 abstract final class CatalogOptionRepository {
   /// Binds the query to [db].
-  const factory CatalogOptionRepository(DatabaseExecutor db) =
+  const factory CatalogOptionRepository(Executor db) =
       _$CatalogOptionRepository;
 
   /// Active options and values belonging to published products.
   @Query(r'''
 SELECT option.id, option.title,
        coalesce((
-         SELECT json_group_array(json(ordered.value_json))
+         SELECT json_agg(dust_json_value(ordered.value_json))
          FROM (
-           SELECT json_object('id', available.id,
+           SELECT json_build_object('id', available.id,
                               'value', available.value,
                               'count', available.count) AS value_json
            FROM (

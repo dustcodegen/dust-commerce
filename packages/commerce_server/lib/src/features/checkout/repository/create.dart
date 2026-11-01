@@ -6,7 +6,7 @@ part 'create.g.dart';
 @SqlxDao()
 abstract final class CheckoutCreateRepository {
   /// Binds the queries to [db].
-  const factory CheckoutCreateRepository(DatabaseExecutor db) =
+  const factory CheckoutCreateRepository(Executor db) =
       _$CheckoutCreateRepository;
 
   /// Writes the order header with its totals already computed.

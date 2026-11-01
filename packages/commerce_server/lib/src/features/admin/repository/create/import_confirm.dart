@@ -7,7 +7,7 @@ part 'import_confirm.g.dart';
 @SqlxDao()
 abstract final class AdminProductImportConfirmRepository {
   /// Binds confirmation reads and finalization to [db].
-  const factory AdminProductImportConfirmRepository(DatabaseExecutor db) =
+  const factory AdminProductImportConfirmRepository(Executor db) =
       _$AdminProductImportConfirmRepository;
 
   /// Reads only a staged import owned by the authenticated administrator.

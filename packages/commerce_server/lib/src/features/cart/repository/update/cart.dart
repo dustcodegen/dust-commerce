@@ -6,8 +6,7 @@ part 'cart.g.dart';
 @SqlxDao()
 abstract final class CartUpdateRepository {
   /// Binds the queries to [db].
-  const factory CartUpdateRepository(DatabaseExecutor db) =
-      _$CartUpdateRepository;
+  const factory CartUpdateRepository(Executor db) = _$CartUpdateRepository;
 
   /// Adds a line, with the price snapshot taken by the caller.
   @Query(r'''

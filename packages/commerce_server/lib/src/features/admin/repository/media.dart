@@ -6,8 +6,7 @@ part 'media.g.dart';
 @SqlxDao()
 abstract final class AdminMediaRepository {
   /// Binds media reference reads to [db].
-  const factory AdminMediaRepository(DatabaseExecutor db) =
-      _$AdminMediaRepository;
+  const factory AdminMediaRepository(Executor db) = _$AdminMediaRepository;
 
   /// Counts active product-image rows that still point at [url].
   @Query(r'''

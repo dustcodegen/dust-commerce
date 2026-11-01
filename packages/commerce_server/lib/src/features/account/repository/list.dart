@@ -7,8 +7,7 @@ part 'list.g.dart';
 @SqlxDao()
 abstract final class AccountListRepository {
   /// Binds the query to [db].
-  const factory AccountListRepository(DatabaseExecutor db) =
-      _$AccountListRepository;
+  const factory AccountListRepository(Executor db) = _$AccountListRepository;
 
   /// Lists only active addresses owned by the authenticated customer.
   @Query(r'''

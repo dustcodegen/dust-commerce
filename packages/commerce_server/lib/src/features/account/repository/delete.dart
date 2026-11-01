@@ -6,7 +6,7 @@ part 'delete.g.dart';
 @SqlxDao()
 abstract final class AccountDeleteRepository {
   /// Binds the query to [db].
-  const factory AccountDeleteRepository(DatabaseExecutor db) =
+  const factory AccountDeleteRepository(Executor db) =
       _$AccountDeleteRepository;
 
   /// Revokes one bearer token by its fingerprint.

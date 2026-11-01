@@ -7,7 +7,7 @@ part 'create_shipment_repository.g.dart';
 @SqlxDao()
 abstract final class AdminCreateShipmentRepository {
   /// Binds shipment validation and writes to [db].
-  const factory AdminCreateShipmentRepository(DatabaseExecutor db) =
+  const factory AdminCreateShipmentRepository(Executor db) =
       _$AdminCreateShipmentRepository;
 
   /// Reads route ownership and lifecycle without exposing a foreign record.

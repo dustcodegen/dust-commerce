@@ -6,13 +6,13 @@ part 'update_repository.g.dart';
 @SqlxDao()
 abstract final class AdminCustomerUpdateRepository {
   /// Binds customer updates to [db].
-  const factory AdminCustomerUpdateRepository(DatabaseExecutor db) =
+  const factory AdminCustomerUpdateRepository(Executor db) =
       _$AdminCustomerUpdateRepository;
 
   /// Replaces contact fields while the account-email guard still matches.
   @Query(r'''
-UPDATE OR IGNORE customers
-SET email = CASE WHEN has_account = 1 THEN email ELSE $2 END,
+UPDATE customers
+SET email = CASE WHEN has_account = 1 THEN email ELSE CAST($2 AS TEXT) END,
     company_name = $3,
     first_name = $4,
     last_name = $5,
@@ -20,8 +20,8 @@ SET email = CASE WHEN has_account = 1 THEN email ELSE $2 END,
 WHERE id = $1
   AND deleted_at IS NULL
   AND (
-    (has_account = 0 AND $2 IS NOT NULL) OR
-    (has_account = 1 AND ($2 IS NULL OR email = $2))
+    (has_account = 0 AND CAST($2 AS TEXT) IS NOT NULL) OR
+    (has_account = 1 AND (CAST($2 AS TEXT) IS NULL OR email = CAST($2 AS TEXT)))
   )
 ''')
   Future<Result<ExecResult, SqlxError>> update(

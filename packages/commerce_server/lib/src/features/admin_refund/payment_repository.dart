@@ -7,7 +7,7 @@ part 'payment_repository.g.dart';
 @SqlxDao()
 abstract final class AdminPaymentRefundRepository {
   /// Binds validation, write, and refreshed response queries to [db].
-  const factory AdminPaymentRefundRepository(DatabaseExecutor db) =
+  const factory AdminPaymentRefundRepository(Executor db) =
       _$AdminPaymentRefundRepository;
 
   /// Reads payment and aggregate refund facts before the first write.
@@ -64,10 +64,10 @@ SELECT payment.id, payment.provider AS provider_id, payment.amount,
        coalesce((SELECT sum(refund.amount) FROM refunds refund
                  WHERE refund.payment_collection_id = payment.id
                    AND refund.deleted_at IS NULL), 0) AS refunded_amount,
-       coalesce((SELECT json_group_array(json_object(
+       coalesce((SELECT json_agg(json_build_object(
          'id', refund.id, 'amount', refund.amount,
          'refund_reason', CASE WHEN refund.reason_id IS NULL THEN NULL ELSE
-           json_object('id', refund.reason_id, 'label', refund.reason_label,
+           json_build_object('id', refund.reason_id, 'label', refund.reason_label,
                        'code', refund.reason_code,
                        'description', refund.reason_description) END,
          'note', refund.note, 'created_by', refund.created_by,

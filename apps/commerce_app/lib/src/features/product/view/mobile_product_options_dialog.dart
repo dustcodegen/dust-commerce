@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:commerce_app/commerce_app.dart';
 import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
@@ -30,10 +28,9 @@ final class _MobileProductOptionsRoute extends StatelessWidget {
         children: [
           Positioned.fill(
             child: IgnorePointer(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
-                child: const SizedBox.expand(),
-              ),
+              // shortcut: native blur is deferred until Dust can resolve
+              // dart:ui from Flutter's SDK source map.
+              child: const ColoredBox(color: Color(0xBF374151)),
             ),
           ),
           const Align(

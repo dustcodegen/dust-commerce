@@ -6,7 +6,7 @@ part 'update.g.dart';
 @SqlxDao()
 abstract final class PaymentUpdateRepository {
   /// Binds the queries to [db].
-  const factory PaymentUpdateRepository(DatabaseExecutor db) =
+  const factory PaymentUpdateRepository(Executor db) =
       _$PaymentUpdateRepository;
 
   /// Captures an authorised payment, and only an authorised one.

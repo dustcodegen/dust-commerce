@@ -7,7 +7,7 @@ part 'repository.g.dart';
 @SqlxDao()
 abstract final class AdminCustomerServiceRepository {
   /// Binds support request operations to [db].
-  const factory AdminCustomerServiceRepository(DatabaseExecutor db) =
+  const factory AdminCustomerServiceRepository(Executor db) =
       _$AdminCustomerServiceRepository;
 
   /// Lists only fields consumed by the isolated Admin contract.
