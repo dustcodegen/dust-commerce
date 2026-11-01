@@ -93,6 +93,7 @@ jobs:
             --command="SELECT count(*) FROM pg_tables WHERE schemaname = 'public' \
              AND tablename != '_sqlx_migrations';")"
           test "$remaining" = "0"
+          sqlx migrate run --source packages/commerce_server/migrations
 
       - name: Analyze
         run: |
