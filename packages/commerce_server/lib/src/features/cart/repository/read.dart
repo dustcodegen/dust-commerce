@@ -199,8 +199,7 @@ WHERE code = UPPER($1)
   /// The line for [variantId] in [cartId], if the cart already holds one.
   @Query(r'''
 SELECT id, variant_id, product_id, product_handle, thumbnail, title, variant_title,
-       json_build_object('amount', unit_amount, 'currency_code', currency_code)::text
-         AS unit_price,
+       json_build_object('amount', unit_amount, 'currency_code', currency_code)::text AS unit_price,
        quantity
 FROM line_items
 WHERE cart_id = $1 AND variant_id = $2
