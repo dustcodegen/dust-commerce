@@ -221,6 +221,18 @@
       }
     }
   },
+  "account_order_quantity_separator": "x",
+  "@account_order_quantity_separator": {
+    "description": "Separator between an ordered product and its quantity."
+  },
+  "account_select_country": "Select...",
+  "@account_select_country": {
+    "description": "Placeholder for the customer-address country selector."
+  },
+  "account_empty_country": "-",
+  "@account_empty_country": {
+    "description": "Empty choice in the customer-address country selector."
+  },
   "account_order_load_failed": "We could not load this order. Please try again.",
   "@account_order_load_failed": {
     "description": "Retryable customer order-detail failure."

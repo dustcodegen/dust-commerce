@@ -100,10 +100,23 @@ final class CustomerCountryField extends StatelessWidget {
       child: DropdownButtonFormField<String>(
         initialValue:
             options.contains(current) && current.isNotEmpty ? current : null,
-        hint: const Text('Select...'),
+        hint: Text(
+          context.tr(
+            'shop_account_select_country',
+            defaultText: 'Select...',
+          ),
+        ),
         icon: const Icon(Icons.unfold_more, size: 20),
         items: [
-          const DropdownMenuItem(value: '', child: Text('-')),
+          DropdownMenuItem(
+            value: '',
+            child: Text(
+              context.tr(
+                'shop_account_empty_country',
+                defaultText: '-',
+              ),
+            ),
+          ),
           for (final country in options)
             DropdownMenuItem(
                 value: country, child: Text(country.toUpperCase())),

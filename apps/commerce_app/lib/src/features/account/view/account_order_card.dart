@@ -117,7 +117,13 @@ class AccountOrderCard extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              const Text('x', style: _orderCardSmallStyle),
+                              Text(
+                                context.tr(
+                                  'shop_account_order_quantity_separator',
+                                  defaultText: 'x',
+                                ),
+                                style: _orderCardSmallStyle,
+                              ),
                               Text('${item.quantity}',
                                   style: _orderCardSmallStyle),
                             ],
