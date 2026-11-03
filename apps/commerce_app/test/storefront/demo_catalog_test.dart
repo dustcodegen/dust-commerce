@@ -9,7 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   test('generated storefront loads the complete development demo', () async {
     final directory = await Directory.systemTemp.createTemp('storefront_demo');
-    final database = CommerceDatabase.open(
+    final database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );
