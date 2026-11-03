@@ -56,8 +56,8 @@ void main() {
           jsonDecode(row.readIndex<String>(4)) as Map<String, Object?>;
 
       expect(row.readIndex<int>(0), 1);
-      expect(DateTime.parse(row.readIndex<String>(1)).isUtc, isTrue);
-      expect(row.readIndex<String>(2), row.readIndex<String>(1));
+      expect(row.readIndex<DateTime>(1).toUtc().isUtc, isTrue);
+      expect(row.readIndex<DateTime>(2), row.readIndex<DateTime>(1));
       expect(row.readIndex<String>(3), 'emailpass');
       expect(metadata['password'], startsWith(r'$argon2id$'));
       expect(metadata['password'], isNot(contains(_AccountHarness.password)));
@@ -87,7 +87,8 @@ void main() {
       expect(stored.readIndex<String>(0), await Tokens.fingerprint(token));
       expect(stored.readIndex<String>(0), isNot(token));
       expect(body['expires_at'], '2100-01-08T12:00:00.000Z');
-      expect(stored.readIndex<String>(1), body['expires_at']);
+      expect(stored.readIndex<DateTime>(1).toUtc().toIso8601String(),
+          body['expires_at']);
 
       final me = harness.client.get('/store/customers/me')..bearer(token);
       (await me.send())
@@ -111,7 +112,7 @@ void main() {
       await queryExecute(
         'INSERT INTO auth_tokens '
         '(token_hash, auth_identity_id, created_at, expires_at) '
-        "VALUES (?, 'id_2', '2026-09-04T12:00:00.000Z', "
+        "VALUES (\$1, 'id_2', '2026-09-04T12:00:00.000Z', "
         "'2026-09-05T11:59:59.000Z')",
         [await Tokens.fingerprint(token)],
       ).execute(harness.database.executor);

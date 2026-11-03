@@ -95,5 +95,34 @@ ORDER BY kcu.ordinal_position
       parameters: const [],
     );
   }
-  return (sql: sql, parameters: parameters);
+  return (
+    sql: _questionMarksToPostgres(sql),
+    parameters: parameters,
+  );
+}
+
+String _questionMarksToPostgres(String sql) {
+  var parameter = 0;
+  var singleQuote = false;
+  final output = StringBuffer();
+  for (var index = 0; index < sql.length; index++) {
+    final character = sql[index];
+    if (character == "'") {
+      if (singleQuote && index + 1 < sql.length && sql[index + 1] == "'") {
+        output
+          ..write(character)
+          ..write(sql[++index]);
+        continue;
+      }
+      singleQuote = !singleQuote;
+      output.write(character);
+      continue;
+    }
+    if (character == '?' && !singleQuote) {
+      output.write('\$${++parameter}');
+    } else {
+      output.write(character);
+    }
+  }
+  return output.toString();
 }

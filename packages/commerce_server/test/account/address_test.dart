@@ -56,7 +56,9 @@ void main() {
         [addressId],
       ))
           .single
-          .readIndex<String>(0),
+          .readIndex<DateTime>(0)
+          .toUtc()
+          .toIso8601String(),
       endsWith('Z'),
     );
   });

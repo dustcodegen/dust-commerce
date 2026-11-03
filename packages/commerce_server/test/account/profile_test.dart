@@ -45,7 +45,10 @@ void main() {
     expect(row.readIndex<String>(0), 'Grace');
     expect(row.readIndex<String>(1), 'Hopper');
     expect(row.readIndex<String>(2), '+1 555 0100');
-    expect(row.readIndex<String>(3), isNot('2000-01-01T00:00:00.000Z'));
+    expect(
+      row.readIndex<DateTime>(3).toUtc(),
+      isNot(DateTime.parse('2000-01-01T00:00:00.000Z')),
+    );
   });
 
   test('profile validation rejects blank names before persistence', () async {

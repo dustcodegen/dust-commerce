@@ -66,19 +66,19 @@ void main() {
       'SELECT COUNT(*) FROM product_variants WHERE inventory_quantity > 0',
       const [],
     ).fetchOne(database.executor);
-    expect(stocked, 14);
+    expect(stocked, const Ok<int, SqlxError>(14));
 
     final thumbnails = await queryScalar<int>(
-      'SELECT COUNT(*) FROM products WHERE thumbnail LIKE ?',
+      'SELECT COUNT(*) FROM products WHERE thumbnail LIKE \$1',
       ['https://%'],
     ).fetchOne(database.executor);
-    expect(thumbnails, 4);
+    expect(thumbnails, const Ok<int, SqlxError>(4));
 
     final images = await queryScalar<int>(
       "SELECT COUNT(*) FROM product_images WHERE product_id = 'prod_tshirt'",
       const [],
     ).fetchOne(database.executor);
-    expect(images, 4);
+    expect(images, const Ok<int, SqlxError>(4));
   });
 
   test('demo catalogue adds a varied second admin page', () async {

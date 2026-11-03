@@ -38,7 +38,7 @@ void main() {
     test('does not start payment for an archived order', () async {
       final orderId = await context.placeOrder();
       await queryExecute(
-        "UPDATE orders SET status = 'archived' WHERE id = ?",
+        "UPDATE orders SET status = 'archived' WHERE id = \$1",
         [orderId],
       ).execute(context.database.executor);
 

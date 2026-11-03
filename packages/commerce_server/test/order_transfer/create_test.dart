@@ -60,7 +60,7 @@ void main() {
     final order = await scenario.ownedOrder();
     await queryExecute(
       "UPDATE orders SET status = 'canceled', "
-      "canceled_at = '2026-09-14T00:00:00.000Z' WHERE id = ?",
+      "canceled_at = '2026-09-14T00:00:00.000Z' WHERE id = \$1",
       [order.orderId],
     ).execute(scenario.harness.database.executor);
 

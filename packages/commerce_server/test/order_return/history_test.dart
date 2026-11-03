@@ -80,7 +80,7 @@ void main() {
     (await scenario.request(owned.order, owned.token).send()).assertCreated();
     await queryExecute(
       "UPDATE return_requests SET deleted_at = "
-      "'2026-09-14T12:00:00.000Z' WHERE order_id = ?",
+      "'2026-09-14T12:00:00.000Z' WHERE order_id = \$1",
       [owned.order.id],
     ).execute(scenario.harness.database.executor);
     final request = scenario.client
