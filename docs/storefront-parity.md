@@ -48,7 +48,7 @@ the pinned DTC source has no equivalent route.
 | `order/templates` | confirmation and order details | partial in #20, #26 and #28; confirmation, authenticated order list, source-shaped cards, guarded frozen order details, transfer request/decision UI, the secure order-transfer API/client and customer-owned return requests are implemented. Confirmation now matches the source `Need help?` block with both `Contact` and `Returns & Exchanges` links, while Morrow preserves the visible order-number prefill into its contact route. Guest confirmation now passes source comparison and live local browser QA for the source-ordered heading, email, order date, order number, summary, totals, delivery, payment, help links and footer. The transfer decision page passed desktop and compact rendered source comparison, with a deliberate 24px-inset full-width compact correction to Medusa's overflowing fixed 40% column. The transfer request form passes local desktop/compact, validation and safe-error checks. The return form is a real expansion of the source's `Returns & Exchanges` help link and passes authenticated browser success plus repeat-quantity rejection. Public merchant reason discovery, per-item optional selection and remaining quantities pass live browser QA. Customer-owned return history is implemented as a secure Dust extension below the pinned source's help block and passes desktop, compact and hard-reload browser QA. The source's `Order status` now renders the real Store fulfillment status; delivered item quantities and return eligibility come only from active delivered fulfillment records. Admin requested-return discovery, receipt, status progression, damaged tracking, intact managed-inventory restoration and independent manual-payment refunds are implemented; external refund providers, labels and exchanges remain. |
 | `regions` store API | account, checkout and storefront country selection | implemented with explicit SQLx response allowlists; selectors use active backend regions rather than hard-coded countries |
 | `payment-providers` store API | checkout payment choices | implemented with Medusa's `region_id` query contract, a direct SQLx response allowlist, stable ordering, and selection enforcement against enabled regional configuration |
-| categories and collections routes | product organisation | implemented in #18 with real API metadata, filtering, hierarchy, sorting and paging; the compact collection grid and shared footer passed rendered comparison, while exact nested category paths wait on `dust#542` |
+| categories and collections routes | product organisation | implemented in #18 with real API metadata, filtering, hierarchy, sorting and paging; the compact collection grid and shared footer passed rendered comparison, and the router normalizes Medusa catch-all links such as `/categories/clothing/shirts` into Dust's encoded typed-handle form |
 
 ## Theme and selection map
 
@@ -122,12 +122,10 @@ discovery fail independently so footer data cannot take down working page
 content.
 
 Medusa declares categories as a catch-all route so a full hierarchical handle
-stays readable (`/categories/clothing/shirts`). Dust Flutter 0.1.4 currently
-supports one segment per typed path parameter, so the generated route preserves
-the same handle as `/categories/clothing%2Fshirts`. Exact parse-and-restore
-support is tracked upstream in
-[`dust#542`](https://github.com/dustcodegen/dust/issues/542); generated files are
-not hand-edited around that limitation.
+stays readable (`/categories/clothing/shirts`). Dust's typed route still owns a
+single handle segment, so the user-owned router boundary folds incoming
+catch-all links into `/categories/clothing%2Fshirts` before generated parsing;
+generated files remain untouched.
 
 ## Customer session boundary
 
