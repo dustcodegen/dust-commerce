@@ -30,7 +30,7 @@ void main() {
     final audit = await scenario.harness.raw('''
 SELECT canceled_at, canceled_by FROM orders WHERE id = 'ord_detail'
 ''');
-    expect(DateTime.parse(audit.single.readIndex<String>(0)).isUtc, isTrue);
+    expect(audit.single.readIndex<DateTime>(0).toUtc().isUtc, isTrue);
     expect(audit.single.readIndex<String>(1), 'admin_1');
   });
 

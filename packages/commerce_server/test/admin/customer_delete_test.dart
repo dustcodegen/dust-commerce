@@ -42,8 +42,8 @@ JOIN customer_addresses address ON address.customer_id = customer.id
 JOIN orders order_row ON order_row.customer_id = customer.id
 WHERE customer.id = 'cus_guest'
 ''');
-    expect(rows.single.readIndex<String?>(0), isNotNull);
-    expect(rows.single.readIndex<String?>(1), isNotNull);
+    expect(rows.single.readIndex<DateTime?>(0), isNotNull);
+    expect(rows.single.readIndex<DateTime?>(1), isNotNull);
     expect(rows.single.readIndex<String>(2), 'cus_guest');
 
     final repeated = harness.client.delete('/admin/customers/cus_guest')
@@ -69,10 +69,10 @@ JOIN auth_identity auth
 JOIN provider_identity provider ON provider.auth_identity_id = auth.id
 WHERE customer.id = 'cus_ada'
 ''');
-    expect(rows.single.readIndex<String?>(0), isNotNull);
-    expect(rows.single.readIndex<String?>(1), isNotNull);
-    expect(rows.single.readIndex<String?>(2), isNotNull);
-    expect(rows.single.readIndex<String?>(3), isNotNull);
+    expect(rows.single.readIndex<DateTime?>(0), isNotNull);
+    expect(rows.single.readIndex<DateTime?>(1), isNotNull);
+    expect(rows.single.readIndex<DateTime?>(2), isNotNull);
+    expect(rows.single.readIndex<DateTime?>(3), isNotNull);
     expect(rows.single.readIndex<int>(4), 0);
     expect(rows.single.readIndex<int>(5), 0);
     final me = harness.client.get('/store/customers/me')

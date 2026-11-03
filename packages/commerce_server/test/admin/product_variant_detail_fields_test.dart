@@ -78,8 +78,8 @@ void main() {
     expect(stored.single.readIndex<int>(14), 1);
     expect(stored.single.readIndex<int>(15), 20);
     expect(
-      stored.single.readIndex<String>(16),
-      isNot('2000-01-01T00:00:00.000Z'),
+      stored.single.readIndex<DateTime>(16).toUtc(),
+      isNot(DateTime.utc(2000)),
     );
 
     final storefront = await harness.client

@@ -63,10 +63,10 @@ void main() {
       'SELECT deleted_at, updated_at FROM products '
       "WHERE id = 'prod_sweatpants'",
     );
-    expect(product.single.readIndex<String>(0), isNotEmpty);
+    expect(product.single.readIndex<DateTime>(0).toUtc().isUtc, isTrue);
     expect(
-      product.single.readIndex<String>(1),
-      isNot('2000-01-01T00:00:00.000Z'),
+      product.single.readIndex<DateTime>(1).toUtc(),
+      isNot(DateTime.utc(2000)),
     );
     final variants = await harness.raw(
       'SELECT count(*), count(deleted_at) FROM product_variants '
@@ -101,12 +101,12 @@ void main() {
       'JOIN product_option_values value ON value.option_id = option.id '
       "WHERE option.id = 'opt_sweatpants_fit'",
     );
-    expect(exclusive.single.readIndex<String>(0), isNotEmpty);
-    expect(exclusive.single.readIndex<String>(1), isNotEmpty);
+    expect(exclusive.single.readIndex<DateTime>(0).toUtc().isUtc, isTrue);
+    expect(exclusive.single.readIndex<DateTime>(1).toUtc().isUtc, isTrue);
     final global = await harness.raw(
       "SELECT deleted_at FROM product_options WHERE id = 'opt_size'",
     );
-    expect(global.single.readIndexNullable<String>(0), isNull);
+    expect(global.single.readIndexNullable<DateTime>(0), isNull);
   });
 
   test('deletion releases active handles and SKUs without erasing rows',
