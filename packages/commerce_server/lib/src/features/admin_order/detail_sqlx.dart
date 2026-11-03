@@ -11,14 +11,6 @@ final class _AdminOrderAddressFromString
       );
 }
 
-final class _AdminOrderDateTimeFromString
-    implements SqlxTryFrom<DateTime, String> {
-  const _AdminOrderDateTimeFromString();
-
-  @override
-  DateTime decode(String value) => DateTime.parse(value);
-}
-
 final class _AdminOrderItemsFromString
     implements SqlxTryFrom<List<AdminOrderItemResponse>, String> {
   const _AdminOrderItemsFromString();

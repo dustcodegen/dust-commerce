@@ -35,7 +35,10 @@ void main() {
 SELECT status, canceled_at, canceled_by FROM orders WHERE id = 'ord_detail'
 ''');
     expect(audit.single.readIndex<String>(0), 'archived');
-    expect(audit.single.readIndex<String>(1), '2026-09-14T01:00:00.000Z');
+    expect(
+      audit.single.readIndex<DateTime>(1).toUtc(),
+      DateTime.utc(2026, 9, 14, 1),
+    );
     expect(audit.single.readIndex<String>(2), 'admin_1');
   });
 

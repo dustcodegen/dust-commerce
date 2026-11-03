@@ -60,7 +60,7 @@ SELECT order_row.id, order_row.region_id, order_row.display_id, order_row.email,
          WHERE record.payment_collection_id = payment.id
            AND record.deleted_at IS NULL
          ORDER BY record.created_at, record.id
-       ) refund), '[]') AS payment_refunds_json,
+       ) refund), '[]'::json)::text AS payment_refunds_json,
        coalesce((
          SELECT json_agg(json_build_object(
            'id', item.id, 'variant_id', item.variant_id, 'product_id', item.product_id,
@@ -79,7 +79,7 @@ SELECT order_row.id, order_row.region_id, order_row.display_id, order_row.email,
            WHERE order_id = order_row.id
            ORDER BY created_at, id
          ) item
-       ), '[]') AS items_json,
+       ), '[]'::json)::text AS items_json,
        coalesce((
          SELECT json_agg(json_build_object(
            'id', fulfillment.id, 'location_id', fulfillment.location_id,
@@ -135,7 +135,7 @@ SELECT order_row.id, order_row.region_id, order_row.display_id, order_row.email,
              AND record.deleted_at IS NULL
            ORDER BY record.created_at, record.id
          ) fulfillment
-       ), '[]') AS fulfillments_json,
+       ), '[]'::json)::text AS fulfillments_json,
        CASE WHEN shipping.order_id IS NULL THEN NULL ELSE json_build_object(
          'first_name', shipping.first_name, 'last_name', shipping.last_name,
          'company', shipping.company, 'line1', shipping.line1,
@@ -143,7 +143,7 @@ SELECT order_row.id, order_row.region_id, order_row.display_id, order_row.email,
          'province', shipping.province, 'postal_code', shipping.postal_code,
          'country_code', shipping.country_code,
          'phone', shipping.phone
-       ) END AS shipping_address_json,
+       ) END::text AS shipping_address_json,
        CASE WHEN billing.order_id IS NULL THEN NULL ELSE json_build_object(
          'first_name', billing.first_name, 'last_name', billing.last_name,
          'company', billing.company, 'line1', billing.line1,
@@ -151,7 +151,7 @@ SELECT order_row.id, order_row.region_id, order_row.display_id, order_row.email,
          'province', billing.province, 'postal_code', billing.postal_code,
          'country_code', billing.country_code,
          'phone', billing.phone
-       ) END AS billing_address_json
+       ) END::text AS billing_address_json
 FROM orders order_row
 LEFT JOIN customers customer ON customer.id = order_row.customer_id AND customer.deleted_at IS NULL
 LEFT JOIN order_addresses shipping ON shipping.order_id = order_row.id AND shipping.kind = 'shipping'

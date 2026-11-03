@@ -25,7 +25,7 @@ void main() {
     expect(body['status'], 'completed');
     expect(body['payment_status'], 'awaiting');
     expect(body['fulfillment_status'], 'partially_fulfilled');
-    expect(DateTime.parse(await scenario.updatedAt()).isUtc, isTrue);
+    expect((await scenario.updatedAt()).isUtc, isTrue);
   });
 
   test('completion is idempotent for an already completed order', () async {
@@ -91,9 +91,10 @@ WHERE id = 'ord_detail'
           .single
           .readIndex<String>(0);
 
-  Future<String> updatedAt() async => (await harness.raw(
+  Future<DateTime> updatedAt() async => (await harness.raw(
         "SELECT updated_at FROM orders WHERE id = 'ord_detail'",
       ))
           .single
-          .readIndex<String>(0);
+          .readIndex<DateTime>(0)
+          .toUtc();
 }

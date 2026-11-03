@@ -59,7 +59,7 @@ final class AdminOrderDetailResponse with _$AdminOrderDetailResponse {
   )
   final AdminOrderAddressResponse? billingAddress;
 
-  @Sqlx(rename: 'created_at', tryFrom: _AdminOrderDateTimeFromString())
+  @Sqlx(rename: 'created_at', tryFrom: _AdminOrderDateTime())
   final DateTime createdAt;
 
   @Sqlx(rename: 'currency_code')
@@ -115,14 +115,14 @@ final class AdminOrderDetailResponse with _$AdminOrderDetailResponse {
   @Sqlx(
     rename: 'payment_captured_at',
     defaultValue: null,
-    tryFrom: _AdminOrderDateTimeFromString(),
+    tryFrom: _AdminOrderDateTime(),
   )
   final DateTime? paymentCapturedAt;
 
   @Sqlx(
     rename: 'payment_created_at',
     defaultValue: null,
-    tryFrom: _AdminOrderDateTimeFromString(),
+    tryFrom: _AdminOrderDateTime(),
   )
   final DateTime? paymentCreatedAt;
 
@@ -144,7 +144,7 @@ final class AdminOrderDetailResponse with _$AdminOrderDetailResponse {
   )
   final AdminOrderPaymentStatus paymentStatus;
 
-  @Sqlx(rename: 'placed_at', tryFrom: _AdminOrderDateTimeFromString())
+  @Sqlx(rename: 'placed_at', tryFrom: _AdminOrderDateTime())
   final DateTime placedAt;
 
   @Sqlx(rename: 'promotion_code')
@@ -174,6 +174,14 @@ final class AdminOrderDetailResponse with _$AdminOrderDetailResponse {
   final int tax;
   final int total;
 
-  @Sqlx(rename: 'updated_at', tryFrom: _AdminOrderDateTimeFromString())
+  @Sqlx(rename: 'updated_at', tryFrom: _AdminOrderDateTime())
   final DateTime updatedAt;
+}
+
+final class _AdminOrderDateTime
+    implements SqlxTryFrom<DateTime, DateTime> {
+  const _AdminOrderDateTime();
+
+  @override
+  DateTime decode(DateTime value) => value.toUtc();
 }

@@ -106,11 +106,11 @@ final class AdminOrderListResponse with _$AdminOrderListResponse {
   final List<AdminOrderResponse> orders;
 }
 
-final class _AdminOrderUtcDateTime implements SqlxTryFrom<DateTime, String> {
+final class _AdminOrderUtcDateTime implements SqlxTryFrom<DateTime, DateTime> {
   const _AdminOrderUtcDateTime();
 
   @override
-  DateTime decode(String value) => DateTime.parse(value).toUtc();
+  DateTime decode(DateTime value) => value.toUtc();
 }
 
 final class _AdminOrderStatusSqlx
