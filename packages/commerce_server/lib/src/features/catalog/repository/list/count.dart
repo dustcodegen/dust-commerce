@@ -35,23 +35,25 @@ WHERE product.status = 'published' AND product.deleted_at IS NULL
   AND (CAST($2 AS TEXT) IS NULL OR lower(product.title) LIKE '%' || lower($2) || '%'
        OR lower(product.handle) LIKE '%' || lower($2) || '%')
   AND (CAST($3 AS TEXT) IS NULL OR collection.handle = $3)
-  AND (json_array_length($4) = 0 OR EXISTS (
+  AND (jsonb_array_length($4::jsonb) = 0 OR EXISTS (
     SELECT 1
     FROM product_category_products filter_link
     JOIN product_categories filter_category
       ON filter_category.id = filter_link.category_id
     WHERE filter_link.product_id = product.id
-      AND filter_category.handle IN (SELECT value FROM json_each($4))
+      AND filter_category.handle IN (
+        SELECT value FROM jsonb_array_elements_text($4::jsonb)
+      )
       AND filter_category.is_active = 1
       AND filter_category.deleted_at IS NULL
   ))
-  AND (json_array_length($5) = 0 OR EXISTS (
+  AND (jsonb_array_length($5::jsonb) = 0 OR EXISTS (
     SELECT 1
     FROM product_tag_products filter_link
     JOIN product_tags filter_tag ON filter_tag.id = filter_link.tag_id
     WHERE filter_link.product_id = product.id
       AND lower(filter_tag.value) IN (
-        SELECT lower(value) FROM json_each($5)
+        SELECT lower(value) FROM jsonb_array_elements_text($5::jsonb)
       )
       AND filter_tag.deleted_at IS NULL
   ))
@@ -72,7 +74,7 @@ WHERE product.status = 'published' AND product.deleted_at IS NULL
   ))
   AND NOT EXISTS (
     SELECT 1
-    FROM json_each($9) selected_option_value
+    FROM jsonb_array_elements_text($9::jsonb) selected_option_value(value)
     WHERE NOT EXISTS (
       SELECT 1
       FROM product_variants filter_variant

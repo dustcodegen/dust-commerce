@@ -9,9 +9,9 @@ Future<void> recordSqlxHistoryForTest(
 CREATE TABLE _sqlx_migrations (
   version BIGINT PRIMARY KEY,
   description TEXT NOT NULL,
-  installed_on TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  installed_on TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
   success BOOLEAN NOT NULL,
-  checksum BLOB NOT NULL,
+  checksum BYTEA NOT NULL,
   execution_time BIGINT NOT NULL
 )
 ''', []).execute(database.connection);
@@ -19,8 +19,8 @@ CREATE TABLE _sqlx_migrations (
     await queryExecute(
       'INSERT INTO _sqlx_migrations '
       '(version, description, success, checksum, execution_time) '
-      "VALUES (?, 'test', 1, x'00', 0)",
-      [version],
+      "VALUES ($version, 'test', TRUE, decode('00', 'hex'), 0)",
+      const [],
     ).execute(database.connection);
   }
 }

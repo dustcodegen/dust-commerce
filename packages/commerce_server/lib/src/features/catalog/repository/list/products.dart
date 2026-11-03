@@ -13,9 +13,9 @@ abstract final class CatalogListRepository {
   @Query(r'''
 SELECT product.id, product.title, product.handle, product.description,
        product.thumbnail, product.status,
-       CASE WHEN collection.id IS NULL THEN 'null' ELSE json_build_object('id', collection.id, 'title', collection.title, 'handle', collection.handle) END AS collection,
+       (CASE WHEN collection.id IS NULL THEN 'null' ELSE json_build_object('id', collection.id, 'title', collection.title, 'handle', collection.handle) END)::text AS collection,
        json_build_object('material', product.material, 'origin_country', product.origin_country, 'product_type', product_type.value,
-         'weight', product.weight, 'length', product.length, 'width', product.width, 'height', product.height) AS details,
+         'weight', product.weight, 'length', product.length, 'width', product.width, 'height', product.height)::text AS details,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.image_json))
          FROM (
@@ -24,7 +24,7 @@ SELECT product.id, product.title, product.handle, product.description,
            WHERE image.product_id = product.id AND image.deleted_at IS NULL
            ORDER BY image.rank, image.id
          ) ordered
-       ), '[]') AS images,
+       ), '[]')::text AS images,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.category_json))
          FROM (
@@ -38,7 +38,7 @@ SELECT product.id, product.title, product.handle, product.description,
              AND category.deleted_at IS NULL
            ORDER BY link.rank, category.handle
          ) ordered
-       ), '[]') AS categories,
+       ), '[]')::text AS categories,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.tag_json))
          FROM (
@@ -48,7 +48,7 @@ SELECT product.id, product.title, product.handle, product.description,
            WHERE link.product_id = product.id AND tag.deleted_at IS NULL
            ORDER BY tag.value
          ) ordered
-       ), '[]') AS tags,
+       ), '[]')::text AS tags,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.option_json))
          FROM (
@@ -68,7 +68,7 @@ SELECT product.id, product.title, product.handle, product.description,
            WHERE link.product_id = product.id AND link.deleted_at IS NULL AND option.deleted_at IS NULL
            ORDER BY link.id
          ) ordered
-       ), '[]') AS options,
+       ), '[]')::text AS options,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.variant_json))
          FROM (
@@ -99,7 +99,7 @@ SELECT product.id, product.title, product.handle, product.description,
              AND price.currency_code = $1
            ORDER BY variant.id
          ) ordered
-       ), '[]') AS variants
+       ), '[]')::text AS variants
 FROM products product
 JOIN (
   SELECT variant.product_id, min(price.amount) AS min_price
@@ -120,16 +120,20 @@ WHERE product.status = 'published' AND product.deleted_at IS NULL
   ))
   AND (CAST($4 AS TEXT) IS NULL OR lower(product.title) LIKE '%' || lower($4) || '%' OR lower(product.handle) LIKE '%' || lower($4) || '%')
   AND (CAST($5 AS TEXT) IS NULL OR collection.handle = $5)
-  AND (json_array_length($6) = 0 OR EXISTS (
+  AND (jsonb_array_length($6::jsonb) = 0 OR EXISTS (
     SELECT 1 FROM product_category_products filter_link
     JOIN product_categories filter_category ON filter_category.id = filter_link.category_id
-    WHERE filter_link.product_id = product.id AND filter_category.handle IN (SELECT value FROM json_each($6))
+      WHERE filter_link.product_id = product.id AND filter_category.handle IN (
+        SELECT value FROM jsonb_array_elements_text($6::jsonb)
+      )
       AND filter_category.is_active = 1 AND filter_category.deleted_at IS NULL
   ))
-  AND (json_array_length($7) = 0 OR EXISTS (
+  AND (jsonb_array_length($7::jsonb) = 0 OR EXISTS (
     SELECT 1 FROM product_tag_products filter_link
     JOIN product_tags filter_tag ON filter_tag.id = filter_link.tag_id
-    WHERE filter_link.product_id = product.id AND lower(filter_tag.value) IN (SELECT lower(value) FROM json_each($7))
+      WHERE filter_link.product_id = product.id AND lower(filter_tag.value) IN (
+        SELECT lower(value) FROM jsonb_array_elements_text($7::jsonb)
+      )
       AND filter_tag.deleted_at IS NULL
   ))
   AND (CAST($9 AS INTEGER) IS NULL OR priced.min_price >= $9)
@@ -142,7 +146,7 @@ WHERE product.status = 'published' AND product.deleted_at IS NULL
       AND sale_price.currency_code = $1 AND sale_original.amount > sale_price.amount
   ))
   AND NOT EXISTS (
-    SELECT 1 FROM json_each($12) selected_option_value
+    SELECT 1 FROM jsonb_array_elements_text($12::jsonb) selected_option_value(value)
     WHERE NOT EXISTS (
       SELECT 1 FROM product_variants filter_variant
       JOIN variant_prices filter_price ON filter_price.variant_id = filter_variant.id

@@ -13,10 +13,19 @@ void main() {
     final databasePath = '${directory.path}/commerce.db';
     final port = await _availablePort();
     addTearDown(() => directory.delete(recursive: true));
-    final database = CommerceDatabase.open(
-      databasePath,
+    final databaseUrl = Platform.environment['COMMERCE_TEST_DATABASE_URL'] ??
+        Platform.environment['DUST_DATABASE_URL'];
+    if (databaseUrl == null || databaseUrl.isEmpty) {
+      throw StateError(
+        'Set COMMERCE_TEST_DATABASE_URL or DUST_DATABASE_URL for the '
+        'server-entrypoint test.',
+      );
+    }
+    final database = CommerceDatabase.connect(
+      databaseUrl,
       options: commerceOptions,
     );
+    await migrateCommerceDatabase(database);
     await recordSqlxHistoryForTest(
       database,
       commerceSqlxMigrationVersions,
@@ -63,17 +72,28 @@ final class _RunningServer {
   }
 
   static Future<_RunningServer> start(String databasePath, int port) async {
+    final environment = Map<String, String>.of(Platform.environment);
+    final databaseUrl = environment['COMMERCE_TEST_DATABASE_URL'] ??
+        environment['DUST_DATABASE_URL'];
+    if (databaseUrl == null || databaseUrl.isEmpty) {
+      throw StateError(
+        'Set COMMERCE_TEST_DATABASE_URL or DUST_DATABASE_URL for the '
+        'server-entrypoint test.',
+      );
+    }
+    environment['COMMERCE_DATABASE_URL'] = databaseUrl;
+    environment.addAll({
+      'COMMERCE_ALLOWED_ORIGINS': 'http://127.0.0.1:13001',
+      'COMMERCE_BIND': '127.0.0.1',
+      'COMMERCE_DATABASE_PATH': databasePath,
+      'COMMERCE_PORT': '$port',
+      'COMMERCE_SEED': 'true',
+    });
     final process = await Process.start(
       _dartExecutable(),
       ['run', 'bin/server.dart'],
       workingDirectory: _packageRoot(),
-      environment: {
-        'COMMERCE_ALLOWED_ORIGINS': 'http://127.0.0.1:13001',
-        'COMMERCE_BIND': '127.0.0.1',
-        'COMMERCE_DATABASE_PATH': databasePath,
-        'COMMERCE_PORT': '$port',
-        'COMMERCE_SEED': 'true',
-      },
+      environment: environment,
     );
     return _RunningServer(process, 'http://127.0.0.1:$port');
   }

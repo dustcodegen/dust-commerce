@@ -27,6 +27,40 @@ WHERE deleted_at IS NULL;
 
 
 -- New products default to the first active channel until Admin supports selection.
+CREATE OR REPLACE FUNCTION dust_attach_product_sales_channel()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+  default_channel_id TEXT;
+BEGIN
+  SELECT id
+  INTO default_channel_id
+  FROM sales_channels
+  WHERE is_disabled = 0 AND deleted_at IS NULL
+  ORDER BY created_at, id
+  LIMIT 1;
+
+  IF default_channel_id IS NOT NULL THEN
+    INSERT INTO product_sales_channels (id, product_id, sales_channel_id)
+    VALUES (
+      'prodsc_' || md5(NEW.id || ':' || default_channel_id || ':' || clock_timestamp()::text),
+      NEW.id,
+      default_channel_id
+    )
+    ON CONFLICT (product_id, sales_channel_id)
+      WHERE deleted_at IS NULL
+    DO NOTHING;
+  END IF;
+
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER product_sales_channels_attach_product_after_insert
+AFTER INSERT ON products
+FOR EACH ROW
+EXECUTE FUNCTION dust_attach_product_sales_channel();
 
 
 -- Existing active products receive the same default when this migration lands.
