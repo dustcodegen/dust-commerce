@@ -131,6 +131,7 @@ VALUES ($1, $2, $3, $4)
 INSERT INTO product_product_option_values
   (id, product_product_option_id, product_option_value_id)
 VALUES ($1, $2, $3)
+ON CONFLICT DO NOTHING
 ''')
   Future<Result<ExecResult, SqlxError>> linkProductOptionValue(
     String id,

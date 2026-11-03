@@ -25,7 +25,7 @@ SELECT product.id AS product_id, product.handle, product.title,
            WHERE link.product_id = product.id AND link.deleted_at IS NULL
              AND option.deleted_at IS NULL ORDER BY link.created_at, link.id
          ) ordered
-       ), '[]') AS options_json,
+       ), '[]'::json)::text AS options_json,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.variant_json)) FROM (
            SELECT json_build_object(
@@ -55,16 +55,16 @@ SELECT product.id AS product_id, product.handle, product.title,
            WHERE variant.product_id=product.id AND variant.deleted_at IS NULL
            ORDER BY variant.id
          ) ordered
-       ), '[]') AS variants_json,
+       ), '[]'::json)::text AS variants_json,
        coalesce((SELECT json_agg(ordered.url) FROM (
          SELECT image.url FROM product_images image
          WHERE image.product_id=product.id AND image.deleted_at IS NULL
-         ORDER BY image.rank, image.id) ordered), '[]') AS images_json,
+         ORDER BY image.rank, image.id) ordered), '[]'::json)::text AS images_json,
        coalesce((SELECT json_agg(ordered.value) FROM (
          SELECT tag.value FROM product_tag_products link
          JOIN product_tags tag ON tag.id=link.tag_id
          WHERE link.product_id=product.id AND tag.deleted_at IS NULL
-         ORDER BY tag.value) ordered), '[]') AS tags_json
+         ORDER BY tag.value) ordered), '[]'::json)::text AS tags_json
 FROM products product
 WHERE product.deleted_at IS NULL
   AND ($1='' OR lower(product.title) LIKE '%'||lower($1)||'%'

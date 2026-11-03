@@ -152,10 +152,9 @@ FROM product_variants WHERE id = 'var_tshirt_s_black'
       token,
       newOnlyProductImportCsv,
     );
-    await harness.database.connection.execute(
+    await harness.raw(
       "UPDATE product_imports SET expires_at = '2020-01-01T00:00:00.000Z' "
-      'WHERE id = ?',
-      [expiredId],
+      "WHERE id = '$expiredId'",
     );
     final expired = harness.client.post(
       '/admin/products/import/$expiredId/confirm',

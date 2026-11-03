@@ -12,7 +12,7 @@ abstract final class AdminProductImportRepository {
   /// Counts unique incoming identities already present in the active catalogue.
   @Query(r'''
 SELECT count(*)
-FROM json_each($1) incoming
+FROM jsonb_array_elements($1::jsonb) incoming(value)
 WHERE EXISTS (
   SELECT 1
   FROM products product
@@ -29,7 +29,7 @@ WHERE EXISTS (
   /// Finds identities that point at two different active products.
   @Query(r'''
 SELECT count(*)
-FROM json_each($1) incoming
+FROM jsonb_array_elements($1::jsonb) incoming(value)
 WHERE (
   SELECT count(DISTINCT product.id)
   FROM products product
