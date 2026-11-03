@@ -76,7 +76,10 @@ void main() {
     expect(hash, startsWith(r'$argon2id$v=19$m=19456,t=2,p=1$'));
     expect(hash, isNot(contains(_oldPassword)));
     expect(hash, isNot(contains(_newPassword)));
-    expect(provider.readIndex<String>(1), isNot('2000-01-01T00:00:00.000Z'));
+    expect(
+      provider.readIndex<DateTime>(1).toUtc(),
+      isNot(DateTime.parse('2000-01-01T00:00:00.000Z')),
+    );
 
     for (final revoked in [token, secondToken]) {
       final me = harness.client.get('/store/customers/me')..bearer(revoked);
