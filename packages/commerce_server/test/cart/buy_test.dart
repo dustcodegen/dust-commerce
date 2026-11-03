@@ -81,6 +81,34 @@ void main() {
             .send())
         .assertUnprocessable();
   });
+
+  test('rejects an unavailable region without creating a cart', () async {
+    final response = await (client.post('/store/carts/buy')
+          ..json({
+            'region_id': 'missing-region',
+            'items': [
+              {'variant_id': 'var_small', 'quantity': 1},
+            ],
+          }))
+        .send();
+
+    response.assertUnprocessable();
+    (await client.get('/store/carts/id_1').send()).assertNotFound();
+  });
+
+  test('rejects an out-of-stock line without creating a cart', () async {
+    final response = await (client.post('/store/carts/buy')
+          ..json({
+            'region_id': 'reg_us',
+            'items': [
+              {'variant_id': 'var_large', 'quantity': 3},
+            ],
+          }))
+        .send();
+
+    response.assertConflict();
+    (await client.get('/store/carts/id_1').send()).assertNotFound();
+  });
 }
 
 Future<void> _seed(CommerceDatabase database) async {
