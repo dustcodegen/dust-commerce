@@ -7,6 +7,9 @@ import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'store_footer_link.dart';
+import 'store_footer_link_groups.dart';
+
 /// Dynamic category, collection, and Dust links from the source footer.
 class StoreFooterLinks extends StatelessWidget {
   /// Creates the footer navigation columns.
@@ -81,31 +84,12 @@ class StoreFooterLinks extends StatelessWidget {
               ],
             ),
           _FooterColumn(
+            title: 'Customer service',
+            children: customerServiceFooterLinks(context),
+          ),
+          _FooterColumn(
             title: 'Dust',
-            children: [
-              FooterTextLink(
-                label: 'GitHub',
-                onPressed: () => _open('https://github.com/dustcodegen/dust'),
-              ),
-              FooterTextLink(
-                label: context.tr(
-                  'shop_footer_documentation',
-                  defaultText: 'Documentation',
-                ),
-                onPressed: () => _open(
-                  'https://github.com/dustcodegen/dust/tree/main/docs',
-                ),
-              ),
-              FooterTextLink(
-                label: context.tr(
-                  'shop_footer_source_code',
-                  defaultText: 'Source code',
-                ),
-                onPressed: () => _open(
-                  'https://github.com/dustcodegen/dust-commerce',
-                ),
-              ),
-            ],
+            children: dustFooterLinks(context, _open),
           ),
         ],
       ),
@@ -144,43 +128,6 @@ class _FooterColumn extends StatelessWidget {
             ],
           ],
         ),
-      );
-}
-
-/// Compact source-style footer link with a full semantic tap target.
-class FooterTextLink extends StatelessWidget {
-  /// Creates a footer link.
-  const FooterTextLink({
-    required this.label,
-    required this.onPressed,
-    this.emphasized = false,
-    super.key,
-  });
-
-  /// Whether a parent category should use stronger text.
-  final bool emphasized;
-
-  /// Visible link label.
-  final String label;
-
-  /// Link destination action.
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) => TextButton(
-        onPressed: onPressed,
-        style: TextButton.styleFrom(
-          padding: EdgeInsets.zero,
-          minimumSize: const Size(44, 20),
-          alignment: Alignment.centerLeft,
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          foregroundColor: StoreColors.foregroundSubtle,
-          textStyle: TextStyle(
-            fontSize: 14,
-            fontWeight: emphasized ? FontWeight.w600 : FontWeight.w400,
-          ),
-        ),
-        child: Text(label),
       );
 }
 
