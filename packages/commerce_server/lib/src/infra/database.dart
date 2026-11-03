@@ -136,6 +136,7 @@ Future<void> requireCommerceSqlxMigrations(CommerceDatabase database) async {
 /// that case the validated SQLx history remains authoritative and Dust does
 /// not replay the same DDL into an already-populated PostgreSQL schema.
 Future<void> migrateCommerceDatabase(CommerceDatabase database) async {
+  // dust:allow-unsafe-sql — fixed migration-history inspection has no input.
   final tableResult = await database.unsafe.fetch(
     "SELECT EXISTS (SELECT 1 FROM information_schema.tables "
     "WHERE table_schema = 'public' AND table_name = '_sqlx_migrations') "
@@ -150,6 +151,7 @@ Future<void> migrateCommerceDatabase(CommerceDatabase database) async {
   };
   final sqlxHistoryExists = tableRows.single.readBool('present');
   if (sqlxHistoryExists) {
+    // dust:allow-unsafe-sql — fixed migration-history inspection has no input.
     final historyResult = await database.unsafe.fetch(
       'SELECT version, success FROM _sqlx_migrations ORDER BY version',
       const [],

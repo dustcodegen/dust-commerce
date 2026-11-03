@@ -77,7 +77,7 @@ void main() {
     expect(stocked, const Ok<int, SqlxError>(14));
 
     final thumbnails = await queryScalar<int>(
-      'SELECT COUNT(*) FROM products WHERE thumbnail LIKE \$1',
+      r'SELECT COUNT(*) FROM products WHERE thumbnail LIKE $1',
       ['https://%'],
     ).fetchOne(database.executor);
     expect(thumbnails, const Ok<int, SqlxError>(4));
