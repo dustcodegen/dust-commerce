@@ -21,8 +21,14 @@ void main() {
         'server-entrypoint test.',
       );
     }
-    final database = CommerceDatabase.connect(
+    final isolatedDatabaseUrl = isolatedTestDatabaseUrl(
       databaseUrl,
+      '${directory.path}/commerce.db',
+    );
+    await ensureTestDatabase(isolatedDatabaseUrl);
+    addTearDown(() => dropTestDatabase(isolatedDatabaseUrl));
+    final database = CommerceDatabase.connect(
+      isolatedDatabaseUrl,
       options: commerceOptions,
     );
     await migrateCommerceDatabase(database);
@@ -81,7 +87,8 @@ final class _RunningServer {
         'server-entrypoint test.',
       );
     }
-    environment['COMMERCE_DATABASE_URL'] = databaseUrl;
+    environment['COMMERCE_DATABASE_URL'] =
+        isolatedTestDatabaseUrl(databaseUrl, databasePath);
     environment.addAll({
       'COMMERCE_ALLOWED_ORIGINS': 'http://127.0.0.1:13001',
       'COMMERCE_BIND': '127.0.0.1',
