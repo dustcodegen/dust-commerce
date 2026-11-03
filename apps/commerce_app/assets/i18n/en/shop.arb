@@ -567,22 +567,6 @@
   "@account_signed_in_as": {
     "description": "Label before the signed-in email."
   },
-  "account_status_archived": "Archived",
-  "@account_status_archived": {
-    "description": "Archived order status."
-  },
-  "account_status_cancelled": "Cancelled",
-  "@account_status_cancelled": {
-    "description": "Cancelled order status."
-  },
-  "account_status_completed": "Completed",
-  "@account_status_completed": {
-    "description": "Completed order status."
-  },
-  "account_status_pending": "Pending",
-  "@account_status_pending": {
-    "description": "Pending order status."
-  },
   "account_submit_return": "Submit return",
   "@account_submit_return": {
     "description": "Submits the selected return items."
@@ -836,10 +820,6 @@
   "@checkout_address": {
     "description": "Translation for `shop_checkout_address`."
   },
-  "checkout_address_line_2": "Apartment / Company",
-  "@checkout_address_line_2": {
-    "description": "Translation for `shop_checkout_address_line_2`."
-  },
   "checkout_back": "BACK",
   "@checkout_back": {
     "description": "Translation for `shop_checkout_back`."
@@ -924,10 +904,6 @@
   "checkout_frontpage": "Go to frontpage",
   "@checkout_frontpage": {
     "description": "Translation for `shop_checkout_frontpage`."
-  },
-  "checkout_help_body": "If you have questions about your order, contact our customer service team.",
-  "@checkout_help_body": {
-    "description": "Translation for `shop_checkout_help_body`."
   },
   "checkout_in_cart": "In your Cart",
   "@checkout_in_cart": {

@@ -567,22 +567,6 @@
   "@account_signed_in_as": {
     "description": "Label before the signed-in email."
   },
-  "account_status_archived": "သိမ်းဆည်းပြီး",
-  "@account_status_archived": {
-    "description": "Archived order status."
-  },
-  "account_status_cancelled": "ပယ်ဖျက်ပြီး",
-  "@account_status_cancelled": {
-    "description": "Cancelled order status."
-  },
-  "account_status_completed": "ပြီးစီးပြီး",
-  "@account_status_completed": {
-    "description": "Completed order status."
-  },
-  "account_status_pending": "စောင့်ဆိုင်းနေသည်",
-  "@account_status_pending": {
-    "description": "Pending order status."
-  },
   "account_submit_return": "ပြန်အပ်ရန် တင်သွင်းမည်",
   "@account_submit_return": {
     "description": "Submits the selected return items."
@@ -836,10 +820,6 @@
   "@checkout_address": {
     "description": "Translation for `shop_checkout_address`."
   },
-  "checkout_address_line_2": "တိုက်ခန်း / ကုမ္ပဏီ",
-  "@checkout_address_line_2": {
-    "description": "Translation for `shop_checkout_address_line_2`."
-  },
   "checkout_back": "နောက်သို့",
   "@checkout_back": {
     "description": "Translation for `shop_checkout_back`."
@@ -924,10 +904,6 @@
   "checkout_frontpage": "ပင်မစာမျက်နှာသို့ သွားရန်",
   "@checkout_frontpage": {
     "description": "Translation for `shop_checkout_frontpage`."
-  },
-  "checkout_help_body": "သင့်အော်ဒါနှင့်ပတ်သက်၍ မေးခွန်းရှိပါက ဝယ်ယူသူဝန်ဆောင်မှုအဖွဲ့ကို ဆက်သွယ်ပါ။",
-  "@checkout_help_body": {
-    "description": "Translation for `shop_checkout_help_body`."
   },
   "checkout_in_cart": "သင့်စျေးခြင်းတောင်းထဲတွင်",
   "@checkout_in_cart": {
