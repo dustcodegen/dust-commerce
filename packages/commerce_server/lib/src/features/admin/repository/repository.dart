@@ -45,7 +45,7 @@ WHERE NOT EXISTS (
 ''')
   Future<Result<ExecResult, SqlxError>> insert(String id, String title);
 
-  /// Lists global options with the columns used by Medusa's table.
+  /// Lists global options newest-first with a stable id tie-break.
   @Query(r'''
 SELECT option.id, option.title, option.is_exclusive = 1 AS is_exclusive,
        (SELECT count(*) FROM product_option_values value
@@ -54,7 +54,7 @@ SELECT option.id, option.title, option.is_exclusive = 1 AS is_exclusive,
 FROM product_options option
 WHERE option.deleted_at IS NULL AND option.is_exclusive = 0
   AND ($1 = '' OR lower(option.title) LIKE '%' || lower($1) || '%')
-ORDER BY option.created_at DESC, option.id
+ORDER BY option.created_at DESC, option.id DESC
 LIMIT $2 OFFSET $3
 ''')
   Future<Result<List<AdminProductOptionSummaryResponse>, SqlxError>> list(
