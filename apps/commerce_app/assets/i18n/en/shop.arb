@@ -571,10 +571,6 @@
   "@account_submit_return": {
     "description": "Submits the selected return items."
   },
-  "account_terms": "By creating an account, you agree to Morrow's Privacy Policy and Terms of Use.",
-  "@account_terms": {
-    "description": "Registration legal acknowledgement."
-  },
   "account_policy_prefix": "By creating an account, you agree to Morrow's ",
   "@account_policy_prefix": {
     "description": "Registration legal acknowledgement before the privacy link."

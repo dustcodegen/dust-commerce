@@ -571,10 +571,6 @@
   "@account_submit_return": {
     "description": "Submits the selected return items."
   },
-  "account_terms": "အကောင့်ဖန်တီးခြင်းဖြင့် ကျွန်ုပ်တို့၏ ကိုယ်ရေးအချက်အလက်မူဝါဒနှင့် အသုံးပြုမှုစည်းမျဉ်းများကို သဘောတူပါသည်။",
-  "@account_terms": {
-    "description": "Registration legal acknowledgement."
-  },
   "account_policy_prefix": "အကောင့်ဖန်တီးခြင်းဖြင့် Morrow ၏ ",
   "@account_policy_prefix": {
     "description": "Registration legal acknowledgement before the privacy link."
