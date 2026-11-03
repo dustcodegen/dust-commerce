@@ -18,7 +18,7 @@ void main() {
 
   setUp(() async {
     directory = await Directory.systemTemp.createTemp('admin_customer_edit');
-    database = CommerceDatabase.open(
+    database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );
