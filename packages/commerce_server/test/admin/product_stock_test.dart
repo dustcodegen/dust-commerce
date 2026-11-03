@@ -39,8 +39,8 @@ void main() {
       "WHERE id = 'var_sweatpants_s'",
     );
     expect(
-      stored.single.readIndex<String>(0),
-      isNot('2000-01-01T00:00:00.000Z'),
+      stored.single.readIndex<DateTime>(0).toUtc(),
+      isNot(DateTime.parse('2000-01-01T00:00:00.000Z')),
     );
 
     final storefront = await harness.client

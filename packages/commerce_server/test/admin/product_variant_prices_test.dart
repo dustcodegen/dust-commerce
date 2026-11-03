@@ -62,7 +62,8 @@ void main() {
     expect(rows.map((row) => row.readIndex<int>(1)), [2101, 3101]);
     expect(
       rows.every(
-          (row) => row.readIndex<String>(2) != '2000-01-01T00:00:00.000Z'),
+          (row) => row.readIndex<DateTime>(2).toUtc() !=
+              DateTime.parse('2000-01-01T00:00:00.000Z')),
       isTrue,
     );
 

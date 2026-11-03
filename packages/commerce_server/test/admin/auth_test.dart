@@ -26,7 +26,7 @@ void main() {
 
       expect(row.readIndex<String>(0), 'admin_1');
       expect(row.readIndex<String>(1), 'owner@example.com');
-      expect(DateTime.parse(row.readIndex<String>(2)).isUtc, isTrue);
+      expect(row.readIndex<DateTime>(2).toUtc().isUtc, isTrue);
       expect(row.readIndex<String>(3), 'emailpass_admin');
       expect(provider['password'], startsWith(r'$argon2id$'));
       expect(provider['password'], isNot(contains(AdminHarness.password)));
