@@ -22,12 +22,7 @@ final class CommerceRouter extends $CommerceRouter {
       required CartViewModel cart})
       : customerSession = CustomerSessionRouterRefresh(account),
         cartSession = cart,
-        _initialLocation = Uri(
-          path: initialLocation.path,
-          query: initialLocation.hasQuery ? initialLocation.query : null,
-          fragment:
-              initialLocation.hasFragment ? initialLocation.fragment : null,
-        );
+        _initialLocation = storefrontLocationWithoutCountry(initialLocation);
 
   /// Customer-session access and router refresh boundary.
   final CustomerSessionRouterRefresh customerSession;
@@ -46,6 +41,29 @@ final class CommerceRouter extends $CommerceRouter {
     _initialLocationRead = true;
     return RouteInformation(uri: _initialLocation);
   }
+}
+
+final _countryCodeSegment = RegExp(r'^[A-Za-z]{2}$');
+
+/// Reads the Medusa country prefix from a storefront deep link, when present.
+String? storefrontCountryCode(Uri location) {
+  final segments = location.pathSegments;
+  if (segments.isEmpty) return null;
+  final candidate = segments.first;
+  return _countryCodeSegment.hasMatch(candidate)
+      ? candidate.toLowerCase()
+      : null;
+}
+
+/// Converts a country-prefixed Medusa URL to the local typed route shape.
+Uri storefrontLocationWithoutCountry(Uri location) {
+  if (storefrontCountryCode(location) == null) return location;
+  final segments = location.pathSegments.skip(1).toList(growable: false);
+  return Uri(
+    pathSegments: segments.isEmpty ? const [''] : ['', ...segments],
+    query: location.hasQuery ? location.query : null,
+    fragment: location.hasFragment ? location.fragment : null,
+  );
 }
 
 /// Restores checkout and rejects a known empty cart before the route builds.
