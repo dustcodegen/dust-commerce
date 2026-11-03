@@ -64,13 +64,13 @@ ORDER BY customer_id, created_at
       (row) => row.read<String>('customer_id') == 'cus_contactless',
     );
     expect(added.readNullable<String>('created_by'), isNotNull);
-    expect(added.readNullable<String>('deleted_at'), isNull);
+    expect(added.readNullable<DateTime>('deleted_at'), isNull);
     final removed = rows.singleWhere(
       (row) => row.read<String>('customer_id') == 'cus_guest',
     );
-    final deletedAt = removed.readNullable<String>('deleted_at');
-    expect(DateTime.parse(deletedAt!).isUtc, isTrue);
-    expect(removed.read<String>('updated_at'), deletedAt);
+    final deletedAt = removed.readNullable<DateTime>('deleted_at');
+    expect(deletedAt!.isUtc, isTrue);
+    expect(removed.read<DateTime>('updated_at'), deletedAt);
   });
 
   test('existing adds and absent removals are idempotent', () async {
@@ -157,12 +157,17 @@ WHERE customer_group_id = 'cusgrp_vip'
 
   test('add failure rolls back removals in the same batch', () async {
     await harness.raw(r'''
+CREATE OR REPLACE FUNCTION reject_customer_group_membership_add()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  RAISE EXCEPTION 'membership add failed';
+END;
+$$
+''');
+    await harness.raw(r'''
 CREATE TRIGGER reject_customer_group_membership_add
 BEFORE INSERT ON customer_group_customers
-WHEN NEW.customer_group_id = 'cusgrp_vip'
-BEGIN
-  SELECT RAISE(ABORT, 'membership add failed');
-END
+FOR EACH ROW EXECUTE FUNCTION reject_customer_group_membership_add()
 ''');
     final request = harness.client.post(
       '/admin/customer-groups/cusgrp_vip/customers',

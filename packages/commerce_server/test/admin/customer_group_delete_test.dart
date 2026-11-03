@@ -41,10 +41,10 @@ void main() {
     final group = await harness.raw(r'''
 SELECT deleted_at, updated_at FROM customer_groups WHERE id = 'cusgrp_vip'
 ''');
-    final deletedAt = group.single.readIndexNullable<String>(0);
+    final deletedAt = group.single.readIndexNullable<DateTime>(0);
     expect(deletedAt, isNotNull);
-    expect(DateTime.parse(deletedAt!).isUtc, isTrue);
-    expect(group.single.readIndex<String>(1), deletedAt);
+    expect(deletedAt!.isUtc, isTrue);
+    expect(group.single.readIndex<DateTime>(1), deletedAt);
 
     final memberships = await harness.raw(r'''
 SELECT count(*), count(deleted_at)
@@ -100,12 +100,17 @@ WHERE name = 'VIP' AND deleted_at IS NULL
 
   test('membership failure rolls back the group deletion', () async {
     await harness.raw(r'''
+CREATE OR REPLACE FUNCTION reject_customer_group_membership_retirement()
+RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  RAISE EXCEPTION 'membership retirement failed';
+END;
+$$
+''');
+    await harness.raw(r'''
 CREATE TRIGGER reject_customer_group_membership_retirement
 BEFORE UPDATE OF deleted_at ON customer_group_customers
-WHEN NEW.customer_group_id = 'cusgrp_vip'
-BEGIN
-  SELECT RAISE(ABORT, 'membership retirement failed');
-END
+FOR EACH ROW EXECUTE FUNCTION reject_customer_group_membership_retirement()
 ''');
     final request = harness.client.delete('/admin/customer-groups/cusgrp_vip')
       ..bearer(await harness.adminToken());
@@ -114,7 +119,7 @@ END
     final group = await harness.raw(r'''
 SELECT deleted_at FROM customer_groups WHERE id = 'cusgrp_vip'
 ''');
-    expect(group.single.readIndexNullable<String>(0), isNull);
+    expect(group.single.readIndexNullable<DateTime>(0), isNull);
     final activeMemberships = await harness.raw(r'''
 SELECT count(*) FROM customer_group_customers
 WHERE customer_group_id = 'cusgrp_vip' AND deleted_at IS NULL

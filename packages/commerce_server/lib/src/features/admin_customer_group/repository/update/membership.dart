@@ -22,7 +22,9 @@ WHERE id = $1 AND deleted_at IS NULL
 SELECT count(*)
 FROM customers
 WHERE deleted_at IS NULL
-  AND id IN (SELECT value FROM json_each($1))
+  AND id IN (
+    SELECT value FROM jsonb_array_elements_text($1::jsonb) AS item(value)
+  )
 ''')
   Future<Result<int, SqlxError>> activeCustomerCount(String customerIdsJson);
 
@@ -32,7 +34,9 @@ UPDATE customer_group_customers
 SET deleted_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
 WHERE customer_group_id = $1
   AND deleted_at IS NULL
-  AND customer_id IN (SELECT value FROM json_each($2))
+  AND customer_id IN (
+    SELECT value FROM jsonb_array_elements_text($2::jsonb) AS item(value)
+  )
 ''')
   Future<Result<ExecResult, SqlxError>> remove(
     String groupId,
@@ -43,16 +47,16 @@ WHERE customer_group_id = $1
   @Query(r'''
 INSERT INTO customer_group_customers
   (id, customer_group_id, customer_id, created_by)
-SELECT json_extract(incoming.value, '$.id'),
+SELECT incoming.value ->> 'id',
        $1,
-       json_extract(incoming.value, '$.customer_id'),
+       incoming.value ->> 'customer_id',
        $2
-FROM json_each($3) incoming
+FROM jsonb_array_elements($3::jsonb) incoming
 WHERE NOT EXISTS (
   SELECT 1
   FROM customer_group_customers membership
   WHERE membership.customer_group_id = $1
-    AND membership.customer_id = json_extract(incoming.value, '$.customer_id')
+    AND membership.customer_id = incoming.value ->> 'customer_id'
     AND membership.deleted_at IS NULL
 )
 ''')

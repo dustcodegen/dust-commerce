@@ -25,7 +25,7 @@ SELECT customer_group.id,
              AND customer.deleted_at IS NULL
            ORDER BY membership.created_at, membership.id
          ) member
-       ), '[]') AS customers_json,
+       ), '[]')::text AS customers_json,
        coalesce(customer_group.metadata, 'null') AS metadata_json,
        customer_group.created_at,
        customer_group.updated_at

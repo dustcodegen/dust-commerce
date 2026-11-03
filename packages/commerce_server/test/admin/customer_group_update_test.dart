@@ -66,8 +66,8 @@ WHERE id = 'cusgrp_vip'
     expect(stored.single.read<String>('name'), 'VIP Customers');
     expect(stored.single.read<String>('metadata'),
         '{"source":"admin","priority":1}');
-    expect(
-        stored.single.read<String>('created_at'), '2026-09-12T10:00:00.000Z');
+    expect(stored.single.read<DateTime>('created_at'),
+        DateTime.utc(2026, 9, 12, 10));
   });
 
   test('invalid or undeclared input preserves the group', () async {

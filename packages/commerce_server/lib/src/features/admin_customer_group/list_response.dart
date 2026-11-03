@@ -82,11 +82,11 @@ final class AdminCustomerGroupListResponse
 }
 
 final class _AdminCustomerGroupDateTime
-    implements SqlxTryFrom<DateTime, String> {
+    implements SqlxTryFrom<DateTime, DateTime> {
   const _AdminCustomerGroupDateTime();
 
   @override
-  DateTime decode(String value) => DateTime.parse(value);
+  DateTime decode(DateTime value) => value.toUtc();
 }
 
 final class _AdminCustomerGroupCustomers

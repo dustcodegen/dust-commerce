@@ -98,9 +98,9 @@ final class _AdminCustomerGroupDetailMetadata
 }
 
 final class _AdminCustomerGroupDetailDateTime
-    implements SqlxTryFrom<DateTime, String> {
+    implements SqlxTryFrom<DateTime, DateTime> {
   const _AdminCustomerGroupDetailDateTime();
 
   @override
-  DateTime decode(String value) => DateTime.parse(value).toUtc();
+  DateTime decode(DateTime value) => value.toUtc();
 }
