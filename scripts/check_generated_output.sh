@@ -13,6 +13,7 @@ packages=(
 )
 
 test -z "$(git ls-files -- '**/*.g.dart')"
+test -z "$(git ls-files -- '**/.dust_sql/**')"
 
 generated_count="$(find apps packages -type f -name '*.g.dart' | wc -l | tr -d ' ')"
 test "$generated_count" -gt 0
@@ -23,6 +24,13 @@ while IFS= read -r -d '' generated; do
     exit 1
   }
 done < <(find apps packages -type f -name '*.g.dart' -print0)
+
+while IFS= read -r -d '' generated_sql; do
+  git check-ignore --no-index --quiet "$generated_sql" || {
+    echo "Generated SQL is not ignored: $generated_sql" >&2
+    exit 1
+  }
+done < <(find apps packages -type f -path '*/.dust_sql/*' -print0)
 
 for package_root in "${packages[@]}"; do
   dust check --root "$package_root"
