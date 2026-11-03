@@ -30,7 +30,6 @@ final class AdminPaymentRefundTarget {
   @Sqlx(
     rename: 'captured_at',
     defaultValue: null,
-    tryFrom: _AdminRefundDateTimeFromString(),
   )
   final DateTime? capturedAt;
 
@@ -83,7 +82,7 @@ final class AdminRefundedPaymentResponse with _$AdminRefundedPaymentResponse {
   final int amount;
 
   /// Provider capture instant.
-  @Sqlx(rename: 'captured_at', tryFrom: _AdminRefundDateTimeFromString())
+  @Sqlx(rename: 'captured_at')
   final DateTime capturedAt;
 
   /// Lowercase ISO 4217 currency shared by every refund.
