@@ -62,11 +62,13 @@ ON CONFLICT DO NOTHING
 '''),
   const _Statement(r'''
 INSERT INTO regions
-  (id, name, currency_code, tax_rate, countries)
+  (id, name, currency_code, tax_rate, countries, metadata)
 VALUES
-  ('reg_eu', 'Europe', 'eur', 0, 'gb,de,dk,se,fr,es,it'),
-  ('reg_us', 'United States', 'usd', 1000, 'us')
-ON CONFLICT DO NOTHING
+  ('reg_eu', 'Europe', 'eur', 0, 'gb,de,dk,se,fr,es,it',
+   '{"return_window_days":30,"free_returns":false,"shipping_rate":10,"handling_days_min":0,"handling_days_max":1,"transit_days_min":2,"transit_days_max":3}'),
+  ('reg_us', 'United States', 'usd', 1000, 'us',
+   '{"return_window_days":30,"free_returns":false,"shipping_rate":10,"handling_days_min":0,"handling_days_max":1,"transit_days_min":2,"transit_days_max":3}')
+ON CONFLICT (id) DO UPDATE SET metadata = COALESCE(regions.metadata, excluded.metadata)
 '''),
   const _Statement(r'''
 INSERT INTO region_payment_providers (region_id, provider_id)
