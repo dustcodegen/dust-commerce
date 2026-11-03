@@ -7,10 +7,12 @@ translated into native Flutter and Dust patterns; the application talks only
 to the dust-commerce API. Visual tokens are pinned to
 `@medusajs/ui-preset@2.21.2`, the version used by that source revision.
 
-The source pin was refreshed against upstream `main` on 2026-10-08. Current
-Medusa DTC adds storefront search in the nav, `/store` page and right-side
-drawer; this repository tracks that as a tested slice instead of treating the
-older rendered-comparison pins as frozen truth.
+Rendered comparisons remain pinned to the source revision above. The current
+behavior audit was refreshed against Medusa DTC `913d4482641da21c9a219c92a5aa6b959af9bfd7`
+(`main`, 2026-10-30), which adds storefront search in the nav, `/store` page,
+right-side drawer, country-prefixed links and the `/buy/[items]` route; this
+repository tracks those as tested slices instead of treating an older raster
+comparison as frozen truth.
 
 Progress is tracked in [GitHub issue #29](https://github.com/dustcodegen/dust-commerce/issues/29)
 and the `Medusa DTC storefront parity` milestone.
