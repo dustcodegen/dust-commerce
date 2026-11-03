@@ -1,6 +1,8 @@
 import 'package:commerce_shared/src/money.dart';
 import 'package:dust_dart/serde.dart';
 
+import 'region_policy.dart';
+
 part 'region.g.dart';
 
 /// A selling territory: one currency, one tax rate, a set of countries.
@@ -22,6 +24,7 @@ class Region with _$Region {
     required this.currencyCode,
     required this.taxRate,
     required this.countries,
+    this.policy,
     this.taxInclusive = false,
   });
 
@@ -36,6 +39,7 @@ class Region with _$Region {
     required String currencyCode,
     required int taxRate,
     required List<String> countries,
+    StoreRegionPolicy? policy,
     bool taxInclusive = false,
   }) {
     if (taxRate < 0 || taxRate > _hundredPercent) {
@@ -58,6 +62,7 @@ class Region with _$Region {
       currencyCode: Money.of(0, currencyCode).currencyCode,
       taxRate: taxRate,
       countries: countries.map(_country).toList(growable: false),
+      policy: policy,
       taxInclusive: taxInclusive,
     );
   }
@@ -76,6 +81,9 @@ class Region with _$Region {
 
   /// Display name.
   final String name;
+
+  /// Validated store-owned shipping and return policy, when published.
+  final StoreRegionPolicy? policy;
 
   /// Whether listed prices already contain tax.
   final bool taxInclusive;

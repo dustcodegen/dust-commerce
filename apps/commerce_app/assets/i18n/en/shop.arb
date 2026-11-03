@@ -1601,6 +1601,39 @@
   "@policy_published_unavailable": {
     "description": "Policy page message when regional policy metadata is absent."
   },
+  "policy_shipping_country": "Orders to {country} ship with the following rates and delivery times.",
+  "@policy_shipping_country": {
+    "description": "Shipping policy country sentence.",
+    "placeholders": {
+      "country": {
+        "example": "DK"
+      }
+    }
+  },
+  "policy_shipping_rate": "Shipping rate",
+  "@policy_shipping_rate": {
+    "description": "Shipping policy rate label."
+  },
+  "policy_processing_time": "Processing time",
+  "@policy_processing_time": {
+    "description": "Shipping policy handling label."
+  },
+  "policy_delivery_time": "Delivery time",
+  "@policy_delivery_time": {
+    "description": "Shipping policy transit label."
+  },
+  "policy_business_days": "business days",
+  "@policy_business_days": {
+    "description": "Shipping policy handling unit."
+  },
+  "policy_business_days_after_dispatch": "business days after dispatch",
+  "@policy_business_days_after_dispatch": {
+    "description": "Shipping policy transit unit."
+  },
+  "policy_shipping_checkout": "Available shipping methods and final costs are shown at checkout.",
+  "@policy_shipping_checkout": {
+    "description": "Shipping policy checkout note."
+  },
   "policy_placeholder": "This is placeholder content from the Medusa starter. Replace it with your store's own text before launch.",
   "@policy_placeholder": {
     "description": "Medusa starter policy placeholder notice."
@@ -1632,6 +1665,23 @@
   "policy_terms_orders": "Orders are confirmed by email once payment is received. Returns and refunds are handled according to our return policy.",
   "@policy_terms_orders": {
     "description": "Terms order-confirmation paragraph."
+  },
+  "policy_returns_window": "You can return items within {days} days of delivery. Items are returned by mail.",
+  "@policy_returns_window": {
+    "description": "Return policy window paragraph.",
+    "placeholders": {
+      "days": {
+        "example": "30"
+      }
+    }
+  },
+  "policy_returns_free": "Return shipping is free.",
+  "@policy_returns_free": {
+    "description": "Return policy free-shipping paragraph."
+  },
+  "policy_returns_paid": "Return shipping costs are paid by the customer.",
+  "@policy_returns_paid": {
+    "description": "Return policy paid-shipping paragraph."
   },
   "shipping_returns": "Shipping & Returns",
   "@shipping_returns": {

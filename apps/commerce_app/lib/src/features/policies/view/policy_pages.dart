@@ -3,6 +3,8 @@ import 'package:commerce_app/route.dart';
 import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
+import 'policy_content.dart';
+
 /// Shipping information route from the Medusa storefront.
 @AppRoute('/shipping', name: 'shipping', guards: [])
 final class ShippingPage extends StatelessWidget {
@@ -10,13 +12,26 @@ final class ShippingPage extends StatelessWidget {
   const ShippingPage({super.key});
 
   @override
-  Widget build(BuildContext context) => PolicyPage(
-        title: context.tr(
-          'shop_policy_shipping_title',
-          defaultText: 'Shipping information',
+  Widget build(BuildContext context) {
+    final shell = context.watchStoreShellViewModel().value;
+    final content = shell.selectedRegion.match(
+      some: (region) => ShippingPolicyContent(
+        countryCode: shell.selectedCountryCode.match(
+          some: (country) => country,
+          none: () => region.countries.first,
         ),
-        children: const [PoliciesUnavailable()],
-      );
+        region: region,
+      ),
+      none: () => const PoliciesUnavailable(),
+    );
+    return PolicyPage(
+      title: context.tr(
+        'shop_policy_shipping_title',
+        defaultText: 'Shipping information',
+      ),
+      children: [content],
+    );
+  }
 }
 
 /// Return policy route from the Medusa storefront.
@@ -26,13 +41,20 @@ final class ReturnsPage extends StatelessWidget {
   const ReturnsPage({super.key});
 
   @override
-  Widget build(BuildContext context) => PolicyPage(
-        title: context.tr(
-          'shop_policy_returns_title',
-          defaultText: 'Return policy',
-        ),
-        children: const [PoliciesUnavailable()],
-      );
+  Widget build(BuildContext context) {
+    final shell = context.watchStoreShellViewModel().value;
+    final content = shell.selectedRegion.match(
+      some: (region) => ReturnsPolicyContent(region: region),
+      none: () => const PoliciesUnavailable(),
+    );
+    return PolicyPage(
+      title: context.tr(
+        'shop_policy_returns_title',
+        defaultText: 'Return policy',
+      ),
+      children: [content],
+    );
+  }
 }
 
 /// Privacy policy route from the Medusa storefront.
@@ -156,22 +178,6 @@ final class PolicyPage extends StatelessWidget {
             ],
           ),
         ),
-      );
-}
-
-/// Source-compatible notice used when regional policy metadata is absent.
-final class PoliciesUnavailable extends StatelessWidget {
-  /// Creates the published-policy boundary.
-  const PoliciesUnavailable({super.key});
-
-  @override
-  Widget build(BuildContext context) => Text(
-        context.tr(
-          'shop_policy_published_unavailable',
-          defaultText:
-              "Policy details for this region haven't been published yet.",
-        ),
-        style: const TextStyle(color: StoreColors.foregroundSubtle),
       );
 }
 

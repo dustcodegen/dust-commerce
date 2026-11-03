@@ -14,7 +14,8 @@ abstract final class SellingRegionRepository {
   @Query(r'''
 SELECT id, name, currency_code, tax_rate,
        tax_inclusive <> 0 AS tax_inclusive,
-       string_to_array(countries, ',') AS countries
+       string_to_array(countries, ',') AS countries,
+       coalesce(metadata, 'null') AS metadata_json
 FROM regions
 WHERE deleted_at IS NULL
 ORDER BY name, id

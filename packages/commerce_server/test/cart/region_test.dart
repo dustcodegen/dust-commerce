@@ -43,6 +43,31 @@ void main() {
     expect(cart.cart.region.currencyCode, 'eur');
   });
 
+  test('GET /store/regions exposes only the validated policy allowlist',
+      () async {
+    await queryExecute(
+      r'''
+UPDATE regions
+SET metadata = '{"return_window_days":30,"free_returns":false,"shipping_rate":10,"handling_days_min":0,"handling_days_max":1,"transit_days_min":2,"transit_days_max":3}'
+WHERE id = 'reg_eu'
+''',
+      const [],
+    ).execute(database.executor);
+
+    final response = await client.get('/store/regions').send();
+
+    response.assertOk();
+    final regions = SellingRegionListView.fromJson(
+      response.json! as Map<String, Object?>,
+    );
+    final policy =
+        regions.regions.singleWhere((region) => region.id == 'reg_eu').policy;
+    expect(policy, isNotNull);
+    expect(policy!.shippingRate, '10');
+    expect(policy.returnWindowDays, 30);
+    expect(policy.freeReturns, isFalse);
+  });
+
   test('PATCH region reprices lines and reconciles cart adjustments', () async {
     final cartId = await _cartWithLine(client, 'var_both');
     await _applyPromotion(client, cartId);

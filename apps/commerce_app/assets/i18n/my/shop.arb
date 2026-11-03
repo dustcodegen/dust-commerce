@@ -1601,6 +1601,39 @@
   "@policy_published_unavailable": {
     "description": "Policy page message when regional policy metadata is absent."
   },
+  "policy_shipping_country": "{country} သို့ ပို့ဆောင်သော အော်ဒါများအတွက် အောက်ပါနှုန်းထားနှင့် ပို့ဆောင်ချိန်များ ရှိပါသည်။",
+  "@policy_shipping_country": {
+    "description": "Shipping policy country sentence.",
+    "placeholders": {
+      "country": {
+        "example": "DK"
+      }
+    }
+  },
+  "policy_shipping_rate": "ပို့ဆောင်ခနှုန်းထား",
+  "@policy_shipping_rate": {
+    "description": "Shipping policy rate label."
+  },
+  "policy_processing_time": "ပြင်ဆင်ချိန်",
+  "@policy_processing_time": {
+    "description": "Shipping policy handling label."
+  },
+  "policy_delivery_time": "ပို့ဆောင်ချိန်",
+  "@policy_delivery_time": {
+    "description": "Shipping policy transit label."
+  },
+  "policy_business_days": "အလုပ်လုပ်ရက်",
+  "@policy_business_days": {
+    "description": "Shipping policy handling unit."
+  },
+  "policy_business_days_after_dispatch": "ပို့ပြီးနောက် အလုပ်လုပ်ရက်",
+  "@policy_business_days_after_dispatch": {
+    "description": "Shipping policy transit unit."
+  },
+  "policy_shipping_checkout": "ရရှိနိုင်သော ပို့ဆောင်နည်းလမ်းနှင့် နောက်ဆုံးကုန်ကျစရိတ်ကို checkout တွင် ပြသပါမည်။",
+  "@policy_shipping_checkout": {
+    "description": "Shipping policy checkout note."
+  },
   "policy_placeholder": "ဤအကြောင်းအရာသည် Medusa starter မှ နမူနာဖြစ်သည်။ မထုတ်ဝေမီ သင့်စတိုး၏ အကြောင်းအရာဖြင့် အစားထိုးပါ။",
   "@policy_placeholder": {
     "description": "Medusa starter policy placeholder notice."
@@ -1632,6 +1665,23 @@
   "policy_terms_orders": "ငွေပေးချေပြီးနောက် အော်ဒါများကို အီးမေးလ်ဖြင့် အတည်ပြုပါသည်။ ပြန်အပ်ခြင်းနှင့် ငွေပြန်အမ်းခြင်းကို ပြန်အပ်မှုမူဝါဒအတိုင်း ဆောင်ရွက်ပါသည်။",
   "@policy_terms_orders": {
     "description": "Terms order-confirmation paragraph."
+  },
+  "policy_returns_window": "ပစ္စည်းရရှိပြီး {days} ရက်အတွင်း ပြန်အပ်နိုင်ပါသည်။ ပစ္စည်းများကို စာတိုက်မှတစ်ဆင့် ပြန်ပို့ရပါမည်။",
+  "@policy_returns_window": {
+    "description": "Return policy window paragraph.",
+    "placeholders": {
+      "days": {
+        "example": "30"
+      }
+    }
+  },
+  "policy_returns_free": "ပြန်ပို့ခ အခမဲ့ဖြစ်သည်။",
+  "@policy_returns_free": {
+    "description": "Return policy free-shipping paragraph."
+  },
+  "policy_returns_paid": "ပြန်ပို့ခကို ဖောက်သည်က ပေးဆောင်ရပါမည်။",
+  "@policy_returns_paid": {
+    "description": "Return policy paid-shipping paragraph."
   },
   "shipping_returns": "ပို့ဆောင်မှုနှင့် ပြန်အပ်မှု",
   "@shipping_returns": {

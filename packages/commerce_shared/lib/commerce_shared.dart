@@ -7,3 +7,4 @@ export 'src/customers/customers.dart';
 export 'src/money.dart';
 export 'src/ordering/ordering.dart';
 export 'src/region.dart';
+export 'src/region_policy.dart';
