@@ -103,6 +103,9 @@ Future<Result<CheckoutPlacementOutcome, SqlxError>> persistOrder(
   );
   if (written case Err(:final error)) return Err(error);
 
+  final channel = await orders.snapshotSalesChannel(orderId, cartId);
+  if (channel case Err(:final error)) return Err(error);
+
   for (final line in cart.items) {
     final copied = await orders.insertOrderItem(
       nextId(),

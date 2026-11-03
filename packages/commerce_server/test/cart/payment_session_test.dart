@@ -44,7 +44,7 @@ void main() {
     (await choose(cartId, 'manual')).assertOk();
 
     final rows = await queryRaw(
-      'SELECT COUNT(*) FROM cart_payment_sessions WHERE cart_id = ?',
+      'SELECT COUNT(*) FROM cart_payment_sessions WHERE cart_id = \$1',
       [cartId],
     ).fetch(harness.database.connection as Executor);
     expect(rows.single.readIndex<int>(0), 1);

@@ -38,6 +38,19 @@ FROM orders
     String placedAt,
   );
 
+  /// Freezes the cart's selling channel on the order inside the same checkout transaction.
+  @Query(r'''
+INSERT INTO order_sales_channels (order_id, sales_channel_id)
+SELECT $1, sales_channel_id
+FROM cart_sales_channels
+WHERE cart_id = $2
+ON CONFLICT (order_id) DO NOTHING
+''')
+  Future<Result<ExecResult, SqlxError>> snapshotSalesChannel(
+    String orderId,
+    String cartId,
+  );
+
   /// Creates or refreshes one checkout-only profile without credentials.
   @Query(r'''
 INSERT INTO customers

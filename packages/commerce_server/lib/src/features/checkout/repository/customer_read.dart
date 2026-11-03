@@ -100,7 +100,7 @@ SELECT o.id, o.display_id, o.email, o.customer_id, o.currency_code, o.subtotal,
            GROUP BY item.order_item_id
          ) returned ON returned.order_item_id = i.id
          WHERE i.order_id = o.id
-       ), '[]') AS items_json,
+       ), '[]')::text AS items_json,
        json_build_object(
          'first_name', shipping.first_name, 'last_name', shipping.last_name,
          'company', shipping.company,
@@ -108,7 +108,7 @@ SELECT o.id, o.display_id, o.email, o.customer_id, o.currency_code, o.subtotal,
          'city', shipping.city, 'province', shipping.province,
          'postal_code', shipping.postal_code,
          'country_code', shipping.country_code, 'phone', shipping.phone
-       ) AS shipping_address_json,
+       )::text AS shipping_address_json,
        json_build_object(
          'first_name', coalesce(billing.first_name, shipping.first_name),
          'last_name', coalesce(billing.last_name, shipping.last_name),
@@ -124,7 +124,7 @@ SELECT o.id, o.display_id, o.email, o.customer_id, o.currency_code, o.subtotal,
          'country_code', coalesce(billing.country_code, shipping.country_code),
          'phone', CASE WHEN billing.order_id IS NULL
                        THEN shipping.phone ELSE billing.phone END
-       ) AS billing_address_json
+       )::text AS billing_address_json
 FROM orders o
 JOIN regions r ON r.id = o.region_id
 JOIN order_addresses shipping ON shipping.order_id = o.id AND shipping.kind = 'shipping'

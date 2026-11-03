@@ -25,7 +25,7 @@ void main() {
     final order = Order.fromJson(placed.json! as Map<String, Object?>);
     final rows = await queryRaw(
       'SELECT email, first_name, last_name, phone, has_account, '
-      'created_at, updated_at FROM customers WHERE email = ?',
+      'created_at, updated_at FROM customers WHERE email = \$1',
       ['guest@example.com'],
     ).fetch(harness.database.connection as Executor);
 
@@ -36,8 +36,8 @@ void main() {
     expect(rows.single.readIndex<String>(2), 'Lovelace');
     expect(rows.single.readIndex<String>(3), '+1 555 0100');
     expect(rows.single.readIndex<int>(4), 0);
-    expect(rows.single.readIndex<String>(5), isNotEmpty);
-    expect(rows.single.readIndex<String>(6), isNotEmpty);
+    expect(rows.single.readIndex<DateTime>(5), isNotNull);
+    expect(rows.single.readIndex<DateTime>(6), isNotNull);
   });
 
   test('later guest checkout refreshes the same email profile', () async {
@@ -53,8 +53,8 @@ void main() {
         .assertCreated();
 
     final rows = await queryRaw(
-      'SELECT COUNT(*), first_name FROM customers '
-      'WHERE email = ? AND has_account = 0 AND deleted_at IS NULL',
+      'SELECT COUNT(*), MAX(first_name) FROM customers '
+      'WHERE email = \$1 AND has_account = 0 AND deleted_at IS NULL',
       ['guest@example.com'],
     ).fetch(harness.database.connection as Executor);
 

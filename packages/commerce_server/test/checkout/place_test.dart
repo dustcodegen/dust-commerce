@@ -29,7 +29,7 @@ void main() {
       expect(order.customerId, account.customerId);
       expect(order.email, 'ada@example.com');
       final rows = await queryRaw(
-        'SELECT customer_id, email FROM carts WHERE id = ?',
+        'SELECT customer_id, email FROM carts WHERE id = \$1',
         [cartId],
       ).fetch(harness.database.connection as Executor);
       expect(rows.single.readIndex<String>(0), account.customerId);
@@ -95,12 +95,12 @@ void main() {
       expect(await harness.stockOf('var_small'), 48);
 
       final rows = await queryRaw(
-        'SELECT COUNT(orders.id), completed_at FROM carts '
-        'LEFT JOIN orders ON orders.cart_id = carts.id WHERE carts.id = ?',
+        'SELECT COUNT(orders.id), MAX(carts.completed_at) FROM carts '
+        'LEFT JOIN orders ON orders.cart_id = carts.id WHERE carts.id = \$1',
         [cartId],
       ).fetch(harness.database.connection as Executor);
       expect(rows.single.readIndex<int>(0), 1);
-      expect(rows.single.readIndex<String?>(1), isNotNull);
+      expect(rows.single.readIndex<DateTime?>(1), isNotNull);
     });
   });
 
@@ -124,7 +124,7 @@ void main() {
           .assertConflict();
 
       final rows = await queryRaw(
-        'SELECT COUNT(*) FROM orders WHERE email = ?',
+        'SELECT COUNT(*) FROM orders WHERE email = \$1',
         ['loser@example.com'],
       ).fetch(harness.database.connection as Executor);
       expect(rows.single.readIndex<int>(0), 0);
@@ -192,7 +192,7 @@ void main() {
         });
       expect(await harness.stockOf('var_small'), 50);
       final orders = await queryRaw(
-        'SELECT COUNT(*) FROM orders WHERE cart_id = ?',
+        'SELECT COUNT(*) FROM orders WHERE cart_id = \$1',
         [cartId],
       ).fetch(harness.database.connection as Executor);
       expect(orders.single.readIndex<int>(0), 0);

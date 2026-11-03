@@ -79,7 +79,7 @@ Future<void> _fulfill(
   await queryExecute(
     'INSERT INTO fulfillments '
     '(id, order_id, location_id, provider_id, delivered_at) '
-    'VALUES (?, ?, ?, ?, ?)',
+    'VALUES (\$1, \$2, \$3, \$4, \$5)',
     [
       'ful_$suffix',
       order.id,
@@ -91,7 +91,7 @@ Future<void> _fulfill(
   await queryExecute(
     'INSERT INTO fulfillment_items '
     '(id, fulfillment_id, title, quantity, sku, barcode, line_item_id) '
-    "VALUES (?, ?, ?, ?, '', '', ?)",
+    "VALUES (\$1, \$2, \$3, \$4, '', '', \$5)",
     [
       'fulitem_$suffix',
       'ful_$suffix',
@@ -108,6 +108,6 @@ Future<void> _event(
   String column,
 ) =>
     queryExecute(
-      'UPDATE fulfillments SET $column = ? WHERE id = ?',
+      'UPDATE fulfillments SET $column = \$1 WHERE id = \$2',
       ['2100-01-01T12:00:00.000Z', 'ful_$suffix'],
     ).execute(harness.database.executor);
