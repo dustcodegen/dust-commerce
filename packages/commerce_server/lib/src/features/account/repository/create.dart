@@ -75,9 +75,16 @@ INSERT INTO customer_addresses
    address_2, city, province, postal_code, country_code,
    is_default_shipping, is_default_billing)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-RETURNING id, first_name, last_name, company, phone, address_1, address_2,
-          city, province, postal_code, country_code,
-          is_default_shipping, is_default_billing
+RETURNING id,
+          coalesce(first_name, '') AS first_name,
+          coalesce(last_name, '') AS last_name,
+          company, phone, address_1, address_2,
+          coalesce(city, '') AS city,
+          province,
+          coalesce(postal_code, '') AS postal_code,
+          country_code,
+          is_default_shipping = 1 AS is_default_shipping,
+          is_default_billing = 1 AS is_default_billing
 ''')
   Future<Result<CustomerAddressResponse, SqlxError>> insertAddress(
     String id,

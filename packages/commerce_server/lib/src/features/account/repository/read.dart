@@ -14,8 +14,8 @@ abstract final class AccountReadRepository {
 SELECT a.id AS auth_identity_id,
        coalesce(CAST(json_extract(p.provider_metadata, '$.password') AS TEXT),
                 '') AS password_hash,
-       CASE WHEN v.auth_identity_id IS NOT NULL AND v.verified_at IS NULL
-            THEN 1 ELSE 0 END AS requires_email_verification
+       v.auth_identity_id IS NOT NULL AND v.verified_at IS NULL
+         AS requires_email_verification
 FROM provider_identity p
 JOIN auth_identity a ON a.id = p.auth_identity_id
 JOIN customers c
@@ -34,8 +34,8 @@ WHERE p.provider = 'emailpass'
 SELECT a.id AS auth_identity_id,
        coalesce(CAST(json_extract(p.provider_metadata, '$.password') AS TEXT),
                 '') AS password_hash,
-       CASE WHEN v.auth_identity_id IS NOT NULL AND v.verified_at IS NULL
-            THEN 1 ELSE 0 END AS requires_email_verification
+       v.auth_identity_id IS NOT NULL AND v.verified_at IS NULL
+         AS requires_email_verification
 FROM provider_identity p
 JOIN auth_identity a ON a.id = p.auth_identity_id
 JOIN customers c

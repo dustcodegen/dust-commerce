@@ -25,10 +25,7 @@ final class PasswordCredential with _$PasswordCredential {
   final String passwordHash;
 
   /// Whether this identity owns an unfinished verification record.
-  @Sqlx(
-    rename: 'requires_email_verification',
-    tryFrom: AccountBoolFromInt(),
-  )
+  @Sqlx(rename: 'requires_email_verification')
   final bool requiresEmailVerification;
 }
 
@@ -112,11 +109,11 @@ final class CustomerAddressResponse with _$CustomerAddressResponse {
   final String id;
 
   /// Whether this is the customer's default billing address.
-  @Sqlx(rename: 'is_default_billing', tryFrom: AccountBoolFromInt())
+  @Sqlx(rename: 'is_default_billing')
   final bool isDefaultBilling;
 
   /// Whether this is the customer's default shipping address.
-  @Sqlx(rename: 'is_default_shipping', tryFrom: AccountBoolFromInt())
+  @Sqlx(rename: 'is_default_shipping')
   final bool isDefaultShipping;
 
   /// Recipient family name.
@@ -148,13 +145,4 @@ final class CustomerAddressListResponse with _$CustomerAddressListResponse {
 
   /// Number of active addresses.
   final int count;
-}
-
-/// Converts SQLite integer flags at the row boundary.
-final class AccountBoolFromInt implements SqlxTryFrom<bool, int> {
-  /// Creates the stateless converter.
-  const AccountBoolFromInt();
-
-  @override
-  bool decode(int value) => value != 0;
 }

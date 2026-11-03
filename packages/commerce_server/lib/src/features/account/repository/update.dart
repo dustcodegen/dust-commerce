@@ -73,9 +73,16 @@ SET first_name = $3, last_name = $4, company = $5, phone = $6,
     postal_code = $11, country_code = $12,
     is_default_shipping = $13, is_default_billing = $14
 WHERE id = $1 AND customer_id = $2 AND deleted_at IS NULL
-RETURNING id, first_name, last_name, company, phone, address_1, address_2,
-          city, province, postal_code, country_code,
-          is_default_shipping, is_default_billing
+RETURNING id,
+          coalesce(first_name, '') AS first_name,
+          coalesce(last_name, '') AS last_name,
+          company, phone, address_1, address_2,
+          coalesce(city, '') AS city,
+          province,
+          coalesce(postal_code, '') AS postal_code,
+          country_code,
+          is_default_shipping = 1 AS is_default_shipping,
+          is_default_billing = 1 AS is_default_billing
 ''')
   Future<Result<CustomerAddressResponse?, SqlxError>> updateAddress(
     String id,
