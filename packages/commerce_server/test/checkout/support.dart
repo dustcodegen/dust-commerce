@@ -19,7 +19,7 @@ final class CheckoutHarness {
     DateTime Function()? now,
   }) async {
     final directory = await Directory.systemTemp.createTemp('commerce_co');
-    final database = CommerceDatabase.open(
+    final database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );

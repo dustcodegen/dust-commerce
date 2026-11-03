@@ -49,6 +49,9 @@ String _testDatabaseUrl() =>
     Platform.environment['DUST_DATABASE_URL'] ??
     'postgres://dust:dust@127.0.0.1:5432/dust_commerce?sslmode=disable';
 
+/// Returns the configured database URL for isolated test connections.
+String commerceTestDatabaseUrl() => _testDatabaseUrl();
+
 /// Compatibility query used by pre-0.3 tests; production handlers use checked
 /// Dust queries or the database facade's explicit [UnsafeSql] escape hatch.
 final class CommerceRawQuery {

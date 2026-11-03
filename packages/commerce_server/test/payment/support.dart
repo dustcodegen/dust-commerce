@@ -13,7 +13,7 @@ final class PaymentTestContext {
 
   static Future<PaymentTestContext> start() async {
     final directory = await Directory.systemTemp.createTemp('commerce_pay');
-    final database = CommerceDatabase.open(
+    final database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );

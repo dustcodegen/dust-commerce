@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 void main() {
   test('applied promotions freeze their customer-facing policy', () async {
     final directory = await Directory.systemTemp.createTemp('promotion_schema');
-    final database = CommerceDatabase.open(
+    final database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );

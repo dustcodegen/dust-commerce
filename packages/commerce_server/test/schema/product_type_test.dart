@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 void main() {
   test('products reference normalized product types', () async {
     final directory = await Directory.systemTemp.createTemp('product_type');
-    final database = CommerceDatabase.open(
+    final database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );

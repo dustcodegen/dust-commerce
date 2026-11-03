@@ -12,7 +12,7 @@ void main() {
   late CatalogListRepository lists;
   setUp(() async {
     directory = await Directory.systemTemp.createTemp('commerce_repo');
-    database = CommerceDatabase.open(
+    database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );

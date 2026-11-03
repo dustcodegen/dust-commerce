@@ -22,7 +22,7 @@ void main() {
 
   test('registration answers 429 when Argon2 capacity is occupied', () async {
     final directory = await Directory.systemTemp.createTemp('commerce_limit');
-    final database = CommerceDatabase.open(
+    final database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );
@@ -54,7 +54,7 @@ void main() {
   test('password rotation answers 429 when Argon2 capacity is occupied',
       () async {
     final directory = await Directory.systemTemp.createTemp('password_limit');
-    final database = CommerceDatabase.open(
+    final database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );

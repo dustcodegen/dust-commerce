@@ -16,7 +16,7 @@ void main() {
   setUp(() async {
     counter = 0;
     directory = await Directory.systemTemp.createTemp('commerce_promo');
-    database = CommerceDatabase.open(
+    database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );

@@ -141,7 +141,7 @@ final class _AccountHarness {
 
   static Future<_AccountHarness> start() async {
     final directory = await Directory.systemTemp.createTemp('commerce_auth');
-    final database = CommerceDatabase.open(
+    final database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );

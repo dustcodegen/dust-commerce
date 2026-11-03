@@ -10,7 +10,7 @@ final class AccountTestHarness {
 
   static Future<AccountTestHarness> start() async {
     final directory = await Directory.systemTemp.createTemp('commerce_account');
-    final database = CommerceDatabase.open(
+    final database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );

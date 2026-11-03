@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 void main() {
   test('development seed is complete and idempotent', () async {
     final directory = await Directory.systemTemp.createTemp('commerce_seed');
-    final database = CommerceDatabase.open(
+    final database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );
@@ -83,7 +83,7 @@ void main() {
 
   test('demo catalogue adds a varied second admin page', () async {
     final directory = await Directory.systemTemp.createTemp('commerce_demo');
-    final database = CommerceDatabase.open(
+    final database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );
@@ -121,7 +121,7 @@ void main() {
 
   test('support inbox seed is varied and idempotent', () async {
     final directory = await Directory.systemTemp.createTemp('commerce_support');
-    final database = CommerceDatabase.open(
+    final database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );

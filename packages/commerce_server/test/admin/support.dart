@@ -21,7 +21,7 @@ final class AdminHarness {
   /// Starts a migrated app with one bootstrapped administrator.
   static Future<AdminHarness> start({bool seedStore = false}) async {
     final directory = await Directory.systemTemp.createTemp('commerce_admin');
-    final database = CommerceDatabase.open(
+    final database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );

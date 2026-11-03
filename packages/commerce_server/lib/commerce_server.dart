@@ -29,3 +29,4 @@ export 'src/infra/database.dart';
 export 'src/infra/development_seed.dart';
 export 'src/infra/smtp_email_verification_mailer.dart';
 export 'src/infra/smtp_order_transfer_mailer.dart';
+export 'src/infra/test_database.dart';

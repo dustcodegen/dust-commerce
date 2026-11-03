@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 void main() {
   test('updated_at is maintained by SQLite on mutable rows', () async {
     final directory = await Directory.systemTemp.createTemp('commerce_touch');
-    final database = CommerceDatabase.open(
+    final database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );
