@@ -165,9 +165,9 @@ final class _PaginationEllipsis extends StatelessWidget {
   const _PaginationEllipsis();
 
   @override
-  Widget build(BuildContext context) => const TranslatedText.dynamic(
+  Widget build(BuildContext context) => const TranslatedText(
         'shop_pagination_ellipsis',
-        fallback: '...',
+        defaultText: '...',
         style: _paginationMutedTextStyle,
       );
 }
