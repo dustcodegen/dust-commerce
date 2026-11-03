@@ -51,6 +51,11 @@ the pinned DTC source has no equivalent route.
 | `payment-providers` store API | checkout payment choices | implemented with Medusa's `region_id` query contract, a direct SQLx response allowlist, stable ordering, and selection enforcement against enabled regional configuration |
 | categories and collections routes | product organisation | implemented in #18 with real API metadata, filtering, hierarchy, sorting and paging; the compact collection grid and shared footer passed rendered comparison, and the router normalizes Medusa catch-all links such as `/categories/clothing/shirts` into Dust's encoded typed-handle form |
 
+The opt-in development seed now supplies the same seven default region-policy
+values as the current Medusa seed for both local regions. Existing custom
+metadata is preserved; only a missing region value is filled, so local policy
+pages render useful defaults without overwriting merchant settings.
+
 ## Theme and selection map
 
 These values come from the light tokens in
