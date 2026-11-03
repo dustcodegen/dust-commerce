@@ -19,7 +19,7 @@ void main() {
 
   setUp(() async {
     directory = await Directory.systemTemp.createTemp('account_view_model');
-    database = CommerceDatabase.open(
+    database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );

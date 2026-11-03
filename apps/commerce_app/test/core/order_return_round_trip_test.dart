@@ -12,7 +12,7 @@ import 'support.dart';
 void main() {
   test('generated client requests a return for an owned paid order', () async {
     final directory = await Directory.systemTemp.createTemp('return_client');
-    final database = CommerceDatabase.open(
+    final database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );

@@ -53,11 +53,11 @@ final class OptionFailureApi implements CommerceApi {
 
 Future<void> seedListingPage(CommerceDatabase database) async {
   await queryExecute(
-    'INSERT INTO product_categories (id, name, handle) VALUES (?, ?, ?)',
+    r'INSERT INTO product_categories (id, name, handle) VALUES ($1, $2, $3)',
     ['cat_accessories', 'Accessories', 'accessories'],
   ).execute(database.executor);
   await queryExecute(
-    'INSERT INTO product_tags (id, value) VALUES (?, ?)',
+    r'INSERT INTO product_tags (id, value) VALUES ($1, $2)',
     ['tag_gift', 'Gift'],
   ).execute(database.executor);
   for (var index = 1; index <= 13; index++) {
@@ -65,7 +65,7 @@ Future<void> seedListingPage(CommerceDatabase database) async {
     final categoryId = index == 13 ? 'cat_accessories' : 'cat_shirts';
     await queryExecute(
       'INSERT INTO products '
-      '(id, collection_id, title, handle, status) VALUES (?, ?, ?, ?, ?)',
+      r'(id, collection_id, title, handle, status) VALUES ($1, $2, $3, $4, $5)',
       [
         'prod_$suffix',
         'col_summer',
@@ -76,29 +76,29 @@ Future<void> seedListingPage(CommerceDatabase database) async {
     ).execute(database.executor);
     await queryExecute(
       'INSERT INTO product_variants '
-      '(id, product_id, title, inventory_quantity) VALUES (?, ?, ?, ?)',
+      r'(id, product_id, title, inventory_quantity) VALUES ($1, $2, $3, $4)',
       ['var_$suffix', 'prod_$suffix', 'Default', 10],
     ).execute(database.executor);
     await queryExecute(
       'INSERT INTO variant_prices '
-      '(variant_id, currency_code, amount) VALUES (?, ?, ?)',
+      r'(variant_id, currency_code, amount) VALUES ($1, $2, $3)',
       ['var_$suffix', 'usd', index * 100],
     ).execute(database.executor);
     if (index == 13) {
       await queryExecute(
         'INSERT INTO variant_original_prices '
-        '(variant_id, currency_code, amount) VALUES (?, ?, ?)',
+        r'(variant_id, currency_code, amount) VALUES ($1, $2, $3)',
         ['var_$suffix', 'usd', 1700],
       ).execute(database.executor);
     }
     await queryExecute(
       'INSERT INTO product_category_products '
-      '(product_id, category_id) VALUES (?, ?)',
+      r'(product_id, category_id) VALUES ($1, $2)',
       ['prod_$suffix', categoryId],
     ).execute(database.executor);
     if (index == 13) {
       await queryExecute(
-        'INSERT INTO product_tag_products (product_id, tag_id) VALUES (?, ?)',
+        r'INSERT INTO product_tag_products (product_id, tag_id) VALUES ($1, $2)',
         ['prod_$suffix', 'tag_gift'],
       ).execute(database.executor);
     }

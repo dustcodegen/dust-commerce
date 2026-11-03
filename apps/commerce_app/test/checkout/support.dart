@@ -30,7 +30,7 @@ final class CheckoutTestContext {
   static Future<CheckoutTestContext> start() async {
     final directory =
         await Directory.systemTemp.createTemp('checkout_view_model');
-    final database = CommerceDatabase.open(
+    final database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );

@@ -17,7 +17,7 @@ void main() {
 
   setUp(() async {
     directory = await Directory.systemTemp.createTemp('cart_region_model');
-    database = CommerceDatabase.open(
+    database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );

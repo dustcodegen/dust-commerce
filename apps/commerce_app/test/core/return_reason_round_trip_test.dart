@@ -10,7 +10,7 @@ void main() {
   test('generated client reads one public return-reason page', () async {
     final directory =
         await Directory.systemTemp.createTemp('return_reason_client');
-    final database = CommerceDatabase.open(
+    final database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );
