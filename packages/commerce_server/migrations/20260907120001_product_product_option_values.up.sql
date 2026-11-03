@@ -25,6 +25,32 @@ ON product_product_option_values (product_option_value_id)
 WHERE deleted_at IS NULL;
 
 -- A product can only expose values owned by its linked option.
+CREATE OR REPLACE FUNCTION product_product_option_values_validate_option()
+RETURNS TRIGGER
+LANGUAGE PLPGSQL
+AS $$
+DECLARE
+  linked_option_id TEXT;
+  value_option_id TEXT;
+BEGIN
+  SELECT product_option_id INTO linked_option_id
+  FROM product_product_options
+  WHERE id = NEW.product_product_option_id;
+  SELECT option_id INTO value_option_id
+  FROM product_option_values
+  WHERE id = NEW.product_option_value_id;
+  IF linked_option_id IS NULL OR value_option_id IS NULL
+     OR linked_option_id <> value_option_id THEN
+    RAISE EXCEPTION 'product option value does not belong to linked option';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER product_product_option_values_validate_option
+BEFORE INSERT OR UPDATE ON product_product_option_values
+FOR EACH ROW
+EXECUTE FUNCTION product_product_option_values_validate_option();
 
 
 

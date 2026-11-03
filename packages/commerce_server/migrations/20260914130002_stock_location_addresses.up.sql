@@ -35,7 +35,7 @@ CREATE TABLE stock_location_addresses (
     province IS NULL OR length(trim(province)) BETWEEN 1 AND 255
   ),
   -- Merchant extension data remains private and valid JSON when present.
-  metadata     TEXT,
+  metadata     TEXT CHECK (metadata IS NULL OR jsonb_typeof(metadata::JSONB) IS NOT NULL),
   -- PostgreSQL owns the creation instant for every address writer.
   created_at TIMESTAMPTZ NOT NULL DEFAULT
                (CURRENT_TIMESTAMP),

@@ -6,7 +6,7 @@ CREATE TABLE fulfillment_providers (
   -- Merchant-facing name explains the adapter without exposing configuration.
   name       TEXT NOT NULL CHECK (length(trim(name)) BETWEEN 1 AND 255),
   -- Provider registration metadata stays private and valid JSON when present.
-  metadata   TEXT,
+  metadata   TEXT CHECK (metadata IS NULL OR jsonb_typeof(metadata::JSONB) IS NOT NULL),
   -- PostgreSQL owns the creation instant for every provider registration.
   created_at TIMESTAMPTZ NOT NULL DEFAULT
              (CURRENT_TIMESTAMP),

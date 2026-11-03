@@ -22,6 +22,35 @@ CREATE INDEX idx_product_shipping_profile_active_profile
 ON product_shipping_profile (shipping_profile_id, product_id)
 WHERE deleted_at IS NULL;
 
+-- New products receive the active default unless Admin later replaces it.
+CREATE OR REPLACE FUNCTION product_shipping_profile_attach_default()
+RETURNS TRIGGER
+LANGUAGE PLPGSQL
+AS $$
+DECLARE
+  profile_id TEXT;
+BEGIN
+  SELECT id INTO profile_id
+  FROM shipping_profile
+  WHERE deleted_at IS NULL
+  ORDER BY CASE type WHEN 'default' THEN 0 ELSE 1 END, created_at, id
+  LIMIT 1;
+  IF profile_id IS NOT NULL THEN
+    INSERT INTO product_shipping_profile (id, product_id, shipping_profile_id)
+    VALUES ('prodsp_' || md5(random()::text || clock_timestamp()::text),
+            NEW.id, profile_id)
+    ON CONFLICT (product_id) WHERE deleted_at IS NULL DO NOTHING;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER product_shipping_profile_attach_product_after_insert
+AFTER INSERT ON products
+FOR EACH ROW
+WHEN (NEW.deleted_at IS NULL)
+EXECUTE FUNCTION product_shipping_profile_attach_default();
+
 -- The PostgreSQL trigger maintains updated_at for every writer.
 
 
