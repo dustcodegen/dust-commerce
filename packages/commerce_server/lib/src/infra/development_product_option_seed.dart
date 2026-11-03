@@ -2,11 +2,12 @@ part of 'development_seed.dart';
 
 final _productOptionStatements = <_Statement>[
   const _Statement(r'''
-INSERT OR IGNORE INTO product_options (id, title, is_exclusive)
+INSERT INTO product_options (id, title, is_exclusive)
 VALUES ('opt_size', 'Size', 0), ('opt_color', 'Color', 0)
+ON CONFLICT DO NOTHING
 '''),
   const _Statement(r'''
-INSERT OR IGNORE INTO product_option_values (id, option_id, value, rank)
+INSERT INTO product_option_values (id, option_id, value, rank)
 VALUES
   ('optval_size_s', 'opt_size', 'S', 0),
   ('optval_size_m', 'opt_size', 'M', 1),
@@ -14,9 +15,10 @@ VALUES
   ('optval_size_xl', 'opt_size', 'XL', 3),
   ('optval_color_black', 'opt_color', 'Black', 0),
   ('optval_color_white', 'opt_color', 'White', 1)
+ON CONFLICT DO NOTHING
 '''),
   const _Statement(r'''
-INSERT OR IGNORE INTO product_product_options
+INSERT INTO product_product_options
   (id, product_id, product_option_id)
 VALUES
   ('prodopt_tshirt_size', 'prod_tshirt', 'opt_size'),
@@ -24,9 +26,10 @@ VALUES
   ('prodopt_sweatshirt_size', 'prod_sweatshirt', 'opt_size'),
   ('prodopt_sweatpants_size', 'prod_sweatpants', 'opt_size'),
   ('prodopt_shorts_size', 'prod_shorts', 'opt_size')
+ON CONFLICT DO NOTHING
 '''),
   const _Statement(r'''
-INSERT OR IGNORE INTO product_product_option_values
+INSERT INTO product_product_option_values
   (id, product_product_option_id, product_option_value_id)
 VALUES
   ('prodoptval_tshirt_size_s', 'prodopt_tshirt_size', 'optval_size_s'),
@@ -43,9 +46,10 @@ VALUES
   ('prodoptval_sweatpants_size_m', 'prodopt_sweatpants_size', 'optval_size_m'),
   ('prodoptval_shorts_size_s', 'prodopt_shorts_size', 'optval_size_s'),
   ('prodoptval_shorts_size_m', 'prodopt_shorts_size', 'optval_size_m')
+ON CONFLICT DO NOTHING
 '''),
   const _Statement(r'''
-INSERT OR IGNORE INTO product_variants
+INSERT INTO product_variants
   (id, product_id, title, sku, inventory_quantity)
 VALUES
   ('var_tshirt_s_black', 'prod_tshirt', 'S / Black', 'TSHIRT-S-BLACK', 20),
@@ -62,12 +66,13 @@ VALUES
   ('var_sweatpants_m', 'prod_sweatpants', 'M', 'SWEATPANTS-M', 20),
   ('var_shorts_s', 'prod_shorts', 'S', 'SHORTS-S', 20),
   ('var_shorts_m', 'prod_shorts', 'M', 'SHORTS-M', 20)
+ON CONFLICT DO NOTHING
 '''),
 ];
 
 final _variantOptionStatements = <_Statement>[
   const _Statement(r'''
-INSERT OR IGNORE INTO variant_option_values
+INSERT INTO variant_option_values
   (variant_id, option_id, option_value_id)
 VALUES
   ('var_tshirt_s_black', 'opt_size', 'optval_size_s'),
@@ -92,5 +97,6 @@ VALUES
   ('var_sweatpants_m', 'opt_size', 'optval_size_m'),
   ('var_shorts_s', 'opt_size', 'optval_size_s'),
   ('var_shorts_m', 'opt_size', 'optval_size_m')
+ON CONFLICT DO NOTHING
 '''),
 ];

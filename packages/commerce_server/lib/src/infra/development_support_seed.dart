@@ -3,7 +3,7 @@ part of 'development_seed.dart';
 /// Support fixtures cover every lifecycle without inventing customer accounts.
 const _supportStatements = <_Statement>[
   _Statement(r'''
-INSERT OR IGNORE INTO customer_service_requests (
+INSERT INTO customer_service_requests (
   id, name, email, subject, message, order_reference, status,
   resolved_at, created_at, updated_at
 )
@@ -37,5 +37,6 @@ VALUES
    'in_progress', NULL,
    strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-1 day'),
    strftime('%Y-%m-%dT%H:%M:%fZ', 'now', '-2 hours'))
+ON CONFLICT DO NOTHING
 '''),
 ];

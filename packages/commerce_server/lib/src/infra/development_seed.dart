@@ -54,28 +54,31 @@ Future<void> _seed(
 
 final _statements = <_Statement>[
   const _Statement(r'''
-INSERT OR IGNORE INTO sales_channels (id, name, description)
+INSERT INTO sales_channels (id, name, description)
 VALUES
   ('sc_web', 'Online Store', 'Primary direct-to-consumer storefront'),
   ('sc_wholesale', 'Wholesale', 'Private partner and bulk orders')
+ON CONFLICT DO NOTHING
 '''),
   const _Statement(r'''
-INSERT OR IGNORE INTO regions
+INSERT INTO regions
   (id, name, currency_code, tax_rate, countries)
 VALUES
   ('reg_eu', 'Europe', 'eur', 0, 'gb,de,dk,se,fr,es,it'),
   ('reg_us', 'United States', 'usd', 1000, 'us')
+ON CONFLICT DO NOTHING
 '''),
   const _Statement(r'''
-INSERT OR IGNORE INTO region_payment_providers (region_id, provider_id)
+INSERT INTO region_payment_providers (region_id, provider_id)
 VALUES
   ('reg_eu', 'manual'),
   ('reg_us', 'manual')
+ON CONFLICT DO NOTHING
 '''),
   ..._fulfillmentProviderStatements,
   ..._taxonomyBeforeProducts,
   const _Statement(r'''
-INSERT OR IGNORE INTO products
+INSERT INTO products
   (id, collection_id, type_id, title, handle, description, thumbnail, weight,
    status)
 VALUES
@@ -97,10 +100,11 @@ VALUES
    'Easy cotton shorts for warm days and fast builds.',
    'https://medusa-public-images.s3.eu-west-1.amazonaws.com/shorts-vintage-front.png',
    400, 'published')
+ON CONFLICT DO NOTHING
 '''),
   ..._taxonomyAfterProducts,
   const _Statement(r'''
-INSERT OR IGNORE INTO product_images (id, product_id, url, rank)
+INSERT INTO product_images (id, product_id, url, rank)
 VALUES
   ('img_tshirt_1', 'prod_tshirt',
    'https://medusa-public-images.s3.eu-west-1.amazonaws.com/tee-black-front.png', 0),
@@ -122,12 +126,13 @@ VALUES
    'https://medusa-public-images.s3.eu-west-1.amazonaws.com/shorts-vintage-front.png', 0),
   ('img_shorts_2', 'prod_shorts',
    'https://medusa-public-images.s3.eu-west-1.amazonaws.com/shorts-vintage-back.png', 1)
+ON CONFLICT DO NOTHING
 '''),
   ..._productOptionStatements,
   ..._variantPriceStatements,
   ..._variantOptionStatements,
   const _Statement(r'''
-INSERT OR IGNORE INTO product_image_variants (image_id, variant_id)
+INSERT INTO product_image_variants (image_id, variant_id)
 SELECT image.id, variant.id
 FROM product_images image
 JOIN product_variants variant ON variant.product_id = image.product_id
@@ -143,16 +148,18 @@ WHERE image.product_id = 'prod_tshirt'
       'var_tshirt_l_white', 'var_tshirt_xl_white'
     ))
   )
+ON CONFLICT DO NOTHING
 '''),
   ..._shippingPriceStatements,
   ..._shippingOptionProviderStatements,
   const _Statement(r'''
-INSERT OR IGNORE INTO promotions
+INSERT INTO promotions
   (id, code, type, value)
 VALUES ('promo_welcome', 'WELCOME10', 'percentage', 1000)
+ON CONFLICT DO NOTHING
 '''),
   const _Statement(r'''
-INSERT OR IGNORE INTO return_reasons (id, value, label, description)
+INSERT INTO return_reasons (id, value, label, description)
 VALUES
   ('reason_wrong_size', 'wrong_size', 'Wrong size',
    'The size or fit is not right.'),
@@ -164,9 +171,10 @@ VALUES
    'The item is no longer wanted.'),
   ('reason_other', 'other', 'Other',
    'Another reason not listed above.')
+ON CONFLICT DO NOTHING
 '''),
   const _Statement(r'''
-INSERT OR IGNORE INTO refund_reasons (id, label, code, description)
+INSERT INTO refund_reasons (id, label, code, description)
 VALUES
   ('refund_reason_damaged', 'Damaged', 'damaged',
    'The delivered item was damaged or defective.'),
@@ -176,6 +184,7 @@ VALUES
    'A discretionary customer-service refund.'),
   ('refund_reason_other', 'Other', 'other',
    'Use the note to explain another refund decision.')
+ON CONFLICT DO NOTHING
 '''),
 ];
 

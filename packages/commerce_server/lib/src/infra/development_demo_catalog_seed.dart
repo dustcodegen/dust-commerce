@@ -3,11 +3,12 @@ part of 'development_seed.dart';
 /// Product rows stay explicit so demo copy, lifecycle and taxonomy are stable.
 const _demoProductStatements = <_Statement>[
   _Statement(r'''
-INSERT OR IGNORE INTO product_collections (id, title, handle)
+INSERT INTO product_collections (id, title, handle)
 VALUES ('pcol_seasonal', 'Seasonal', 'seasonal')
+ON CONFLICT DO NOTHING
 '''),
   _Statement(r'''
-INSERT OR IGNORE INTO products
+INSERT INTO products
   (id, collection_id, type_id, title, handle, description, thumbnail, weight,
    status)
 VALUES
@@ -96,5 +97,6 @@ VALUES
    'A two-axis demo tee with one intentionally unavailable combination.',
    'https://medusa-public-images.s3.eu-west-1.amazonaws.com/tee-black-front.png',
    410, 'published')
+ON CONFLICT DO NOTHING
 '''),
 ];
