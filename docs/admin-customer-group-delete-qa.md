@@ -2,8 +2,8 @@
 
 ## Scope
 
-This vertical slice implements Medusa-compatible customer-group deletion under
-issue [#33](https://github.com/dustcodegen/dust-commerce/issues/33). It includes a
+This vertical slice implements Medusa-compatible customer-group deletion in the
+admin parity ledger. It includes a
 standalone acknowledgement, guarded transactional soft deletion, generated Dio
 and Dust state, source-shaped Flutter actions, and live release-browser QA. It
 adds no migration or widget test.

@@ -3,8 +3,7 @@
 ## Scope
 
 This vertical slice closes the Created and Updated filter gap on the protected
-customer-group list under issue
-[#33](https://github.com/dustcodegen/dust-commerce/issues/33). It reuses the
+customer-group list in the admin parity ledger. It reuses the
 existing typed server query instead of adding another endpoint or migration.
 No widget test or generated-file edit was added.
 

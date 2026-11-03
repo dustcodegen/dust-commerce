@@ -33,7 +33,7 @@ update time.
 - Every UI subtree is a widget class. No widget test was added.
 
 Customer creation and detail are now covered by their own QA slices. Mutation
-and groups remain separate issue #33 responsibilities.
+and groups remain separate responsibilities in the admin parity ledger.
 
 ## Guest acquisition correction
 

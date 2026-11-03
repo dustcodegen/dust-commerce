@@ -2,8 +2,8 @@
 
 ## Scope
 
-This vertical slice implements Medusa-compatible customer-group editing under
-issue [#33](https://github.com/dustcodegen/dust-commerce/issues/33). It includes a
+This vertical slice implements Medusa-compatible customer-group editing in the
+admin parity ledger. It includes a
 standalone Admin input, guarded server mutation, generated Dio and Dust command
 state, source-shaped Flutter drawer and live release-browser QA. It adds no
 schema migration or widget test.

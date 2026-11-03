@@ -79,8 +79,8 @@ customer fixture was available, so same-state pixel parity is not claimed.
 - `admin_app`: Flutter analyzer clean; 121 non-widget tests passed.
 - Dust checks: 48 Admin-contract, 131 server, 43 Admin-app and 118 database
   projections clean with zero stale outputs.
-- The largest touched handwritten UI file remains 165 lines; generated files
-  were committed exactly as emitted.
+- The largest touched handwritten UI file remains 165 lines; generated output
+  is ignored, rebuilt, and validated by Dust in CI.
 - Changed-slice scans found no private widget-building method and no nested
   `Result`; repo-wide legacy findings remain tracked separately.
 

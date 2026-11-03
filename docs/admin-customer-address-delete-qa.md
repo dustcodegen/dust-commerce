@@ -2,8 +2,8 @@
 
 ## Scope
 
-This slice implements Medusa-compatible customer-address deletion under issue
-[#33](https://github.com/dustcodegen/dust-commerce/issues/33). It does not invent
+This slice implements Medusa-compatible customer-address deletion in the admin
+parity ledger. It does not invent
 an address edit screen absent from the pinned Admin source, add customer groups
 or RBAC, or add widget tests.
 
@@ -80,4 +80,4 @@ covered through real server/database integration tests.
 
 Address update remains API-only in Medusa and is not yet implemented here.
 Customer groups, group membership, RBAC and same-state Medusa raster comparison
-remain under issue #33.
+remain separate tracked slices.

@@ -2,8 +2,8 @@
 
 ## Scope
 
-This slice implements Medusa-compatible address creation under issue
-[#33](https://github.com/dustcodegen/dust-commerce/issues/33). It does not add
+This slice implements Medusa-compatible address creation in the admin parity
+ledger. It does not add
 address update/delete, customer groups, RBAC, or widget tests.
 
 Stacked commits keep each responsibility independently reviewable:
@@ -76,9 +76,9 @@ one-column compact form without a blank alignment row.
 - SQLx CLI 0.8.6 ran all 60 migrations, reverted to zero application tables and
   ran all migrations again.
 - Every touched handwritten Dart file remains within 180 code lines. Generated
-  output is committed exactly as emitted.
+  output is ignored, rebuilt, and validated by Dust in CI.
 
 ## Remaining parity boundary
 
 Address update/delete, customer groups, group membership, and a same-state
-running Medusa Admin raster comparison remain under issue #33.
+running Medusa Admin raster comparison remain separate tracked slices.

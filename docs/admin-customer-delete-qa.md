@@ -2,8 +2,8 @@
 
 ## Scope
 
-This slice implements Medusa-compatible Admin customer deletion under issue
-[#33](https://github.com/dustcodegen/dust-commerce/issues/33). It does not add
+This slice implements Medusa-compatible Admin customer deletion in the admin
+parity ledger. It does not add
 address mutation, customer groups, RBAC, or widget tests.
 
 Stacked commits keep each responsibility independently reviewable:
@@ -88,12 +88,12 @@ persistence effects are exercised by the non-widget integration suites.
 - The new root-only `scripts/verify_package.sh` rejects a package working
   directory and passes the Admin package using the Flutter runner.
 - Every touched handwritten Dart file is within 180 lines. Generated output is
-  committed exactly as emitted.
+  ignored, rebuilt, and validated by Dust in CI.
 - Repository-wide gates still report their inherited five formatting, six
   file-size and 22 backend-name structure violations outside this slice.
 
 ## Remaining parity boundary
 
-Customer address mutations, customer groups and group membership remain under
-issue #33. A same-state running Medusa Admin raster was unavailable, so source
+Customer address mutations, customer groups and group membership remain
+separate slices. A same-state running Medusa Admin raster was unavailable, so source
 and responsive interaction parity are proven here, not pixel identity.

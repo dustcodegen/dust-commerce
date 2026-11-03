@@ -2,8 +2,8 @@
 
 ## Scope
 
-This slice implements Medusa-compatible customer-group discovery under issue
-[#33](https://github.com/dustcodegen/dust-commerce/issues/33). It does not add
+This slice implements Medusa-compatible customer-group discovery in the admin
+parity ledger. It does not add
 group creation, detail, edit, deletion, membership mutation, address update or
 widget tests. Unsupported actions are absent instead of appearing functional.
 
@@ -90,4 +90,4 @@ Authenticated browser QA verified:
 
 Customer-group creation is the next vertical slice. Detail, edit, deletion,
 membership mutation, address update and a same-state Medusa Admin raster
-comparison remain tracked under issue #33.
+comparison remain separate tracked slices.

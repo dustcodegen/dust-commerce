@@ -2,8 +2,8 @@
 
 ## Scope
 
-This vertical slice implements Medusa-compatible customer-group creation under
-issue [#33](https://github.com/dustcodegen/dust-commerce/issues/33). It adds the
+This vertical slice implements Medusa-compatible customer-group creation in the
+admin parity ledger. It adds the
 standalone Admin request and response contracts, guarded server operation,
 generated Dio command state, source-matched focus form and live browser QA.
 
@@ -113,4 +113,4 @@ Authenticated browser QA verified:
 
 Customer-group detail is next because Medusa creation routes directly to it.
 Edit, deletion, membership add/remove, customer-address update and same-state
-Medusa raster comparison remain tracked under issue #33.
+Medusa raster comparison remain separate tracked slices.

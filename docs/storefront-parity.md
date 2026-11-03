@@ -14,8 +14,9 @@ right-side drawer, country-prefixed links and the `/buy/[items]` route; this
 repository tracks those as tested slices instead of treating an older raster
 comparison as frozen truth.
 
-Progress is tracked in [GitHub issue #29](https://github.com/dustcodegen/dust-commerce/issues/29)
-and the `Medusa DTC storefront parity` milestone.
+This document is the current storefront parity ledger. The public repository
+currently has no linked issue or milestone for this work, so status claims here
+must be backed by the source, tests and browser evidence recorded below.
 
 The functional Customer Service route is documented in
 [customer-service-qa.md](customer-service-qa.md) as a Morrow extension because

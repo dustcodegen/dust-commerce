@@ -71,5 +71,5 @@ running Medusa Admin was not available, so pixel parity is not claimed.
 
 Customer deletion is now covered by `admin-customer-delete-qa.md`. Address
 mutations, customer groups and group membership remain separate vertical slices
-under issue #33. Registered email changes remain an account-ownership operation
+in the admin parity ledger. Registered email changes remain an account-ownership operation
 and are intentionally rejected by this profile editor.

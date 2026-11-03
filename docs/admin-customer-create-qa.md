@@ -65,8 +65,8 @@ running Medusa Admin was not available, so pixel parity is not claimed.
 - `admin_app`: analyzer clean; 124 non-widget tests passed.
 - Dust checks: 132 server, 119 database projections and 45 Admin-app outputs
   clean with zero stale outputs.
-- Every touched handwritten file remains within 180 lines. Generated files were
-  committed exactly as emitted.
+- Every touched handwritten file remains within 180 lines. Generated output is
+  ignored, rebuilt, and validated by Dust in CI.
 - Changed-slice scans found no private widget-building method and no nested
   `Result` signature.
 - Repository-wide format and file-size gates still report inherited files
@@ -75,10 +75,8 @@ running Medusa Admin was not available, so pixel parity is not claimed.
 ## Remaining parity boundary
 
 Customer edit and deletion are now covered by their dedicated QA documents.
-Address mutations and customer groups remain separate vertical slices under
-issue #33. Customer creation intentionally makes a non-authenticating guest
+Address mutations and customer groups remain separate vertical slices in this
+ledger. Customer creation intentionally makes a non-authenticating guest
 profile; Store account registration remains the only password-bearing customer
-flow.
-
-GitHub issue #33 remains open in the `Medusa admin parity` milestone so those
-capability boundaries stay visible rather than being implied complete.
+flow. Those capability boundaries stay visible here rather than being implied
+complete by an external tracker.
