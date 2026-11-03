@@ -102,6 +102,13 @@ VALUES
    400, 'published')
 ON CONFLICT DO NOTHING
 '''),
+  const _Statement(r'''
+INSERT INTO product_shipping_profile (id, product_id, shipping_profile_id)
+SELECT 'prodsp_' || product.id, product.id, 'sp_default'
+FROM products product
+WHERE product.deleted_at IS NULL
+ON CONFLICT DO NOTHING
+'''),
   ..._taxonomyAfterProducts,
   const _Statement(r'''
 INSERT INTO product_images (id, product_id, url, rank)

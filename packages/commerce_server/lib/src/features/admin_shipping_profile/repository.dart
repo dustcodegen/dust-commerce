@@ -118,7 +118,7 @@ LIMIT 1
   /// Soft-deletes the current assignment before replacement or clearing.
   @Query(r'''
 UPDATE product_shipping_profile
-SET deleted_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+SET deleted_at = CURRENT_TIMESTAMP
 WHERE product_id = $1 AND deleted_at IS NULL
 ''')
   Future<Result<ExecResult, SqlxError>> removeCurrent(String productId);

@@ -77,9 +77,9 @@ final class AdminProductShippingProfileResponse
 }
 
 final class _AdminShippingProfileUtcDateTime
-    implements SqlxTryFrom<DateTime, String> {
+    implements SqlxTryFrom<DateTime, DateTime> {
   const _AdminShippingProfileUtcDateTime();
 
   @override
-  DateTime decode(String value) => DateTime.parse(value).toUtc();
+  DateTime decode(DateTime value) => value.toUtc();
 }

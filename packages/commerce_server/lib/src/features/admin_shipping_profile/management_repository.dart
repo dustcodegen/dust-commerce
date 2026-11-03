@@ -37,7 +37,7 @@ RETURNING id, name, type, created_at, updated_at
   /// Soft-deletes one active profile using a database-generated UTC instant.
   @Query(r'''
 UPDATE shipping_profile
-SET deleted_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+SET deleted_at = CURRENT_TIMESTAMP
 WHERE id = $1 AND deleted_at IS NULL
 ''')
   Future<Result<ExecResult, SqlxError>> retire(String id);
@@ -45,7 +45,7 @@ WHERE id = $1 AND deleted_at IS NULL
   /// Retires active product links when their profile is retired.
   @Query(r'''
 UPDATE product_shipping_profile
-SET deleted_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+SET deleted_at = CURRENT_TIMESTAMP
 WHERE shipping_profile_id = $1 AND deleted_at IS NULL
 ''')
   Future<Result<ExecResult, SqlxError>> retireProductLinks(String id);

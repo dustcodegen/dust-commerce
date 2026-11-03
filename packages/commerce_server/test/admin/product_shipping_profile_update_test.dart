@@ -46,7 +46,7 @@ WHERE product_id = 'prod_tshirt'
 ORDER BY created_at, id
 ''');
     expect(rows, hasLength(2));
-    expect(rows.where((row) => row.readIndex<int>(1) == 1), hasLength(1));
+    expect(rows.where((row) => row.readIndex<bool>(1)), hasLength(1));
   });
 
   test('null clears the optional product profile', () async {
