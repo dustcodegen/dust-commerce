@@ -17,6 +17,7 @@ env:
   DUST_VERSION: v0.3.0
   DUST_LINUX_X64_SHA256: dd9cc1bdd44a282a4f1eeea9ae5c6f60da61b5e3d543c66d093cce1b35eca115
   FLUTTER_VERSION: 3.44.1
+  DUST_DATABASE_URL: postgres://dust:dust@127.0.0.1:5432/dust_commerce?sslmode=disable
 
 jobs:
   package:
@@ -24,6 +25,20 @@ jobs:
     if: github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: dust
+          POSTGRES_PASSWORD: dust
+          POSTGRES_DB: dust_commerce
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U dust -d dust_commerce"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
     steps:
       - name: Checkout the verified revision
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
