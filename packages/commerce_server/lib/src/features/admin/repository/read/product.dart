@@ -35,7 +35,7 @@ SELECT product.id, product.title, product.subtitle, product.handle,
            AND link.deleted_at IS NULL
            AND profile.deleted_at IS NULL
          LIMIT 1
-       ), 'null') AS shipping_profile,
+       ), 'null')::text AS shipping_profile,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.image_json))
          FROM (
@@ -52,7 +52,7 @@ SELECT product.id, product.title, product.subtitle, product.handle,
            WHERE image.product_id = product.id AND image.deleted_at IS NULL
            ORDER BY image.rank, image.id
          ) ordered
-       ), '[]') AS images,
+       ), '[]')::text AS images,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.option_json))
          FROM (
@@ -79,7 +79,7 @@ SELECT product.id, product.title, product.subtitle, product.handle,
              AND option.deleted_at IS NULL
            ORDER BY link.id
          ) ordered
-       ), '[]') AS options,
+       ), '[]')::text AS options,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.variant_json))
          FROM (
@@ -124,7 +124,7 @@ SELECT product.id, product.title, product.subtitle, product.handle,
              AND variant.deleted_at IS NULL
            ORDER BY variant.id
          ) ordered
-       ), '[]') AS variants,
+       ), '[]')::text AS variants,
        coalesce((
          SELECT array_agg(category.name ORDER BY link.rank, category.name)
          FROM product_category_products link

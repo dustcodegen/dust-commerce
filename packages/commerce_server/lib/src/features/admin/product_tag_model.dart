@@ -55,9 +55,9 @@ final class AdminProductTagListResponse with _$AdminProductTagListResponse {
   final List<AdminProductTagResponse> productTags;
 }
 
-final class _AdminUtcDateTime implements SqlxTryFrom<DateTime, String> {
+final class _AdminUtcDateTime implements SqlxTryFrom<DateTime, DateTime> {
   const _AdminUtcDateTime();
 
   @override
-  DateTime decode(String value) => DateTime.parse(value).toUtc();
+  DateTime decode(DateTime value) => value.toUtc();
 }

@@ -28,7 +28,7 @@ SELECT product.id,
              AND channel.deleted_at IS NULL
            ORDER BY lower(channel.name), channel.id
          ) ordered
-       ), '[]') AS sales_channels,
+       ), '[]')::text AS sales_channels,
        count(variant.id) AS variant_count,
        product.status
 FROM products product
