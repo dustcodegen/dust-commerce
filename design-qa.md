@@ -150,16 +150,13 @@ account, so authenticated head-to-head evidence remains open.
   Fix: capture both sites at matching desktop and mobile viewports, combine
   each pair, and run the comparison loop.
 
-- [P2] Source account content links have no production destination
+- Account content destinations are now actionable
   Location: signed-out account support and registration terms.
-  Evidence: the pinned source links to `/customer-service`,
-  `/content/privacy-policy`, and `/content/terms-of-use`, but contains no
-  customer-service route or portable Morrow policy content. The Flutter page
-  intentionally renders honest text instead of dead or invented links.
-  Impact: public sign-in and registration work, but these secondary destinations
-  are not yet actionable.
-  Fix: complete the real contact and policy routes under #20, then replace the
-  text with the shared interactive-link treatment and rerun the matched pair.
+  Evidence: Customer Service, Privacy and Terms routes are public; the
+  registration consent uses underlined actions that navigate to the local
+  `/privacy` and `/terms` equivalents of Medusa's content links.
+  Remaining limitation: a fresh matched-raster capture of the registration
+  links is still pending, so this closes the functional gap, not the visual QA.
 
 **Required fidelity surfaces**
 
@@ -392,8 +389,9 @@ unnecessary. The missing rendered source control remains the comparison limit.
   A browser validation pass rejected a tightly constrained input experiment
   because it compressed error borders; the final dense 44px controls retain
   readable expanding errors. The sign-in/register pair has no remaining P0 or
-  P1 mismatch. The missing real customer-service and policy destinations remain
-  the explicit P2 above rather than dead links.
+  P1 mismatch. The later consent-link slice replaced the former dead policy
+  text with actionable Privacy and Terms destinations; only a fresh visual
+  capture remains.
 - The initial populated-cart comparison exposed P2 regular-weight headings, an
   Item label over the product-title track, a compressed quantity column, square
   quantity control, extra final-row divider and 14px actions. The final pair
