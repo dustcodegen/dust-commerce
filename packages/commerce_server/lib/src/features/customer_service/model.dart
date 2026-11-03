@@ -22,9 +22,10 @@ final class CustomerServiceSubmissionResponse
   final String id;
 }
 
-final class _CustomerServiceDateTime implements SqlxTryFrom<DateTime, String> {
+final class _CustomerServiceDateTime
+    implements SqlxTryFrom<DateTime, DateTime> {
   const _CustomerServiceDateTime();
 
   @override
-  DateTime decode(String value) => DateTime.parse(value);
+  DateTime decode(DateTime value) => value.toUtc();
 }

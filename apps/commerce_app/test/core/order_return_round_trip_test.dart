@@ -69,14 +69,13 @@ void main() {
     await queryExecute(
       "INSERT INTO fulfillments "
       "(id, order_id, location_id, provider_id, delivered_at) "
-      "VALUES ('ful_client', ?, 'location_test', 'manual', "
-      "strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))",
+      r"VALUES ('ful_client', $1, 'location_test', 'manual', CURRENT_TIMESTAMP)",
       [paid.id],
     ).execute(database.executor);
     await queryExecute(
       "INSERT INTO fulfillment_items "
       "(id, fulfillment_id, title, quantity, sku, barcode, line_item_id) "
-      "VALUES ('fulitem_client', 'ful_client', ?, 2, '', '', ?)",
+      r"VALUES ('fulitem_client', 'ful_client', $1, 2, '', '', $2)",
       [paid.items.single.title, paid.items.single.id],
     ).execute(database.executor);
 
