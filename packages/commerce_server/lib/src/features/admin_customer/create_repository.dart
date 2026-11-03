@@ -26,7 +26,7 @@ RETURNING id,
           first_name,
           last_name,
           phone,
-          has_account,
+          has_account = 1 AS has_account,
           created_at,
           updated_at,
           '[]' AS addresses_json

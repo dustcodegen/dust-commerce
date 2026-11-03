@@ -16,7 +16,7 @@ SELECT customer.id,
        customer.email,
        customer.first_name,
        customer.last_name,
-       customer.has_account,
+       customer.has_account = 1 AS has_account,
        customer.created_at,
        customer.updated_at
 FROM customers customer

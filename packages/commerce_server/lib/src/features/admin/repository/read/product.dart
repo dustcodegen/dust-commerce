@@ -13,7 +13,8 @@ abstract final class AdminProductReadRepository {
   /// Reads every currently modeled Medusa detail section in one SQL row.
   @Query(r'''
 SELECT product.id, product.title, product.subtitle, product.handle,
-       product.description, product.discountable, product.thumbnail,
+       product.description, product.discountable = 1 AS discountable,
+       product.thumbnail,
        product.material, product.origin_country,
        product.type_id AS product_type_id,
        product_type.value AS product_type,
@@ -125,26 +126,18 @@ SELECT product.id, product.title, product.subtitle, product.handle,
          ) ordered
        ), '[]') AS variants,
        coalesce((
-         SELECT json_agg(ordered.name)
-         FROM (
-           SELECT category.name
-           FROM product_category_products link
-           JOIN product_categories category ON category.id = link.category_id
-           WHERE link.product_id = product.id
-             AND category.deleted_at IS NULL
-           ORDER BY link.rank, category.name
-         ) ordered
-       ), '[]')::text AS categories,
+         SELECT array_agg(category.name ORDER BY link.rank, category.name)
+         FROM product_category_products link
+         JOIN product_categories category ON category.id = link.category_id
+         WHERE link.product_id = product.id
+           AND category.deleted_at IS NULL
+       ), ARRAY[]::text[]) AS categories,
        coalesce((
-         SELECT json_agg(ordered.value)
-         FROM (
-           SELECT tag.value
-           FROM product_tag_products link
-           JOIN product_tags tag ON tag.id = link.tag_id
-           WHERE link.product_id = product.id AND tag.deleted_at IS NULL
-           ORDER BY tag.value
-         ) ordered
-       ), '[]')::text AS tags
+         SELECT array_agg(tag.value ORDER BY tag.value)
+         FROM product_tag_products link
+         JOIN product_tags tag ON tag.id = link.tag_id
+         WHERE link.product_id = product.id AND tag.deleted_at IS NULL
+       ), ARRAY[]::text[]) AS tags
 FROM products product
 LEFT JOIN product_collections collection
   ON collection.id = product.collection_id AND collection.deleted_at IS NULL

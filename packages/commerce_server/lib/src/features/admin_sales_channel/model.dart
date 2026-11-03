@@ -68,7 +68,7 @@ final class AdminSalesChannelDetailResponse
   final String id;
 
   /// Whether the channel rejects new commercial activity.
-  @Sqlx(rename: 'is_disabled', tryFrom: _AdminSalesChannelBoolFromInt())
+  @Sqlx(rename: 'is_disabled')
   final bool isDisabled;
 
   /// Merchant-facing sales-channel name.
@@ -106,16 +106,9 @@ final class AdminSalesChannelDetailListResponse
 }
 
 final class _AdminSalesChannelUtcDateTime
-    implements SqlxTryFrom<DateTime, String> {
+    implements SqlxTryFrom<DateTime, DateTime> {
   const _AdminSalesChannelUtcDateTime();
 
   @override
-  DateTime decode(String value) => DateTime.parse(value).toUtc();
-}
-
-final class _AdminSalesChannelBoolFromInt implements SqlxTryFrom<bool, int> {
-  const _AdminSalesChannelBoolFromInt();
-
-  @override
-  bool decode(int value) => value != 0;
+  DateTime decode(DateTime value) => value.toUtc();
 }

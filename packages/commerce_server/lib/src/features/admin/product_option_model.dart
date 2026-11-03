@@ -23,7 +23,7 @@ final class AdminProductOptionSummaryResponse
   final String id;
 
   /// False for every row in the current global-options route.
-  @Sqlx(rename: 'is_exclusive', tryFrom: _ProductOptionBoolFromInt())
+  @Sqlx(rename: 'is_exclusive')
   final bool isExclusive;
 
   /// Merchant-facing dimension name.
@@ -78,7 +78,7 @@ final class AdminProductOptionDetailResponse
   final String id;
 
   /// Whether one product owns the option.
-  @Sqlx(rename: 'is_exclusive', tryFrom: _ProductOptionBoolFromInt())
+  @Sqlx(rename: 'is_exclusive')
   final bool isExclusive;
 
   /// Active products currently using this option.
@@ -101,13 +101,6 @@ final class AdminProductOptionLink {
 
   /// Stable product-option link identifier.
   final String id;
-}
-
-final class _ProductOptionBoolFromInt implements SqlxTryFrom<bool, int> {
-  const _ProductOptionBoolFromInt();
-
-  @override
-  bool decode(int value) => value != 0;
 }
 
 final class _ProductOptionValuesSqlxJson

@@ -1,11 +1,11 @@
 part of 'payment_model.dart';
 
 final class _AdminRefundDateTimeFromString
-    implements SqlxTryFrom<DateTime, String> {
+    implements SqlxTryFrom<DateTime, DateTime> {
   const _AdminRefundDateTimeFromString();
 
   @override
-  DateTime decode(String value) => DateTime.parse(value);
+  DateTime decode(DateTime value) => value.toUtc();
 }
 
 final class _AdminRefundPaymentStatusFromString

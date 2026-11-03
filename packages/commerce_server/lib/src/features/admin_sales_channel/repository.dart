@@ -21,7 +21,8 @@ WHERE deleted_at IS NULL
 
   /// Lists enabled and disabled choices for current and historical orders.
   @Query(r'''
-SELECT id, name, description, is_disabled, created_at, updated_at
+SELECT id, name, description, is_disabled = 1 AS is_disabled,
+       created_at, updated_at
 FROM sales_channels
 WHERE deleted_at IS NULL
   AND ($1 = '' OR lower(name) LIKE '%' || lower($1) || '%')

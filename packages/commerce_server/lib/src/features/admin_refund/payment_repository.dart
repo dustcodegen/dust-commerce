@@ -60,7 +60,8 @@ WHERE id = $1 AND payment_status = 'captured' AND deleted_at IS NULL
   /// Returns the Medusa-shaped payment with active refund audits.
   @Query(r'''
 SELECT payment.id, payment.provider AS provider_id, payment.amount,
-       payment.currency_code, payment.status, payment.captured_at,
+       payment.currency_code, payment.status,
+       payment.captured_at AS "captured_at!",
        coalesce((SELECT sum(refund.amount) FROM refunds refund
                  WHERE refund.payment_collection_id = payment.id
                    AND refund.deleted_at IS NULL), 0) AS refunded_amount,

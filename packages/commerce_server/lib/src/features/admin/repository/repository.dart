@@ -47,7 +47,7 @@ WHERE NOT EXISTS (
 
   /// Lists global options with the columns used by Medusa's table.
   @Query(r'''
-SELECT option.id, option.title, option.is_exclusive,
+SELECT option.id, option.title, option.is_exclusive = 1 AS is_exclusive,
        (SELECT count(*) FROM product_option_values value
         WHERE value.option_id = option.id AND value.deleted_at IS NULL)
          AS value_count
@@ -74,7 +74,7 @@ WHERE option.deleted_at IS NULL AND option.is_exclusive = 0
 
   /// Reads one complete active product option by stable identifier.
   @Query(r'''
-SELECT option.id, option.title, option.is_exclusive,
+SELECT option.id, option.title, option.is_exclusive = 1 AS is_exclusive,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.value_json))
          FROM (

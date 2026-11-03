@@ -17,8 +17,8 @@ final class AdminPromotionResponse with _$AdminPromotionResponse {
     required this.isAutomatic,
     required this.status,
     required this.currencyCode,
-    required this.startsAtText,
-    required this.endsAtText,
+    required this.startsAt,
+    required this.endsAt,
     required this.usageLimit,
     required this.usageCount,
     required this.createdAt,
@@ -37,29 +37,27 @@ final class AdminPromotionResponse with _$AdminPromotionResponse {
   final String? currencyCode;
 
   /// Optional expiry instant.
-  @SerDe(rename: 'ends_at')
-  @Sqlx(rename: 'ends_at')
-  final String? endsAtText;
-
-  /// Optional expiry instant.
-  DateTime? get endsAt =>
-      endsAtText == null ? null : DateTime.parse(endsAtText!).toUtc();
+  @Sqlx(
+    rename: 'ends_at',
+    defaultValue: null,
+    tryFrom: _AdminPromotionUtcDateTime(),
+  )
+  final DateTime? endsAt;
 
   /// Stable promotion identifier.
   final String id;
 
   /// Medusa method column; this slice has code promotions only.
-  @Sqlx(rename: 'is_automatic', tryFrom: _AdminPromotionBoolFromInt())
+  @Sqlx(rename: 'is_automatic')
   final bool isAutomatic;
 
   /// Optional start instant.
-  @SerDe(rename: 'starts_at')
-  @Sqlx(rename: 'starts_at')
-  final String? startsAtText;
-
-  /// Optional start instant.
-  DateTime? get startsAt =>
-      startsAtText == null ? null : DateTime.parse(startsAtText!).toUtc();
+  @Sqlx(
+    rename: 'starts_at',
+    defaultValue: null,
+    tryFrom: _AdminPromotionUtcDateTime(),
+  )
+  final DateTime? startsAt;
 
   /// Derived merchant lifecycle.
   @SerDe(using: AdminPromotionStatusCodec())
@@ -121,13 +119,6 @@ final class AdminPromotionDetailResponse with _$AdminPromotionDetailResponse {
   final AdminPromotionResponse promotion;
 }
 
-final class _AdminPromotionBoolFromInt implements SqlxTryFrom<bool, int> {
-  const _AdminPromotionBoolFromInt();
-
-  @override
-  bool decode(int value) => value != 0;
-}
-
 final class _AdminPromotionStatusSqlx
     implements SqlxTryFrom<AdminPromotionStatus, String> {
   const _AdminPromotionStatusSqlx();
@@ -138,9 +129,9 @@ final class _AdminPromotionStatusSqlx
 }
 
 final class _AdminPromotionUtcDateTime
-    implements SqlxTryFrom<DateTime, String> {
+    implements SqlxTryFrom<DateTime, DateTime> {
   const _AdminPromotionUtcDateTime();
 
   @override
-  DateTime decode(String value) => DateTime.parse(value).toUtc();
+  DateTime decode(DateTime value) => value.toUtc();
 }

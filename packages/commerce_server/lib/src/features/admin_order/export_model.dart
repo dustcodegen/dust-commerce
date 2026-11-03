@@ -59,7 +59,9 @@ final class AdminOrderExportRow {
   // ignore: public_member_api_docs, avoid_multiple_declarations_per_line
   final String orderId, status, paymentStatus, fulfillmentStatus;
   // ignore: public_member_api_docs, avoid_multiple_declarations_per_line
-  final String createdAt, updatedAt, email, customerName, currencyCode;
+  final DateTime createdAt, updatedAt;
+  // ignore: public_member_api_docs, avoid_multiple_declarations_per_line
+  final String email, customerName, currencyCode;
 
   /// Required order totals represented in exact minor units.
   // ignore: public_member_api_docs, avoid_multiple_declarations_per_line
@@ -95,7 +97,10 @@ final class AdminOrderExportRow {
 
   /// Optional provider payment record values.
   // ignore: public_member_api_docs, avoid_multiple_declarations_per_line
-  final String? paymentProvider, paymentRecordStatus, paymentCapturedAt;
+  final String? paymentProvider, paymentRecordStatus;
+
+  /// Optional provider capture instant.
+  final DateTime? paymentCapturedAt;
 
   /// Optional provider payment amount in exact minor units.
   final int? paymentAmount;

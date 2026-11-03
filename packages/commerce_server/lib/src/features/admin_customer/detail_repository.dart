@@ -18,7 +18,7 @@ SELECT customer.id,
        customer.first_name,
        customer.last_name,
        customer.phone,
-       customer.has_account,
+       customer.has_account = 1 AS has_account,
        customer.created_at,
        customer.updated_at,
        coalesce((

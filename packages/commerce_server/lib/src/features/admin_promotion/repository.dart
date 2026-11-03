@@ -13,7 +13,7 @@ abstract final class AdminPromotionRepository {
   /// Lists active promotions with Medusa's table columns.
   @Query(r'''
 SELECT id, code, type, value, currency_code, starts_at, ends_at, usage_limit,
-       usage_count, created_at, updated_at, 0 AS is_automatic,
+       usage_count, created_at, updated_at, FALSE AS is_automatic,
        CASE
          WHEN starts_at IS NOT NULL
               AND starts_at > strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
@@ -88,7 +88,7 @@ WHERE deleted_at IS NULL
   /// Reads one active promotion row.
   @Query(r'''
 SELECT id, code, type, value, currency_code, starts_at, ends_at, usage_limit,
-       usage_count, created_at, updated_at, 0 AS is_automatic,
+       usage_count, created_at, updated_at, FALSE AS is_automatic,
        CASE
          WHEN starts_at IS NOT NULL
               AND starts_at > strftime('%Y-%m-%dT%H:%M:%fZ', 'now')

@@ -30,7 +30,7 @@ final class AdminCustomerResponse with _$AdminCustomerResponse {
   final String? firstName;
 
   /// Whether the profile owns sign-in credentials.
-  @Sqlx(rename: 'has_account', tryFrom: _AdminCustomerAccountFlag())
+  @Sqlx(rename: 'has_account')
   final bool hasAccount;
 
   /// Stable opaque customer identifier.
@@ -70,16 +70,10 @@ final class AdminCustomerListResponse with _$AdminCustomerListResponse {
   final int offset;
 }
 
-final class _AdminCustomerUtcDateTime implements SqlxTryFrom<DateTime, String> {
+final class _AdminCustomerUtcDateTime
+    implements SqlxTryFrom<DateTime, DateTime> {
   const _AdminCustomerUtcDateTime();
 
   @override
-  DateTime decode(String value) => DateTime.parse(value).toUtc();
-}
-
-final class _AdminCustomerAccountFlag implements SqlxTryFrom<bool, int> {
-  const _AdminCustomerAccountFlag();
-
-  @override
-  bool decode(int value) => value == 1;
+  DateTime decode(DateTime value) => value.toUtc();
 }

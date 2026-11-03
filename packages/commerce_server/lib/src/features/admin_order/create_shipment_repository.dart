@@ -12,7 +12,7 @@ abstract final class AdminCreateShipmentRepository {
 
   /// Reads route ownership and lifecycle without exposing a foreign record.
   @Query(r'''
-SELECT fulfillment.requires_shipping,
+SELECT fulfillment.requires_shipping = 1 AS requires_shipping,
        fulfillment.canceled_at IS NOT NULL AS canceled,
        fulfillment.shipped_at IS NOT NULL AS shipped,
        fulfillment.delivered_at IS NOT NULL AS delivered

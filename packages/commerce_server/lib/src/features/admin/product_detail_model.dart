@@ -38,7 +38,7 @@ final class AdminProductDetailResponse with _$AdminProductDetailResponse {
   });
 
   /// Public categories assigned to this product.
-  @Sqlx(tryFrom: _AdminProductStringsSqlxJson())
+  @Sqlx()
   final List<String> categories;
 
   /// Optional curated collection label.
@@ -49,7 +49,7 @@ final class AdminProductDetailResponse with _$AdminProductDetailResponse {
   final String? description;
 
   /// Whether promotions may reduce this product's price.
-  @Sqlx(tryFrom: _AdminBoolFromInt())
+  @Sqlx()
   final bool discountable;
 
   /// Optional height in the store's configured unit.
@@ -103,7 +103,7 @@ final class AdminProductDetailResponse with _$AdminProductDetailResponse {
   final String? subtitle;
 
   /// Public discovery tags assigned to this product.
-  @Sqlx(tryFrom: _AdminProductStringsSqlxJson())
+  @Sqlx()
   final List<String> tags;
 
   /// Optional primary merchant image.
@@ -155,24 +155,10 @@ final class _AdminProductVariantsSqlxJson
       const json.AdminProductVariantsFromJson().decode(value);
 }
 
-final class _AdminProductStringsSqlxJson
-    implements SqlxTryFrom<List<String>, String> {
-  const _AdminProductStringsSqlxJson();
-  @override
-  List<String> decode(String value) =>
-      const json.AdminProductStringsFromJson().decode(value);
-}
-
 final class _AdminProductLifecycleSqlx
     implements SqlxTryFrom<AdminProductLifecycle, String> {
   const _AdminProductLifecycleSqlx();
   @override
   AdminProductLifecycle decode(String value) =>
       AdminProductLifecycle.values.byName(value);
-}
-
-final class _AdminBoolFromInt implements SqlxTryFrom<bool, int> {
-  const _AdminBoolFromInt();
-  @override
-  bool decode(int value) => value != 0;
 }

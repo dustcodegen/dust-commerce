@@ -47,7 +47,7 @@ final class AdminReturnResponse with _$AdminReturnResponse {
   final List<AdminReturnItemResponse> items;
 
   /// Notification suppression retained without provider internals.
-  @Sqlx(rename: 'no_notification', tryFrom: _ReturnBool())
+  @Sqlx(rename: 'no_notification')
   final bool noNotification;
 
   /// Frozen order associated with this return.
@@ -101,18 +101,11 @@ final class AdminReturnListResponse with _$AdminReturnListResponse {
   final List<AdminReturnResponse> returns;
 }
 
-final class _ReturnBool implements SqlxTryFrom<bool, int> {
-  const _ReturnBool();
-
-  @override
-  bool decode(int value) => value != 0;
-}
-
-final class _ReturnDateTime implements SqlxTryFrom<DateTime, String> {
+final class _ReturnDateTime implements SqlxTryFrom<DateTime, DateTime> {
   const _ReturnDateTime();
 
   @override
-  DateTime decode(String value) => DateTime.parse(value).toUtc();
+  DateTime decode(DateTime value) => value.toUtc();
 }
 
 final class _ReturnItems
