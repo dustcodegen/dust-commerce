@@ -2,6 +2,34 @@ part of 'cart_view_model.dart';
 
 /// Persisted-cart recovery and checkout completion.
 extension CartRestore on CartViewModel {
+  /// Loads an externally supplied open-cart capability for checkout handoff.
+  Future<bool> restoreCapability(String cartId) async {
+    final id = cartId.trim();
+    if (id.isEmpty || !_begin(CartOperation.restore)) return false;
+    CartView? restored;
+    try {
+      restored = await args.api.cart(id);
+      final selected = args.selectedRegion();
+      if (selected case Some(value: final region)
+          when restored.cart.region.id != region.id) {
+        restored = await args.api.updateCartRegion(
+          id,
+          UpdateCartRegionBody(regionId: region.id),
+        );
+      }
+      final loaded = await _succeed(restored);
+      try {
+        await args.cartIds.write(args.storageScope, id);
+      } on Object {
+        // The current checkout remains usable when secure storage is down.
+      }
+      return loaded;
+    } on Object catch (error) {
+      _fail(CartOperation.restore, error, cart: restored);
+      return false;
+    }
+  }
+
   /// Restores the cart capability and refreshes it from the server.
   Future<void> restore({bool force = false}) {
     final active = _restoreTask;

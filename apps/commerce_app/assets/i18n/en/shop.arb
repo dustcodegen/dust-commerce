@@ -726,6 +726,10 @@
   "@cart_loading": {
     "description": "Promotion action shown while the cart is updating."
   },
+  "cart_resume_expired": "This cart link has expired.",
+  "@cart_resume_expired": {
+    "description": "Expired external cart handoff message."
+  },
   "cart_preview_empty": "Your shopping bag is empty.",
   "@cart_preview_empty": {
     "description": "Empty state in the navigation cart preview."

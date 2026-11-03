@@ -87,6 +87,15 @@ void main() {
     expect(category.location, '/categories/clothing%2Fshirts?page=3');
   });
 
+  test('cart resume links retain their opaque capability', () {
+    final route = parseCommerceRoute(
+      Uri.parse('/cart/resume/cart_qa_123'),
+    );
+
+    expect(route, isA<CartResumeRoute>());
+    expect(route.location, '/cart/resume/cart_qa_123');
+  });
+
   test('taxonomy routes retain option refinements without page stickiness', () {
     const collection = CollectionRoute(
       handle: 'summer',

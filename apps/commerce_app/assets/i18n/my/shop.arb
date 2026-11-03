@@ -726,6 +726,10 @@
   "@cart_loading": {
     "description": "ခြင်းတောင်း ပြင်ဆင်နေစဉ် ပြသသည့် ပရိုမိုးရှင်းလုပ်ဆောင်ချက်။"
   },
+  "cart_resume_expired": "ဤစျေးခြင်းတောင်းလင့်ခ် သက်တမ်းကုန်ဆုံးသွားပါပြီ။",
+  "@cart_resume_expired": {
+    "description": "Expired external cart handoff message."
+  },
   "cart_preview_empty": "သင့်စျေးခြင်းတောင်းထဲတွင် ပစ္စည်းမရှိပါ။",
   "@cart_preview_empty": {
     "description": "Empty state in the navigation cart preview."
