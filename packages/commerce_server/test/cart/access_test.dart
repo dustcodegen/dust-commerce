@@ -67,6 +67,14 @@ void main() {
     (await harness.client.get('/store/carts/$cartId').send()).assertOk();
   });
 
+  test('completed carts no longer expose a resume capability', () async {
+    final cartId = await harness.cartWith('var_small');
+
+    (await harness.checkout(cartId)).assertCreated();
+
+    (await harness.client.get('/store/carts/$cartId').send()).assertNotFound();
+  });
+
   test('an invalid bearer token is rejected instead of treated as a guest',
       () async {
     final cartId = await harness.cartWith('var_small');
