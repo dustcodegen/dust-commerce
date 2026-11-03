@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:test/test.dart';
 
 import 'order_detail_fixture.dart';
@@ -40,12 +42,14 @@ WHERE order_id = 'ord_detail' AND id <> 'ful_detail'
     expect(rows.single.readIndex<String>(0), 'manual');
     expect(rows.single.readIndex<String>(1), 'ship_eu_standard');
     expect(rows.single.readIndex<String>(2), 'admin_1');
-    expect(rows.single.readIndex<String>(3),
-        '{"service_code":"ship_eu_standard"}');
-    final createdAt = DateTime.parse(rows.single.readIndex<String>(4));
+    expect(
+      jsonDecode(rows.single.readIndex<String>(3)),
+      {'service_code': 'ship_eu_standard'},
+    );
+    final createdAt = rows.single.readIndex<DateTime>(4).toUtc();
     expect(createdAt.isUtc, isTrue);
     expect(createdAt, isNot(DateTime.utc(2026, 9, 13, 12)));
-    expect(rows.single.readIndex<String>(5), rows.single.readIndex<String>(4));
+    expect(rows.single.readIndex<DateTime>(5).toUtc(), createdAt);
   });
 
   test('rejects missing order and invalid commands without partial writes',

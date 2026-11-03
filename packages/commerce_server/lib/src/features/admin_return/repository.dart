@@ -37,7 +37,7 @@ SELECT request.id,
            WHERE return_id = request.id
            ORDER BY created_at, id
          ) item
-       ), '[]') AS items_json
+       ), '[]'::json)::text AS items_json
 FROM return_requests request
 WHERE request.deleted_at IS NULL
   AND request.status IN ('requested', 'received', 'partially_received', 'canceled')
