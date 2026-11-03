@@ -48,7 +48,7 @@ void main() {
     await queryExecute(
       r'''
 UPDATE regions
-SET metadata = '{"return_window_days":30,"free_returns":false,"shipping_rate":10,"handling_days_min":0,"handling_days_max":1,"transit_days_min":2,"transit_days_max":3}'
+SET metadata = '{"return_window_days":30,"free_returns":false,"shipping_rate":10,"handling_days_min":0,"handling_days_max":1,"transit_days_min":2,"transit_days_max":3,"internal":"merchant-only"}'
 WHERE id = 'reg_eu'
 ''',
       const [],
@@ -57,6 +57,7 @@ WHERE id = 'reg_eu'
     final response = await client.get('/store/regions').send();
 
     response.assertOk();
+    expect(response.body, isNot(contains('merchant-only')));
     final regions = SellingRegionListView.fromJson(
       response.json! as Map<String, Object?>,
     );
