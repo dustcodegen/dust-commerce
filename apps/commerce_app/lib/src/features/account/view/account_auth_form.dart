@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'account_auth_layout.dart';
 import 'account_auth_field.dart';
+import 'account_policy_notice.dart';
 import 'account_verification_notice.dart';
 
 part 'account_form_actions.dart';

@@ -32,18 +32,7 @@ class _AccountFormActions extends StatelessWidget {
           ],
           if (registering) ...[
             const SizedBox(height: 24),
-            Text(
-              context.tr(
-                'shop_account_terms',
-                defaultText: "By creating an account, you agree to Morrow's "
-                    'Privacy Policy and Terms of Use.',
-              ),
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 12,
-                height: 20 / 12,
-              ),
-            ),
+            const AccountPolicyNotice(),
           ],
           const SizedBox(height: 24),
           FilledButton(
