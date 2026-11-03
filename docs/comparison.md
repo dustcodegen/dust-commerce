@@ -274,10 +274,10 @@ than copying this SQLite representation.
 
 ## Not attempted
 
-Fulfilment and returns, external payment integrations or saved payment methods,
-provider-driven taxes, inventory locations, sales-channel management and
-product availability by channel, product-type CRUD,
-search, password reset, email verification,
+External fulfilment-provider integrations, labels and exchanges, external
+payment integrations or saved payment methods, provider-driven taxes,
+inventory locations, sales-channel management and product availability by
+channel, product-type CRUD, password reset,
 MFA, OAuth providers, API keys, admin RBAC, most admin catalogue mutations,
 admin order/customer/operations APIs, workflow engine, plugin system,
 notifications, external object/CDN storage, and a complete operational admin
