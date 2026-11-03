@@ -11,46 +11,59 @@ final class CheckoutAddressSummary extends StatelessWidget {
   final CheckoutState state;
 
   @override
-  Widget build(BuildContext context) => Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: _SummaryColumn(
-              title: context.tr(
-                'shop_checkout_shipping_address',
-                defaultText: 'Shipping Address',
-              ),
-              lines: _addressLines(state.shipping),
-            ),
-          ),
-          const SizedBox(width: 4),
-          Expanded(
-            child: _SummaryColumn(
-              title:
-                  context.tr('shop_checkout_contact', defaultText: 'Contact'),
-              lines: [state.shipping.phone, state.email],
-            ),
-          ),
-          const SizedBox(width: 4),
-          Expanded(
-            child: _SummaryColumn(
-              title: context.tr(
-                'shop_checkout_billing_address',
-                defaultText: 'Billing Address',
-              ),
-              lines: state.sameAsBilling
-                  ? [
-                      context.tr(
-                        'shop_checkout_same_billing_summary',
-                        defaultText:
-                            'Billing and delivery address are the same.',
-                      ),
-                    ]
-                  : _addressLines(state.billing),
-            ),
-          ),
-        ],
-      );
+  Widget build(BuildContext context) {
+    final columns = [
+      _SummaryColumn(
+        title: context.tr(
+          'shop_checkout_shipping_address',
+          defaultText: 'Shipping Address',
+        ),
+        lines: _addressLines(state.shipping),
+      ),
+      _SummaryColumn(
+        title: context.tr('shop_checkout_contact', defaultText: 'Contact'),
+        lines: [state.shipping.phone, state.email],
+      ),
+      _SummaryColumn(
+        title: context.tr(
+          'shop_checkout_billing_address',
+          defaultText: 'Billing Address',
+        ),
+        lines: state.sameAsBilling
+            ? [
+                context.tr(
+                  'shop_checkout_same_billing_summary',
+                  defaultText: 'Billing and delivery address are the same.',
+                ),
+              ]
+            : _addressLines(state.billing),
+      ),
+    ];
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 560) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final column in columns) ...[
+                column,
+                const SizedBox(height: 16),
+              ],
+            ],
+          );
+        }
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (var index = 0; index < columns.length; index++) ...[
+              Expanded(child: columns[index]),
+              if (index < columns.length - 1) const SizedBox(width: 4),
+            ],
+          ],
+        );
+      },
+    );
+  }
 
   static List<String> _addressLines(CheckoutAddressDraft value) => [
         '${value.firstName} ${value.lastName}',
