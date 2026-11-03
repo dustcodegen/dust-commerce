@@ -1597,41 +1597,41 @@
   "@policy_shipping_title": {
     "description": "Shipping policy page title."
   },
-  "policy_shipping_summary": "Shipping methods and final costs are calculated for your destination at checkout.",
-  "@policy_shipping_summary": {
-    "description": "Shipping policy page summary."
+  "policy_published_unavailable": "Policy details for this region haven't been published yet.",
+  "@policy_published_unavailable": {
+    "description": "Policy page message when regional policy metadata is absent."
+  },
+  "policy_placeholder": "This is placeholder content from the Medusa starter. Replace it with your store's own text before launch.",
+  "@policy_placeholder": {
+    "description": "Medusa starter policy placeholder notice."
   },
   "policy_returns_title": "Return policy",
   "@policy_returns_title": {
     "description": "Return policy page title."
   },
-  "policy_returns_summary": "Return eligibility and instructions are confirmed by customer service for each order.",
-  "@policy_returns_summary": {
-    "description": "Return policy page summary."
-  },
   "policy_privacy_title": "Privacy policy",
   "@policy_privacy_title": {
     "description": "Privacy policy page title."
   },
-  "policy_privacy_summary": "Privacy details are not configured for this storefront yet. Contact support for the current policy.",
-  "@policy_privacy_summary": {
-    "description": "Privacy policy page summary."
+  "policy_privacy_collection": "Morrow collects the information you provide at checkout, such as your name, email address and shipping address, to process and deliver your order.",
+  "@policy_privacy_collection": {
+    "description": "Privacy policy data-collection paragraph."
+  },
+  "policy_privacy_payment": "Payment details are handled by our payment provider and are not stored by the store. Cookies are used to keep your cart and sign-in session.",
+  "@policy_privacy_payment": {
+    "description": "Privacy policy payment and cookie paragraph."
   },
   "policy_terms_title": "Terms of service",
   "@policy_terms_title": {
     "description": "Terms page title."
   },
-  "policy_terms_summary": "Purchase terms are not configured for this storefront yet. Contact support before placing an order.",
-  "@policy_terms_summary": {
-    "description": "Terms page summary."
+  "policy_terms_agreement": "By placing an order with Morrow you agree to these terms. Prices, product availability and shipping options are shown on the product pages and at checkout, and may change without notice.",
+  "@policy_terms_agreement": {
+    "description": "Terms agreement paragraph."
   },
-  "policy_unavailable": "Policy information unavailable",
-  "@policy_unavailable": {
-    "description": "Policy page unavailable heading."
-  },
-  "policy_contact_customer_service": "Contact customer service",
-  "@policy_contact_customer_service": {
-    "description": "Policy page support action."
+  "policy_terms_orders": "Orders are confirmed by email once payment is received. Returns and refunds are handled according to our return policy.",
+  "@policy_terms_orders": {
+    "description": "Terms order-confirmation paragraph."
   },
   "shipping_returns": "Shipping & Returns",
   "@shipping_returns": {

@@ -1597,41 +1597,41 @@
   "@policy_shipping_title": {
     "description": "Shipping policy page title."
   },
-  "policy_shipping_summary": "သင့်ပို့ဆောင်မည့်နေရာအပေါ်မူတည်၍ ပို့ဆောင်နည်းလမ်းနှင့် နောက်ဆုံးကုန်ကျစရိတ်ကို အော်ဒါတင်ချိန်တွင် တွက်ချက်ပါမည်။",
-  "@policy_shipping_summary": {
-    "description": "Shipping policy page summary."
+  "policy_published_unavailable": "ဤဒေသအတွက် မူဝါဒအသေးစိတ်ကို မထုတ်ပြန်ရသေးပါ။",
+  "@policy_published_unavailable": {
+    "description": "Policy page message when regional policy metadata is absent."
+  },
+  "policy_placeholder": "ဤအကြောင်းအရာသည် Medusa starter မှ နမူနာဖြစ်သည်။ မထုတ်ဝေမီ သင့်စတိုး၏ အကြောင်းအရာဖြင့် အစားထိုးပါ။",
+  "@policy_placeholder": {
+    "description": "Medusa starter policy placeholder notice."
   },
   "policy_returns_title": "ပြန်အပ်မှုမူဝါဒ",
   "@policy_returns_title": {
     "description": "Return policy page title."
   },
-  "policy_returns_summary": "အော်ဒါတစ်ခုချင်းစီအတွက် ပြန်အပ်နိုင်မှုနှင့် လုပ်ဆောင်ရမည့်အဆင့်များကို ဖောက်သည်ဝန်ဆောင်မှုက အတည်ပြုပါမည်။",
-  "@policy_returns_summary": {
-    "description": "Return policy page summary."
-  },
   "policy_privacy_title": "ကိုယ်ရေးအချက်အလက်မူဝါဒ",
   "@policy_privacy_title": {
     "description": "Privacy policy page title."
   },
-  "policy_privacy_summary": "ဤစတိုးအတွက် ကိုယ်ရေးအချက်အလက်အသေးစိတ်ကို မသတ်မှတ်ရသေးပါ။ လက်ရှိမူဝါဒအတွက် အကူအညီကို ဆက်သွယ်ပါ။",
-  "@policy_privacy_summary": {
-    "description": "Privacy policy page summary."
+  "policy_privacy_collection": "Morrow သည် အော်ဒါကို ပြင်ဆင်ပေးပို့ရန် checkout တွင် သင်ပေးသော အမည်၊ အီးမေးလ်နှင့် ပို့ဆောင်ရေးလိပ်စာကဲ့သို့ အချက်အလက်များကို စုဆောင်းပါသည်။",
+  "@policy_privacy_collection": {
+    "description": "Privacy policy data-collection paragraph."
+  },
+  "policy_privacy_payment": "ငွေပေးချေမှုအချက်အလက်ကို ငွေပေးချေမှုဝန်ဆောင်မှုပေးသူက ကိုင်တွယ်ပြီး စတိုးက သိမ်းဆည်းမထားပါ။ သင့် cart နှင့် sign-in session ကို ထိန်းသိမ်းရန် cookies ကို အသုံးပြုပါသည်။",
+  "@policy_privacy_payment": {
+    "description": "Privacy policy payment and cookie paragraph."
   },
   "policy_terms_title": "ဝန်ဆောင်မှုအသုံးပြုမှုစည်းမျဉ်းများ",
   "@policy_terms_title": {
     "description": "Terms page title."
   },
-  "policy_terms_summary": "ဝယ်ယူမှုစည်းမျဉ်းများကို ဤစတိုးအတွက် မသတ်မှတ်ရသေးပါ။ အော်ဒါမတင်မီ အကူအညီကို ဆက်သွယ်ပါ။",
-  "@policy_terms_summary": {
-    "description": "Terms page summary."
+  "policy_terms_agreement": "Morrow မှာ အော်ဒါတင်ခြင်းဖြင့် ဤစည်းမျဉ်းများကို သဘောတူပါသည်။ စျေးနှုန်း၊ ကုန်ပစ္စည်းရရှိနိုင်မှုနှင့် ပို့ဆောင်မှုရွေးချယ်စရာများကို ကုန်ပစ္စည်းစာမျက်နှာနှင့် checkout တွင် ပြသပြီး ကြိုတင်အသိပေးခြင်းမရှိဘဲ ပြောင်းလဲနိုင်ပါသည်။",
+  "@policy_terms_agreement": {
+    "description": "Terms agreement paragraph."
   },
-  "policy_unavailable": "မူဝါဒအချက်အလက် မရရှိနိုင်ပါ",
-  "@policy_unavailable": {
-    "description": "Policy page unavailable heading."
-  },
-  "policy_contact_customer_service": "ဖောက်သည်ဝန်ဆောင်မှုကို ဆက်သွယ်ပါ",
-  "@policy_contact_customer_service": {
-    "description": "Policy page support action."
+  "policy_terms_orders": "ငွေပေးချေပြီးနောက် အော်ဒါများကို အီးမေးလ်ဖြင့် အတည်ပြုပါသည်။ ပြန်အပ်ခြင်းနှင့် ငွေပြန်အမ်းခြင်းကို ပြန်အပ်မှုမူဝါဒအတိုင်း ဆောင်ရွက်ပါသည်။",
+  "@policy_terms_orders": {
+    "description": "Terms order-confirmation paragraph."
   },
   "shipping_returns": "ပို့ဆောင်မှုနှင့် ပြန်အပ်မှု",
   "@shipping_returns": {

@@ -10,16 +10,12 @@ final class ShippingPage extends StatelessWidget {
   const ShippingPage({super.key});
 
   @override
-  Widget build(BuildContext context) => _PolicyPage(
+  Widget build(BuildContext context) => PolicyPage(
         title: context.tr(
           'shop_policy_shipping_title',
           defaultText: 'Shipping information',
         ),
-        summary: context.tr(
-          'shop_policy_shipping_summary',
-          defaultText:
-              'Shipping methods and final costs are calculated for your destination at checkout.',
-        ),
+        children: const [PoliciesUnavailable()],
       );
 }
 
@@ -30,16 +26,12 @@ final class ReturnsPage extends StatelessWidget {
   const ReturnsPage({super.key});
 
   @override
-  Widget build(BuildContext context) => _PolicyPage(
+  Widget build(BuildContext context) => PolicyPage(
         title: context.tr(
           'shop_policy_returns_title',
           defaultText: 'Return policy',
         ),
-        summary: context.tr(
-          'shop_policy_returns_summary',
-          defaultText:
-              'Return eligibility and instructions are confirmed by customer service for each order.',
-        ),
+        children: const [PoliciesUnavailable()],
       );
 }
 
@@ -50,16 +42,28 @@ final class PrivacyPage extends StatelessWidget {
   const PrivacyPage({super.key});
 
   @override
-  Widget build(BuildContext context) => _PolicyPage(
+  Widget build(BuildContext context) => PolicyPage(
         title: context.tr(
           'shop_policy_privacy_title',
           defaultText: 'Privacy policy',
         ),
-        summary: context.tr(
-          'shop_policy_privacy_summary',
-          defaultText:
-              'Privacy details are not configured for this storefront yet. Contact support for the current policy.',
-        ),
+        children: [
+          const PlaceholderNotice(),
+          Text(
+            context.tr(
+              'shop_policy_privacy_collection',
+              defaultText:
+                  'Morrow collects the information you provide at checkout, such as your name, email address and shipping address, to process and deliver your order.',
+            ),
+          ),
+          Text(
+            context.tr(
+              'shop_policy_privacy_payment',
+              defaultText:
+                  'Payment details are handled by our payment provider and are not stored by the store. Cookies are used to keep your cart and sign-in session.',
+            ),
+          ),
+        ],
       );
 }
 
@@ -70,23 +74,40 @@ final class TermsPage extends StatelessWidget {
   const TermsPage({super.key});
 
   @override
-  Widget build(BuildContext context) => _PolicyPage(
+  Widget build(BuildContext context) => PolicyPage(
         title: context.tr(
           'shop_policy_terms_title',
           defaultText: 'Terms of service',
         ),
-        summary: context.tr(
-          'shop_policy_terms_summary',
-          defaultText:
-              'Purchase terms are not configured for this storefront yet. Contact support before placing an order.',
-        ),
+        children: [
+          const PlaceholderNotice(),
+          Text(
+            context.tr(
+              'shop_policy_terms_agreement',
+              defaultText:
+                  'By placing an order with Morrow you agree to these terms. Prices, product availability and shipping options are shown on the product pages and at checkout, and may change without notice.',
+            ),
+          ),
+          Text(
+            context.tr(
+              'shop_policy_terms_orders',
+              defaultText:
+                  'Orders are confirmed by email once payment is received. Returns and refunds are handled according to our return policy.',
+            ),
+          ),
+        ],
       );
 }
 
-final class _PolicyPage extends StatelessWidget {
-  const _PolicyPage({required this.title, required this.summary});
+/// Shared source-shaped policy page shell.
+final class PolicyPage extends StatelessWidget {
+  /// Creates a policy page with source-ordered content blocks.
+  const PolicyPage({required this.title, required this.children, super.key});
 
-  final String summary;
+  /// Content blocks below the title.
+  final List<Widget> children;
+
+  /// Page heading.
   final String title;
 
   @override
@@ -96,7 +117,7 @@ final class _PolicyPage extends StatelessWidget {
             children: [
               Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 896),
+                  constraints: const BoxConstraints(maxWidth: 768),
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(24, 48, 24, 80),
                     child: Column(
@@ -110,34 +131,20 @@ final class _PolicyPage extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-                        const SizedBox(height: 24),
-                        Text(
-                          context.tr(
-                            'shop_policy_unavailable',
-                            defaultText: 'Policy information unavailable',
-                          ),
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          summary,
-                          style: const TextStyle(
-                            color: StoreColors.foregroundSubtle,
-                            height: 1.5,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: FilledButton(
-                            onPressed: () =>
-                                context.navigator.customerService().go(),
-                            child: Text(
-                              context.tr(
-                                'shop_policy_contact_customer_service',
-                                defaultText: 'Contact customer service',
-                              ),
+                        const SizedBox(height: 32),
+                        ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: children.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 24),
+                          itemBuilder: (_, index) => DefaultTextStyle(
+                            style: const TextStyle(
+                              color: StoreColors.foreground,
+                              fontSize: 16,
+                              height: 1.5,
                             ),
+                            child: children[index],
                           ),
                         ),
                       ],
@@ -149,5 +156,37 @@ final class _PolicyPage extends StatelessWidget {
             ],
           ),
         ),
+      );
+}
+
+/// Source-compatible notice used when regional policy metadata is absent.
+final class PoliciesUnavailable extends StatelessWidget {
+  /// Creates the published-policy boundary.
+  const PoliciesUnavailable({super.key});
+
+  @override
+  Widget build(BuildContext context) => Text(
+        context.tr(
+          'shop_policy_published_unavailable',
+          defaultText:
+              "Policy details for this region haven't been published yet.",
+        ),
+        style: const TextStyle(color: StoreColors.foregroundSubtle),
+      );
+}
+
+/// Source placeholder notice kept visible until store-owned copy replaces it.
+final class PlaceholderNotice extends StatelessWidget {
+  /// Creates the starter placeholder notice.
+  const PlaceholderNotice({super.key});
+
+  @override
+  Widget build(BuildContext context) => Text(
+        context.tr(
+          'shop_policy_placeholder',
+          defaultText:
+              "This is placeholder content from the Medusa starter. Replace it with your store's own text before launch.",
+        ),
+        style: const TextStyle(color: StoreColors.foregroundSubtle),
       );
 }
