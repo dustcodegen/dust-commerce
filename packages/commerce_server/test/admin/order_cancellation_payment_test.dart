@@ -24,7 +24,7 @@ FROM refunds WHERE payment_collection_id = 'pay_detail'
     expect(rows.single.readIndex<int>(0), 5400);
     expect(rows.single.readIndex<String>(1), 'eur');
     expect(rows.single.readIndex<String>(2), 'admin_1');
-    expect(DateTime.parse(rows.single.readIndex<String>(3)).isUtc, isTrue);
+    expect(rows.single.readIndex<DateTime>(3).toUtc().isUtc, isTrue);
   });
 
   test('concurrent retry restores inventory and refunds exactly once',

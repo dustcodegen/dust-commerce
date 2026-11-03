@@ -53,7 +53,7 @@ WHERE payment_collection_id = 'pay_detail'
     expect(rows.single.readIndex<String>(0), 'refund_reason_damaged');
     expect(rows.single.readIndex<String>(1), 'Seal broken');
     expect(rows.single.readIndex<String>(2), 'admin_1');
-    expect(DateTime.parse(rows.single.readIndex<String>(3)).isUtc, isTrue);
+    expect(rows.single.readIndex<DateTime>(3).toUtc().isUtc, isTrue);
     expect(await scenario.orderPaymentStatus(), 'captured');
   });
 

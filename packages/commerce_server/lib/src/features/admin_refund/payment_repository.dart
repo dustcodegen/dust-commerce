@@ -82,7 +82,7 @@ SELECT payment.id, payment.provider AS provider_id, payment.amount,
          WHERE record.payment_collection_id = payment.id
            AND record.deleted_at IS NULL
          ORDER BY record.created_at, record.id
-       ) refund), '[]') AS refunds_json
+       ) refund), '[]'::json)::text AS refunds_json
 FROM payment_collections payment
 WHERE payment.id = $1 AND payment.deleted_at IS NULL
 ''')
