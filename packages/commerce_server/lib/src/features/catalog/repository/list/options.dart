@@ -39,7 +39,7 @@ SELECT option.id, option.title,
            ) available
            ORDER BY available.rank, available.id
          ) ordered
-       ), '[]') AS "values"
+       ), '[]')::text AS "values"
 FROM product_options option
 WHERE option.deleted_at IS NULL
   AND EXISTS (

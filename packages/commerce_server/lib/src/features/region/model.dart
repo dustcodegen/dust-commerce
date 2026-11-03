@@ -18,7 +18,7 @@ final class SellingRegionResponse with _$SellingRegionResponse {
   });
 
   /// ISO country codes served by the region.
-  @Sqlx(tryFrom: RegionCountriesFromCsv())
+  @Sqlx(tryFrom: RegionCountriesFromArray())
   final List<String> countries;
 
   /// ISO currency code used by regional prices.
@@ -32,7 +32,7 @@ final class SellingRegionResponse with _$SellingRegionResponse {
   final String name;
 
   /// Whether displayed prices already contain tax.
-  @Sqlx(rename: 'tax_inclusive', tryFrom: RegionBoolFromInt())
+  @Sqlx(rename: 'tax_inclusive')
   final bool taxInclusive;
 
   /// Tax rate in basis points.
@@ -76,24 +76,13 @@ final class PaymentProviderListResponse with _$PaymentProviderListResponse {
   final List<PaymentProviderResponse> paymentProviders;
 }
 
-/// Converts SQLite's region boolean representation.
-final class RegionBoolFromInt implements SqlxTryFrom<bool, int> {
+/// Converts PostgreSQL's text array into the public country list.
+final class RegionCountriesFromArray
+    implements SqlxTryFrom<List<String>, List<String>> {
   /// Creates the stateless converter.
-  const RegionBoolFromInt();
+  const RegionCountriesFromArray();
 
   @override
-  bool decode(int value) => value != 0;
-}
-
-/// Converts compact persisted country codes into a public list.
-final class RegionCountriesFromCsv
-    implements SqlxTryFrom<List<String>, String> {
-  /// Creates the stateless converter.
-  const RegionCountriesFromCsv();
-
-  @override
-  List<String> decode(String value) => value
-      .split(',')
-      .where((country) => country.isNotEmpty)
-      .toList(growable: false);
+  List<String> decode(List<String> value) =>
+      value.where((country) => country.isNotEmpty).toList(growable: false);
 }

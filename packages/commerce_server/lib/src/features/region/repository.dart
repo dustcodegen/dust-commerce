@@ -13,7 +13,7 @@ abstract final class SellingRegionRepository {
   /// Lists active regions in stable display order.
   @Query(r'''
 SELECT id, name, currency_code, tax_rate,
-       tax_inclusive = 1 AS tax_inclusive,
+       tax_inclusive <> 0 AS tax_inclusive,
        string_to_array(countries, ',') AS countries
 FROM regions
 WHERE deleted_at IS NULL

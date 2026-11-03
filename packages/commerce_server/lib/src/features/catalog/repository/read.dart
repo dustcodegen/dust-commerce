@@ -14,9 +14,9 @@ abstract final class CatalogReadRepository {
   @Query(r'''
 SELECT product.id, product.title, product.handle, product.description,
        product.thumbnail, product.status,
-       CASE WHEN collection.id IS NULL THEN 'null' ELSE json_build_object('id', collection.id, 'title', collection.title, 'handle', collection.handle) END AS collection,
+       (CASE WHEN collection.id IS NULL THEN 'null' ELSE json_build_object('id', collection.id, 'title', collection.title, 'handle', collection.handle) END)::text AS collection,
        json_build_object('material', product.material, 'origin_country', product.origin_country, 'product_type', product_type.value,
-         'weight', product.weight, 'length', product.length, 'width', product.width, 'height', product.height) AS details,
+         'weight', product.weight, 'length', product.length, 'width', product.width, 'height', product.height)::text AS details,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.image_json))
          FROM (
@@ -25,7 +25,7 @@ SELECT product.id, product.title, product.handle, product.description,
            WHERE image.product_id = product.id AND image.deleted_at IS NULL
            ORDER BY image.rank, image.id
          ) ordered
-       ), '[]') AS images,
+       ), '[]')::text AS images,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.category_json))
          FROM (
@@ -39,7 +39,7 @@ SELECT product.id, product.title, product.handle, product.description,
              AND category.deleted_at IS NULL
            ORDER BY link.rank, category.handle
          ) ordered
-       ), '[]') AS categories,
+       ), '[]')::text AS categories,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.tag_json))
          FROM (
@@ -49,7 +49,7 @@ SELECT product.id, product.title, product.handle, product.description,
            WHERE link.product_id = product.id AND tag.deleted_at IS NULL
            ORDER BY tag.value
          ) ordered
-       ), '[]') AS tags,
+       ), '[]')::text AS tags,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.option_json))
          FROM (
@@ -76,7 +76,7 @@ SELECT product.id, product.title, product.handle, product.description,
              AND option.deleted_at IS NULL
            ORDER BY link.id
          ) ordered
-       ), '[]') AS options,
+       ), '[]')::text AS options,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.variant_json))
          FROM (
@@ -118,7 +118,7 @@ SELECT product.id, product.title, product.handle, product.description,
              AND price.currency_code = $2
            ORDER BY variant.id
          ) ordered
-       ), '[]') AS variants
+       ), '[]')::text AS variants
 FROM products product
 LEFT JOIN product_collections collection
   ON collection.id = product.collection_id AND collection.deleted_at IS NULL
