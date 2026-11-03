@@ -18,7 +18,6 @@ final class RegionResponse with _$RegionResponse {
   });
 
   /// ISO country codes served by this region.
-  @Sqlx(tryFrom: CountriesFromCsv())
   final List<String> countries;
 
   /// Currency used by every regional amount.
@@ -32,31 +31,10 @@ final class RegionResponse with _$RegionResponse {
   final String name;
 
   /// Whether displayed amounts already contain tax.
-  @Sqlx(rename: 'tax_inclusive', tryFrom: BoolFromInt())
+  @Sqlx(rename: 'tax_inclusive')
   final bool taxInclusive;
 
   /// Tax rate in basis points.
   @Sqlx(rename: 'tax_rate')
   final int taxRate;
-}
-
-/// Converts SQLite's integer boolean representation.
-final class BoolFromInt implements SqlxTryFrom<bool, int> {
-  /// Creates the stateless converter.
-  const BoolFromInt();
-
-  @override
-  bool decode(int value) => value != 0;
-}
-
-/// Converts the compact region country list.
-final class CountriesFromCsv implements SqlxTryFrom<List<String>, String> {
-  /// Creates the stateless converter.
-  const CountriesFromCsv();
-
-  @override
-  List<String> decode(String value) => value
-      .split(',')
-      .where((country) => country.isNotEmpty)
-      .toList(growable: false);
 }

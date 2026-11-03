@@ -44,7 +44,8 @@ LIMIT 1
   /// One region by id, for a storefront that has chosen one.
   @Query(r'''
 SELECT id, name, currency_code,
-       tax_rate, tax_inclusive, countries
+       tax_rate, tax_inclusive = 1 AS tax_inclusive,
+       string_to_array(countries, ',') AS countries
 FROM regions
 WHERE id = $1
 ''')
@@ -53,7 +54,8 @@ WHERE id = $1
   /// The default region, for a storefront that has not chosen one.
   @Query(r'''
 SELECT id, name, currency_code,
-       tax_rate, tax_inclusive, countries
+       tax_rate, tax_inclusive = 1 AS tax_inclusive,
+       string_to_array(countries, ',') AS countries
 FROM regions
 ORDER BY id
 LIMIT 1

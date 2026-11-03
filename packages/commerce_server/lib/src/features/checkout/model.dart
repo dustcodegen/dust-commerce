@@ -33,7 +33,7 @@ final class OrderResponse implements Serializable {
     required this.storedStatus,
     required this.storedFulfillmentStatus,
     required this.storedPaymentStatus,
-    required this.placedAtText,
+    required this.placedAt,
     required this.regionId,
     required this.regionName,
     required this.regionTaxRate,
@@ -44,7 +44,7 @@ final class OrderResponse implements Serializable {
     required this.billingAddressJson,
     this.orderCustomerId,
     this.paymentAmount,
-    this.paymentCreatedAtText,
+    this.paymentCreatedAt,
     this.paymentProvider,
     this.shippingOptionId,
     this.shippingName,
@@ -83,8 +83,12 @@ final class OrderResponse implements Serializable {
   final int? paymentAmount;
 
   /// Provider record creation time, absent before payment begins.
-  @Sqlx(rename: 'payment_created_at')
-  final String? paymentCreatedAtText;
+  @Sqlx(
+    rename: 'payment_created_at',
+    defaultValue: null,
+    tryFrom: _PostgresDateTime(),
+  )
+  final DateTime? paymentCreatedAt;
 
   /// Public provider identifier, absent before payment begins.
   @Sqlx(rename: 'payment_provider')
@@ -110,13 +114,13 @@ final class OrderResponse implements Serializable {
   @Sqlx(rename: 'total')
   final int orderTotal;
 
-  /// Placement timestamp stored as UTC ISO-8601 text.
-  @Sqlx(rename: 'placed_at')
-  final String placedAtText;
+  /// Placement timestamp stored as a UTC instant.
+  @Sqlx(rename: 'placed_at', tryFrom: _PostgresDateTime())
+  final DateTime placedAt;
 
-  /// Region country codes in their compact database representation.
+  /// Region country codes decoded from PostgreSQL's text array.
   @Sqlx(rename: 'countries')
-  final String regionCountries;
+  final List<String> regionCountries;
 
   /// Region identifier captured by the order.
   @Sqlx(rename: 'region_id')
@@ -126,9 +130,9 @@ final class OrderResponse implements Serializable {
   @Sqlx(rename: 'region_name')
   final String regionName;
 
-  /// SQLite integer representation of tax inclusion.
+  /// Whether the frozen region prices included tax.
   @Sqlx(rename: 'tax_inclusive')
-  final int regionTaxInclusive;
+  final bool regionTaxInclusive;
 
   /// Region tax rate in basis points.
   @Sqlx(rename: 'tax_rate')
@@ -174,4 +178,12 @@ final class OrderLineItemsFromJson
   @override
   List<OrderLineItemResponse> decode(String value) =>
       _decodeOrderLineItems(value);
+}
+
+/// Normalizes PostgreSQL TIMESTAMPTZ values at the row boundary.
+final class _PostgresDateTime implements SqlxTryFrom<DateTime, DateTime> {
+  const _PostgresDateTime();
+
+  @override
+  DateTime decode(DateTime value) => value.toUtc();
 }

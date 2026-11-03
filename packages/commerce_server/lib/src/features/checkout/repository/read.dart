@@ -52,7 +52,9 @@ SELECT o.id, o.display_id, o.email, o.customer_id, o.currency_code, o.subtotal,
        o.shipping_option_id, o.shipping_name,
        payment.provider AS payment_provider, payment.amount AS payment_amount,
        payment.created_at AS payment_created_at,
-       r.name AS region_name, r.tax_rate, r.tax_inclusive, r.countries,
+       r.name AS region_name, r.tax_rate,
+       r.tax_inclusive = 1 AS tax_inclusive,
+       string_to_array(r.countries, ',') AS countries,
        coalesce((
          SELECT json_agg(json_build_object(
            'id', i.id, 'variant_id', i.variant_id,

@@ -47,7 +47,7 @@ WHERE id = $1
   /// Private raw capability after a sender successfully claims its lease.
   @Query(r'''
 SELECT transfer.id, transfer.order_id, orders.email AS recipient_email,
-       transfer.delivery_token AS token, transfer.expires_at
+       transfer.delivery_token AS "token!", transfer.expires_at
 FROM order_transfers transfer
 JOIN orders ON orders.id = transfer.order_id
 WHERE transfer.id = $1

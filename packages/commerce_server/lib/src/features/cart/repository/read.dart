@@ -40,8 +40,8 @@ SELECT c.id, c.customer_id, c.email,
          'name', r.name,
          'currency_code', r.currency_code,
          'tax_rate', r.tax_rate,
-         'tax_inclusive', r.tax_inclusive,
-         'countries', r.countries
+         'tax_inclusive', r.tax_inclusive = 1,
+         'countries', string_to_array(r.countries, ',')
        ) AS region,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.line_json))
@@ -188,7 +188,8 @@ WHERE promotion.cart_id = $1
   /// Matched upper case in SQL so entry is not case sensitive, which is a
   /// property of the lookup rather than something every caller remembers.
   @Query(r'''
-SELECT id, code, type, value, currency_code, starts_at, ends_at,
+SELECT id, code, type, value, currency_code,
+       starts_at, ends_at,
        usage_limit, usage_count
 FROM promotions
 WHERE code = UPPER($1)

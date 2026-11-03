@@ -99,14 +99,14 @@ final class PromotionPolicy {
     required this.promotionValue,
     required this.promotionUsageCount,
     this.promotionCurrencyCode,
-    this.startsAtText,
-    this.endsAtText,
+    this.startsAt,
+    this.endsAt,
     this.promotionUsageLimit,
   });
 
   /// Stored exclusive validity end.
-  @Sqlx(rename: 'ends_at')
-  final String? endsAtText;
+  @Sqlx(rename: 'ends_at', defaultValue: null, tryFrom: _PromotionDateTime())
+  final DateTime? endsAt;
 
   /// Promotion code matched case-insensitively in SQL.
   @Sqlx(rename: 'code')
@@ -133,8 +133,8 @@ final class PromotionPolicy {
   final int promotionValue;
 
   /// Stored inclusive validity start.
-  @Sqlx(rename: 'starts_at')
-  final String? startsAtText;
+  @Sqlx(rename: 'starts_at', defaultValue: null, tryFrom: _PromotionDateTime())
+  final DateTime? startsAt;
 
   /// Stored promotion type name.
   @Sqlx(rename: 'type')
@@ -167,11 +167,16 @@ final class PromotionPolicy {
 
   /// Whether the promotion is within its configured window and usage limit.
   bool isUsableAt(DateTime when) {
-    final starts = startsAtText == null ? null : DateTime.parse(startsAtText!);
-    final ends = endsAtText == null ? null : DateTime.parse(endsAtText!);
-    if (starts != null && when.isBefore(starts)) return false;
-    if (ends != null && !when.isBefore(ends)) return false;
+    if (startsAt != null && when.isBefore(startsAt!)) return false;
+    if (endsAt != null && !when.isBefore(endsAt!)) return false;
     final limit = promotionUsageLimit;
     return limit == null || promotionUsageCount < limit;
   }
+}
+
+final class _PromotionDateTime implements SqlxTryFrom<DateTime, DateTime> {
+  const _PromotionDateTime();
+
+  @override
+  DateTime decode(DateTime value) => value.toUtc();
 }

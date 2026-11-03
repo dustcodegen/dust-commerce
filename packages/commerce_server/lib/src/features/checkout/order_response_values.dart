@@ -28,17 +28,14 @@ extension OrderResponseValues on OrderResponse {
   OrderPaymentResponse? get payment {
     final provider = paymentProvider;
     final amount = paymentAmount;
-    final createdAt = paymentCreatedAtText;
+    final createdAt = paymentCreatedAt;
     if (provider == null || amount == null || createdAt == null) return null;
     return OrderPaymentResponse(
       providerId: provider,
       amount: _money(amount),
-      createdAt: DateTime.parse(createdAt),
+      createdAt: createdAt,
     );
   }
-
-  /// UTC placement time.
-  DateTime get placedAt => DateTime.parse(placedAtText);
 
   /// Explicit region response captured with the order.
   RegionResponse get region => RegionResponse(
@@ -46,11 +43,8 @@ extension OrderResponseValues on OrderResponse {
         name: regionName,
         currencyCode: currencyCode,
         taxRate: regionTaxRate,
-        countries: regionCountries
-            .split(',')
-            .where((country) => country.isNotEmpty)
-            .toList(growable: false),
-        taxInclusive: regionTaxInclusive != 0,
+        countries: regionCountries,
+        taxInclusive: regionTaxInclusive,
       );
 
   /// Shipping destination decoded from the query aggregate.
@@ -103,7 +97,7 @@ extension OrderResponseValues on OrderResponse {
         storedStatus: storedStatus,
         storedFulfillmentStatus: storedFulfillmentStatus,
         storedPaymentStatus: PaymentStatus.captured.name,
-        placedAtText: placedAtText,
+        placedAt: placedAt,
         regionId: regionId,
         regionName: regionName,
         regionTaxRate: regionTaxRate,
@@ -113,7 +107,7 @@ extension OrderResponseValues on OrderResponse {
         shippingAddressJson: shippingAddressJson,
         billingAddressJson: billingAddressJson,
         paymentAmount: paymentAmount,
-        paymentCreatedAtText: paymentCreatedAtText,
+        paymentCreatedAt: paymentCreatedAt,
         paymentProvider: paymentProvider,
         shippingOptionId: shippingOptionId,
         shippingName: shippingName,

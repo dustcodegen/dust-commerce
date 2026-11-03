@@ -167,11 +167,11 @@ final class RegionResponseFromJson
       name: json['name']! as String,
       currencyCode: json['currency_code']! as String,
       taxRate: json['tax_rate']! as int,
-      countries: (json['countries']! as String)
-          .split(',')
-          .where((country) => country.isNotEmpty)
-          .toList(growable: false),
-      taxInclusive: json['tax_inclusive']! as int != 0,
+      countries: [
+        for (final country in json['countries']! as List<Object?>)
+          country! as String,
+      ],
+      taxInclusive: json['tax_inclusive']! as bool,
     );
   }
 }
