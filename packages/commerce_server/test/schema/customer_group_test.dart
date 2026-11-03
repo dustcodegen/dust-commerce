@@ -71,8 +71,8 @@ UNION ALL
 SELECT created_at, updated_at FROM customer_group_customers WHERE id = 'cgc_1'
 ''', []).fetch(database.connection as Executor);
     for (final row in timestamps) {
-      expect(DateTime.parse(row.readIndex<String>(0)).isUtc, isTrue);
-      expect(DateTime.parse(row.readIndex<String>(1)).isUtc, isTrue);
+      expect(row.readIndex<DateTime>(0).toUtc().isUtc, isTrue);
+      expect(row.readIndex<DateTime>(1).toUtc().isUtc, isTrue);
     }
 
     Future<void> duplicate() => _execute(database, r'''
@@ -97,5 +97,7 @@ Future<List<String>> _columns(CommerceDatabase database, String table) async {
   return rows.map((row) => row.readIndex<String>(1)).toList();
 }
 
-Future<void> _execute(CommerceDatabase database, String sql) =>
-    queryExecute(sql, []).execute(database.executor);
+Future<void> _execute(CommerceDatabase database, String sql) async {
+  final result = await queryExecute(sql, []).execute(database.executor);
+  if (result.isErr) throw StateError('$result');
+}

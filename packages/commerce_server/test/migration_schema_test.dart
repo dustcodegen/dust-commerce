@@ -9,7 +9,7 @@ void main() {
 
   setUp(() async {
     directory = await Directory.systemTemp.createTemp('commerce_migrations');
-    database = CommerceDatabase.open(
+    database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );
@@ -171,7 +171,7 @@ void main() {
 
   test('migrations are idempotent across reopen', () async {
     await database.close();
-    final reopened = CommerceDatabase.open(
+    final reopened = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );

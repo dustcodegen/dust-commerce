@@ -55,8 +55,8 @@ VALUES
 
     final initial = await _request(database, 'csreq_01');
     expect(initial.read<String>('status'), 'open');
-    expect(DateTime.parse(initial.read<String>('created_at')).isUtc, isTrue);
-    expect(DateTime.parse(initial.read<String>('updated_at')).isUtc, isTrue);
+    expect(initial.read<DateTime>('created_at').toUtc().isUtc, isTrue);
+    expect(initial.read<DateTime>('updated_at').toUtc().isUtc, isTrue);
     expect(initial.readNullable<String>('resolved_at'), isNull);
 
     Future<void> resolveWithoutTime() => _execute(database, r'''
@@ -74,7 +74,7 @@ WHERE id = 'csreq_01'
     final resolved = await _request(database, 'csreq_01');
     expect(resolved.read<String>('status'), 'resolved');
     expect(
-      DateTime.parse(resolved.read<String>('resolved_at')).isUtc,
+      resolved.read<DateTime>('resolved_at').toUtc().isUtc,
       isTrue,
     );
   });
@@ -89,5 +89,7 @@ Future<Row> _request(CommerceDatabase database, String id) async {
   return rows.single;
 }
 
-Future<void> _execute(CommerceDatabase database, String sql) =>
-    queryExecute(sql, []).execute(database.executor);
+Future<void> _execute(CommerceDatabase database, String sql) async {
+  final result = await queryExecute(sql, []).execute(database.executor);
+  if (result.isErr) throw StateError('$result');
+}

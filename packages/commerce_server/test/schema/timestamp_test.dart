@@ -28,7 +28,9 @@ void main() {
       "SELECT created_at, updated_at FROM regions WHERE id = 'reg_1'",
       [],
     ).fetch(database.connection as Executor);
-    expect(rows.single.readIndex<String>(0), '2000-01-01T00:00:00.000Z');
-    expect(rows.single.readIndex<String>(1), isNot('2000-01-01T00:00:00.000Z'));
+    expect(rows.single.readIndex<DateTime>(0).toUtc(),
+        DateTime.parse('2000-01-01T00:00:00.000Z'));
+    expect(rows.single.readIndex<DateTime>(1).toUtc(),
+        isNot(DateTime.parse('2000-01-01T00:00:00.000Z')));
   });
 }

@@ -51,7 +51,8 @@ WHERE id = 'ord_one'
 SELECT status, canceled_at, canceled_by FROM orders WHERE id = 'ord_one'
 ''', []).fetch(database.connection as Executor);
     expect(rows.single.readIndex<String>(0), 'archived');
-    expect(rows.single.readIndex<String>(1), '2026-09-14T04:00:00.000Z');
+    expect(rows.single.readIndex<DateTime>(1).toUtc(),
+        DateTime.parse('2026-09-14T04:00:00.000Z'));
     expect(rows.single.readIndex<String>(2), 'admin_one');
   });
 }

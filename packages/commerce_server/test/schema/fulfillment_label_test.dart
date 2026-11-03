@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:commerce_server/commerce_server.dart';
 import 'package:test/test.dart';
 
+import '../support/expect_result.dart';
+
 void main() {
   late CommerceDatabase database;
   late Directory directory;
@@ -40,8 +42,8 @@ FROM fulfillment_labels WHERE id = 'ful_label_one'
     expect(row.readIndex<String>(0), 'TRACK-123');
     expect(row.readIndex<String>(1), 'https://carrier.example/TRACK-123');
     expect(row.readIndex<String>(2), '#');
-    expect(DateTime.parse(row.readIndex<String>(3)).isUtc, isTrue);
-    expect(row.readIndex<String>(4), row.readIndex<String>(3));
+    expect(row.readIndex<DateTime>(3).toUtc().isUtc, isTrue);
+    expect(row.readIndex<DateTime>(4), row.readIndex<DateTime>(3));
   });
 
   test('removes labels with their fulfillment', () async {
@@ -61,22 +63,19 @@ INSERT INTO fulfillment_labels (
       'SELECT count(*) FROM fulfillment_labels',
       [],
     ).fetchOne(database.connection as Executor);
-    expect(count, 0);
+    expect(count, const Ok<int, SqlxError>(0));
   });
 
   test('rejects stored-script label links', () async {
     await _seedFulfillment(database);
 
-    expect(
-      () => queryExecute(r'''
+    await expectDbFailure(() => queryExecute(r'''
 INSERT INTO fulfillment_labels (
   id, fulfillment_id, tracking_number, tracking_url, label_url
 ) VALUES (
   'ful_label_bad', 'ful_one', 'TRACK-123', 'javascript:alert(1)', '#'
 )
-''', []).execute(database.executor),
-      throwsStateError,
-    );
+''', []).execute(database.executor));
   });
 }
 

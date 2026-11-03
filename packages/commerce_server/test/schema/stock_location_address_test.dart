@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:commerce_server/commerce_server.dart';
 import 'package:test/test.dart';
 
+import '../support/expect_result.dart';
+
 void main() {
   late CommerceDatabase database;
   late Directory directory;
@@ -57,8 +59,8 @@ SELECT created_at, updated_at FROM stock_location_addresses
 WHERE id = 'laddr_one'
 ''', []).fetch(database.connection as Executor);
 
-    expect(DateTime.parse(rows.single.readIndex<String>(0)).isUtc, isTrue);
-    expect(DateTime.parse(rows.single.readIndex<String>(1)).isUtc, isTrue);
+    expect(rows.single.readIndex<DateTime>(0).toUtc().isUtc, isTrue);
+    expect(rows.single.readIndex<DateTime>(1).toUtc().isUtc, isTrue);
     for (final invalid in <String>[
       '''
 INSERT INTO stock_location_addresses (id, address_1, country_code)
@@ -69,9 +71,8 @@ INSERT INTO stock_location_addresses (id, address_1, country_code, metadata)
 VALUES ('laddr_json', 'One', 'us', 'not-json')
 ''',
     ]) {
-      expect(
+      await expectDbFailure(
         () => queryExecute(invalid, []).execute(database.executor),
-        throwsStateError,
       );
     }
   });

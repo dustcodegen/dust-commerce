@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:commerce_server/commerce_server.dart';
 import 'package:test/test.dart';
 
+import '../support/expect_result.dart';
+
 void main() {
   late CommerceDatabase database;
   late Directory directory;
@@ -45,42 +47,32 @@ void main() {
 
   test('guards active quantity and order ownership', () async {
     await _insertItem(database, id: 'fulitem_one', quantity: 2);
-    final rows = await queryRaw('''
+    final rows = await queryRaw(r'''
 SELECT created_at, quantity FROM fulfillment_items WHERE id = 'fulitem_one'
 ''', []).fetch(database.connection as Executor);
-    expect(DateTime.parse(rows.single.readIndex<String>(0)).isUtc, isTrue);
+    expect(rows.single.readIndex<DateTime>(0).toUtc().isUtc, isTrue);
     expect(rows.single.readIndex<int>(1), 2);
 
-    expect(
+    await expectDbFailure(
       () => _insertItem(database, id: 'fulitem_duplicate', quantity: 1),
-      throwsStateError,
     );
-    expect(
-      () => _insertItem(
+    await expectDbFailure(() => _insertItem(
         database,
         id: 'fulitem_excess',
         quantity: 2,
         fulfillmentId: 'ful_two',
-      ),
-      throwsStateError,
-    );
-    expect(
-      () => _insertItem(
+      ));
+    await expectDbFailure(() => _insertItem(
         database,
         id: 'fulitem_foreign',
         quantity: 1,
         fulfillmentId: 'ful_two',
         lineItemId: 'item_two',
-      ),
-      throwsStateError,
-    );
-    expect(
-      () => queryExecute(
+      ));
+    await expectDbFailure(() => queryExecute(
         "UPDATE fulfillments SET order_id = 'ord_two' WHERE id = 'ful_one'",
         [],
-      ).execute(database.executor),
-      throwsStateError,
-    );
+      ).execute(database.executor));
 
     await queryExecute(
       "UPDATE fulfillments SET canceled_at = "
@@ -96,18 +88,18 @@ SELECT created_at, quantity FROM fulfillment_items WHERE id = 'fulitem_one'
   });
 }
 
-Future<void> _insertItem(
+Future<Result<ExecResult, SqlxError>> _insertItem(
   CommerceDatabase database, {
   required String id,
   required int quantity,
   String fulfillmentId = 'ful_one',
   String lineItemId = 'item_one',
 }) =>
-    queryExecute('''
+    queryExecute(r'''
 INSERT INTO fulfillment_items (
   id, fulfillment_id, title, quantity, sku, barcode, line_item_id
 ) VALUES (
-  ?, ?, 'Sample tee', ?, 'TEE-S', '0123456789', ?
+  $1, $2, 'Sample tee', $3, 'TEE-S', '0123456789', $4
 )
 ''', [id, fulfillmentId, quantity, lineItemId]).execute(database.executor);
 

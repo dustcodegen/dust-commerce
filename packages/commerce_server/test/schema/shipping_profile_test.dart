@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:commerce_server/commerce_server.dart';
 import 'package:test/test.dart';
 
+import '../support/expect_result.dart';
+
 void main() {
   late CommerceDatabase database;
   late Directory directory;
@@ -70,12 +72,9 @@ VALUES ('prod_one', 'One', 'one')
     ).fetch(database.connection as Executor);
     expect(assigned.single.readIndex<String>(0), 'sp_default');
 
-    expect(
-      () => queryExecute('''
+    await expectDbFailure(() => queryExecute('''
 INSERT INTO product_shipping_profile (id, product_id, shipping_profile_id)
 VALUES ('prodsp_two', 'prod_one', 'sp_digital')
-''', []).execute(database.executor),
-      throwsStateError,
-    );
+''', []).execute(database.executor));
   });
 }

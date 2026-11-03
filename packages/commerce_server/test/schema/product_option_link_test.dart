@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:commerce_server/commerce_server.dart';
 import 'package:test/test.dart';
 
+import '../support/expect_result.dart';
+
 void main() {
   late Directory directory;
   late CommerceDatabase database;
@@ -41,13 +43,13 @@ void main() {
   });
 
   test('a product option cannot expose a value from another option', () async {
-    Future<void> mismatch() => queryExecute(
+    Future<Result<ExecResult, SqlxError>> mismatch() => queryExecute(
           'INSERT INTO product_product_option_values '
           '(id, product_product_option_id, product_option_value_id) '
           r"VALUES ('availability_1', 'link_1', 'val_black')",
           [],
         ).execute(database.executor);
 
-    await expectLater(mismatch, throwsStateError);
+    await expectDbFailure(mismatch);
   });
 }

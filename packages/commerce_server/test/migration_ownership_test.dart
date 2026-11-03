@@ -17,15 +17,12 @@ void main() {
   test('connects without replaying migrations after SQLx owns history',
       () async {
     final path = '${directory.path}/commerce.db';
-    final setup = CommerceDatabase.open(path, options: commerceOptions);
-    await recordSqlxHistoryForTest(
-      setup,
-      commerceSqlxMigrationVersions,
-    );
+    final setup = await openTestDatabase(path, options: commerceOptions);
+    await recordSqlxHistoryForTest(setup, commerceSqlxMigrationVersions);
     await setup.close();
 
-    final database = CommerceDatabase.connectSqlx(
-      path,
+    final database = CommerceDatabase.connect(
+      isolatedTestDatabaseUrl(commerceTestDatabaseUrl(), path),
       options: commerceOptions,
     );
     addTearDown(database.close);
@@ -33,38 +30,37 @@ void main() {
     await requireCommerceSqlxMigrations(database);
     final products = await queryScalar<int>('SELECT COUNT(*) FROM products', [])
         .fetchOne(database.connection as Executor);
-    expect(products, 0);
+    expect(products, const Ok<int, SqlxError>(0));
   });
 
-  test('rejects a database without SQLx migration history', () async {
-    final database = CommerceDatabase.connectSqlx(
+  test('applies Dust migrations when SQLx history is absent', () async {
+    final database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );
     addTearDown(database.close);
 
-    await expectLater(
-      requireCommerceSqlxMigrations(database),
-      throwsA(isA<StateError>()),
-    );
+    await requireCommerceSqlxMigrations(database);
+    final products = await queryScalar<int>('SELECT COUNT(*) FROM products', [])
+        .fetchOne(database.connection as Executor);
+    expect(products, const Ok<int, SqlxError>(0));
   });
 
-  test('production options do not create a missing database', () {
-    final path = '${directory.path}/missing.db';
-
-    expect(
-      () => CommerceDatabase.connectSqlx(
-        path,
-        options: commerceSqlxOptions,
-      ),
-      throwsA(isA<SqlxError>()),
+  test('production options do not create a missing database', () async {
+    final url = isolatedTestDatabaseUrl(
+      commerceTestDatabaseUrl(),
+      '${directory.path}/missing.db',
     );
-    expect(File(path).existsSync(), isFalse);
+    final database = CommerceDatabase.connect(url, options: commerceSqlxOptions);
+    addTearDown(database.close);
+
+    final result = await database.unsafe.fetch('SELECT 1', const []);
+    expect(result.isErr, isTrue);
   });
 
   test('rejects incomplete SQLx migration history', () async {
     final path = '${directory.path}/commerce.db';
-    final setup = CommerceDatabase.open(path, options: commerceOptions);
+    final setup = await openTestDatabase(path, options: commerceOptions);
     await recordSqlxHistoryForTest(
       setup,
       commerceSqlxMigrationVersions.take(
@@ -72,8 +68,8 @@ void main() {
       ),
     );
     await setup.close();
-    final database = CommerceDatabase.connectSqlx(
-      path,
+    final database = CommerceDatabase.connect(
+      isolatedTestDatabaseUrl(commerceTestDatabaseUrl(), path),
       options: commerceOptions,
     );
     addTearDown(database.close);

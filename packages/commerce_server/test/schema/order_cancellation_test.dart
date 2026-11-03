@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:commerce_server/commerce_server.dart';
 import 'package:test/test.dart';
 
+import '../support/expect_result.dart';
+
 void main() {
   late Directory directory;
   late CommerceDatabase database;
@@ -39,25 +41,19 @@ WHERE id = 'ord_one'
 SELECT status, canceled_at, canceled_by FROM orders WHERE id = 'ord_one'
 ''', []).fetch(database.connection as Executor);
     expect(order.single.readIndex<String>(0), 'canceled');
-    expect(DateTime.parse(order.single.readIndex<String>(1)).isUtc, isTrue);
+    expect(order.single.readIndex<DateTime>(1).toUtc().isUtc, isTrue);
     expect(order.single.readIndex<String>(2), 'admin_one');
   });
 
   test('orders reject British spelling and unaudited cancellation', () async {
-    expect(
-      () => queryExecute(
+    await expectDbFailure(() => queryExecute(
         "UPDATE orders SET status = 'cancelled' WHERE id = 'ord_one'",
         [],
-      ).execute(database.executor),
-      throwsStateError,
-    );
-    expect(
-      () => queryExecute(
+      ).execute(database.executor));
+    await expectDbFailure(() => queryExecute(
         "UPDATE orders SET status = 'canceled' WHERE id = 'ord_one'",
         [],
-      ).execute(database.executor),
-      throwsStateError,
-    );
+      ).execute(database.executor));
   });
 
   test('payment cancellation and refunds retain separate money facts',
@@ -86,16 +82,13 @@ FROM refunds WHERE id = 'ref_one'
     expect(refund.single.readIndex<int>(0), 1000);
     expect(refund.single.readIndex<String>(1), 'usd');
     expect(refund.single.readIndex<String>(2), 'admin_one');
-    expect(DateTime.parse(refund.single.readIndex<String>(3)).isUtc, isTrue);
+    expect(refund.single.readIndex<DateTime>(3).toUtc().isUtc, isTrue);
 
-    expect(
-      () => queryExecute('''
+    await expectDbFailure(() => queryExecute('''
 INSERT INTO refunds (
   id, payment_collection_id, amount, currency_code, created_by
 ) VALUES ('ref_bad', 'pay_one', 0, 'usd', 'admin_one')
-''', []).execute(database.executor),
-      throwsStateError,
-    );
+''', []).execute(database.executor));
   });
 }
 

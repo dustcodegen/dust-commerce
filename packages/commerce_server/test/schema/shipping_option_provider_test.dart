@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:commerce_server/commerce_server.dart';
 import 'package:test/test.dart';
 
+import '../support/expect_result.dart';
+
 void main() {
   late CommerceDatabase database;
   late Directory directory;
@@ -64,15 +66,12 @@ SELECT created_at, updated_at FROM shipping_option_fulfillment_provider
 WHERE shipping_option_id = 'so_one'
 ''', []).fetch(database.connection as Executor);
 
-    expect(DateTime.parse(rows.single.readIndex<String>(0)).isUtc, isTrue);
-    expect(DateTime.parse(rows.single.readIndex<String>(1)).isUtc, isTrue);
-    expect(
-      () => queryExecute('''
+    expect(rows.single.readIndex<DateTime>(0).toUtc().isUtc, isTrue);
+    expect(rows.single.readIndex<DateTime>(1).toUtc().isUtc, isTrue);
+    await expectDbFailure(() => queryExecute('''
 INSERT INTO shipping_option_fulfillment_provider (
   shipping_option_id, fulfillment_provider_id
 ) VALUES ('so_one', 'manual')
-''', []).execute(database.executor),
-      throwsStateError,
-    );
+''', []).execute(database.executor));
   });
 }

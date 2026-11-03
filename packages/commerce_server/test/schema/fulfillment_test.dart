@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:commerce_server/commerce_server.dart';
 import 'package:test/test.dart';
 
+import '../support/expect_result.dart';
+
 void main() {
   late CommerceDatabase database;
   late Directory directory;
@@ -67,31 +69,25 @@ SELECT created_at, updated_at, requires_shipping
 FROM fulfillments WHERE id = 'ful_one'
 ''', []).fetch(database.connection as Executor);
     final row = rows.single;
-    expect(DateTime.parse(row.readIndex<String>(0)).isUtc, isTrue);
-    expect(DateTime.parse(row.readIndex<String>(1)).isUtc, isTrue);
+    expect(row.readIndex<DateTime>(0).toUtc().isUtc, isTrue);
+    expect(row.readIndex<DateTime>(1).toUtc().isUtc, isTrue);
     expect(row.readIndex<int>(2), 1);
 
-    expect(
-      () => queryExecute('''
+    await expectDbFailure(() => queryExecute('''
 INSERT INTO fulfillments (
   id, order_id, location_id, provider_id, shipped_at, canceled_at
 ) VALUES (
   'ful_bad', 'ord_one', 'loc_default', 'manual',
   '2026-09-14T01:00:00.000Z', '2026-09-14T02:00:00.000Z'
 )
-''', []).execute(database.executor),
-      throwsStateError,
-    );
+''', []).execute(database.executor));
 
     await queryExecute('''
 INSERT INTO admin_users (id, email) VALUES ('admin_one', 'admin@example.com')
 ''', []).execute(database.executor);
-    expect(
-      () => queryExecute('''
+    await expectDbFailure(() => queryExecute('''
 UPDATE fulfillments SET canceled_by = 'admin_one' WHERE id = 'ful_one'
-''', []).execute(database.executor),
-      throwsStateError,
-    );
+''', []).execute(database.executor));
   });
 }
 

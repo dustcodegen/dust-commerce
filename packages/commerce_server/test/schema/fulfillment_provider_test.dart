@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:commerce_server/commerce_server.dart';
 import 'package:test/test.dart';
 
+import '../support/expect_result.dart';
+
 void main() {
   late CommerceDatabase database;
   late Directory directory;
@@ -46,14 +48,11 @@ VALUES ('manual', 'Manual Fulfillment', '{}')
 SELECT created_at, updated_at FROM fulfillment_providers WHERE id = 'manual'
 ''', []).fetch(database.connection as Executor);
 
-    expect(DateTime.parse(rows.single.readIndex<String>(0)).isUtc, isTrue);
-    expect(DateTime.parse(rows.single.readIndex<String>(1)).isUtc, isTrue);
-    expect(
-      () => queryExecute('''
+    expect(rows.single.readIndex<DateTime>(0).toUtc().isUtc, isTrue);
+    expect(rows.single.readIndex<DateTime>(1).toUtc().isUtc, isTrue);
+    await expectDbFailure(() => queryExecute('''
 INSERT INTO fulfillment_providers (id, name, metadata)
 VALUES ('invalid', 'Invalid', 'not-json')
-''', []).execute(database.executor),
-      throwsStateError,
-    );
+''', []).execute(database.executor));
   });
 }

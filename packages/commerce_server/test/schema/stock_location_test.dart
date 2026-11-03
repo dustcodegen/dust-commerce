@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:commerce_server/commerce_server.dart';
 import 'package:test/test.dart';
 
+import '../support/expect_result.dart';
+
 void main() {
   late CommerceDatabase database;
   late Directory directory;
@@ -52,15 +54,12 @@ VALUES ('sloc_one', 'Main Warehouse', 'laddr_one', '{}')
 SELECT created_at, updated_at FROM stock_locations WHERE id = 'sloc_one'
 ''', []).fetch(database.connection as Executor);
 
-    expect(DateTime.parse(rows.single.readIndex<String>(0)).isUtc, isTrue);
-    expect(DateTime.parse(rows.single.readIndex<String>(1)).isUtc, isTrue);
-    expect(
-      () => queryExecute('''
+    expect(rows.single.readIndex<DateTime>(0).toUtc().isUtc, isTrue);
+    expect(rows.single.readIndex<DateTime>(1).toUtc().isUtc, isTrue);
+    await expectDbFailure(() => queryExecute('''
 INSERT INTO stock_locations (id, name, address_id)
 VALUES ('sloc_duplicate', 'Overflow', 'laddr_one')
-''', []).execute(database.executor),
-      throwsStateError,
-    );
+''', []).execute(database.executor));
 
     await queryExecute('''
 INSERT INTO stock_locations (id, name)

@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:commerce_server/commerce_server.dart';
 import 'package:test/test.dart';
 
+import 'support/expect_result.dart';
+
 /// Raw SQL access required by `fetch` beyond `DatabaseClient.executor`.
 extension on CommerceDatabase {
   Executor get raw => connection as Executor;
@@ -105,13 +107,13 @@ void main() {
         [],
       ).execute(database.executor);
 
-      Future<void> duplicate() => queryExecute(
+      Future<Result<ExecResult, SqlxError>> duplicate() => queryExecute(
             'INSERT INTO variant_prices (variant_id, currency_code, amount) '
             r"VALUES ('var_1', 'usd', 2999)",
             [],
           ).execute(database.executor);
 
-      await expectLater(duplicate, throwsStateError);
+      await expectDbFailure(duplicate);
     });
 
     test('a line cannot be ordered at a quantity of zero', () async {
@@ -127,27 +129,27 @@ void main() {
         [],
       ).execute(database.executor);
 
-      Future<void> zeroQuantity() => queryExecute(
+      Future<Result<ExecResult, SqlxError>> zeroQuantity() => queryExecute(
             'INSERT INTO line_items (id, cart_id, variant_id, product_id, '
             'title, unit_amount, currency_code, quantity) '
             r"VALUES ('li_1', 'cart_1', 'var_1', 'prod_1', 'T', 1999, 'usd', 0)",
             [],
           ).execute(database.executor);
 
-      await expectLater(zeroQuantity, throwsStateError);
+      await expectDbFailure(zeroQuantity);
     });
 
     test('a handle cannot be reused, because the storefront routes on it',
         () async {
       await _seedVariant(database);
 
-      Future<void> reusedHandle() => queryExecute(
+      Future<Result<ExecResult, SqlxError>> reusedHandle() => queryExecute(
             r"INSERT INTO products (id, title, handle) "
             r"VALUES ('prod_2', 'Other', 't-shirt')",
             [],
           ).execute(database.executor);
 
-      await expectLater(reusedHandle, throwsStateError);
+      await expectDbFailure(reusedHandle);
     });
 
     test('an image cannot be associated with another product variant',
@@ -169,13 +171,13 @@ void main() {
         [],
       ).execute(database.executor);
 
-      Future<void> crossProductLink() => queryExecute(
+      Future<Result<ExecResult, SqlxError>> crossProductLink() => queryExecute(
             r"INSERT INTO product_image_variants (image_id, variant_id) "
             r"VALUES ('img_1', 'var_2')",
             [],
           ).execute(database.executor);
 
-      await expectLater(crossProductLink, throwsStateError);
+      await expectDbFailure(crossProductLink);
     });
   });
 }

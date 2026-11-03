@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:dust_dart/db.dart';
 import 'package:dust_db_postgres/dust_db_postgres.dart';
 
+export 'raw_query.dart';
+
 part 'database.g.dart';
 
 /// The application's PostgreSQL database and embedded migration manifest.
@@ -51,32 +53,6 @@ String _testDatabaseUrl() =>
 
 /// Returns the configured database URL for isolated test connections.
 String commerceTestDatabaseUrl() => _testDatabaseUrl();
-
-/// Compatibility query used by pre-0.3 tests; production handlers use checked
-/// Dust queries or the database facade's explicit [UnsafeSql] escape hatch.
-final class CommerceRawQuery {
-  /// Creates one compatibility query.
-  const CommerceRawQuery(this.sql, this.parameters);
-
-  /// SQL text executed by the compatibility path.
-  final String sql;
-
-  /// Positional values bound to [sql].
-  final List<Object?> parameters;
-
-  /// Executes the query and unwraps Dust's result for legacy tests.
-  Future<List<Row>> fetch(Executor executor) async {
-    final result = await executor.fetchAll<Row>(sql, parameters, (row) => row);
-    return switch (result) {
-      Ok(:final value) => value,
-      Err(:final error) => throw StateError('Raw query failed: $error'),
-    };
-  }
-}
-
-/// Creates a compatibility raw query for legacy tests.
-CommerceRawQuery queryRaw(String sql, List<Object?> parameters) =>
-    CommerceRawQuery(sql, parameters);
 
 /// Historical SQLx migration versions kept for old ownership tests.
 const commerceSqlxMigrationVersions = <int>[
