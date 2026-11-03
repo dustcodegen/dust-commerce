@@ -22,7 +22,9 @@ final class CommerceRouter extends $CommerceRouter {
       required CartViewModel cart})
       : customerSession = CustomerSessionRouterRefresh(account),
         cartSession = cart,
-        _initialLocation = storefrontLocationWithoutCountry(initialLocation);
+        _initialLocation = _normalizeCategoryLocation(
+          storefrontLocationWithoutCountry(initialLocation),
+        );
 
   /// Customer-session access and router refresh boundary.
   final CustomerSessionRouterRefresh customerSession;
@@ -35,7 +37,7 @@ final class CommerceRouter extends $CommerceRouter {
   /// Restores a country prefix when region discovery rejects it.
   void setInitialLocation(Uri location) {
     if (_initialLocationRead) return;
-    _initialLocation = location;
+    _initialLocation = _normalizeCategoryLocation(location);
   }
 
   @override
@@ -59,6 +61,23 @@ String? storefrontCountryCode(Uri location) {
   return _countryCodeSegment.hasMatch(candidate)
       ? candidate.toLowerCase()
       : null;
+}
+
+/// Normalizes source catch-all category links for Dust's typed route parser.
+Uri _normalizeCategoryLocation(Uri location) {
+  final segments = location.pathSegments;
+  if (segments.length <= 2 || segments.first != 'categories') {
+    return location;
+  }
+  return Uri(
+    pathSegments: [
+      '',
+      'categories',
+      segments.skip(1).join('/'),
+    ],
+    query: location.hasQuery ? location.query : null,
+    fragment: location.hasFragment ? location.fragment : null,
+  );
 }
 
 /// Converts a country-prefixed Medusa URL to the local typed route shape.

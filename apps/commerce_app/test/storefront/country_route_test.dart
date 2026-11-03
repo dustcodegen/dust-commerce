@@ -31,6 +31,23 @@ void main() {
     );
   });
 
+  test('router normalizes Medusa catch-all category links', () {
+    final router = CommerceRouter(
+      initialLocation: Uri.parse('/categories/clothing/shirts?page=2'),
+      account: testAccount(const _UnusedApi()),
+      cart: testCart(const _UnusedApi()),
+    );
+
+    final restored = router.parseRouteInformation(
+      RouteInformation(uri: Uri.parse('/')),
+    );
+
+    expect(
+      restored.uri.toString(),
+      '/categories/clothing%2Fshirts?page=2',
+    );
+  });
+
   test('unknown country prefixes remain on the not-found route', () {
     final location = Uri.parse('/ZZ/products/t-shirt');
     final router = CommerceRouter(
@@ -45,6 +62,22 @@ void main() {
     );
 
     expect(parsed.uri.toString(), '/ZZ/products/t-shirt');
+  });
+
+  test('unknown country prefixes do not normalize nested categories', () {
+    final location = Uri.parse('/ZZ/categories/clothing/shirts');
+    final router = CommerceRouter(
+      initialLocation: location,
+      account: testAccount(const _UnusedApi()),
+      cart: testCart(const _UnusedApi()),
+    );
+
+    router.setInitialLocation(location);
+    final parsed = router.parseRouteInformation(
+      RouteInformation(uri: Uri.parse('/')),
+    );
+
+    expect(parsed.uri.toString(), '/ZZ/categories/clothing/shirts');
   });
 }
 
