@@ -20,6 +20,9 @@ enum CartStatus {
 
 /// The cart action whose progress the storefront is showing.
 enum CartOperation {
+  /// Creating a cart from an external checkout permalink.
+  buy,
+
   /// Restoring the persisted cart capability.
   restore,
 

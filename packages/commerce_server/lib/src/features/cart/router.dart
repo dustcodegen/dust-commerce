@@ -10,6 +10,7 @@ import 'package:dust_server/server.dart';
 Router cartRoutes() {
   final create = Router()
     ..routeLayer(fromExtractor(const OptionalCustomerAuth()))
+    ..route('/carts/buy', post(buyCartHandler, status: 201))
     ..route('/carts', post(createCartHandler, status: 201));
   final byId = Router()
     ..routeLayer(fromExtractor(const CartAccessExtractor()))

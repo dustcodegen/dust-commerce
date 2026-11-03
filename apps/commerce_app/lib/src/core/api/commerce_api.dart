@@ -136,6 +136,10 @@ abstract interface class CommerceApi {
   @POST('/store/carts')
   Future<CartView> createCart(@Body() CreateCartBody body);
 
+  /// Creates a cart and all permalink lines atomically.
+  @POST('/store/carts/buy')
+  Future<CartView> createCartWithItems(@Body() BuyCartBody body);
+
   /// One cart with the totals the server computed.
   @GET('/store/carts/{id}')
   Future<CartView> cart(@Path() String id);

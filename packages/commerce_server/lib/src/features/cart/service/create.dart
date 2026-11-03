@@ -28,6 +28,22 @@ Future<Result<Option<CartResponse>, SqlxError>> createCart(
           customerId: customerId,
         ));
 
+/// Starts a cart on a transaction shared with its initial line writes.
+Future<Result<Option<CartResponse>, SqlxError>> createCartInTransaction(
+  CartCreateRepository writes, {
+  required String id,
+  String? regionId,
+  String? email,
+  String? customerId,
+}) =>
+    _createCart(
+      writes,
+      id: id,
+      regionId: regionId,
+      email: email,
+      customerId: customerId,
+    );
+
 Future<Result<Option<CartResponse>, SqlxError>> _createCart(
   CartCreateRepository writes, {
   required String id,

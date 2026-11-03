@@ -8,6 +8,7 @@ import 'package:dust_flutter/state.dart';
 
 part 'cart_view_model.g.dart';
 part 'cart_mutations.dart';
+part 'cart_buy.dart';
 part 'cart_restore.dart';
 part 'cart_transfer.dart';
 

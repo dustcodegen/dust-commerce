@@ -47,6 +47,25 @@ final class UpdateCartRegionBody with _$UpdateCartRegionBody {
   final String regionId;
 }
 
+/// The atomic cart payload used by a checkout permalink.
+@Derive([ToString(), Eq(), Validate(), Serialize(), Deserialize()])
+@SerDe(renameAll: SerDeRename.snakeCase)
+final class BuyCartBody with _$BuyCartBody {
+  /// Creates a cart containing every requested line.
+  const BuyCartBody({required this.items, this.regionId});
+
+  /// Decodes a checkout-permalink request.
+  factory BuyCartBody.fromJson(Map<String, Object?> json) =>
+      _$BuyCartBodyFromJson(json);
+
+  /// Every line is validated before the server writes the cart.
+  @Validate(length: Length(min: 1), message: 'Add at least one item')
+  final List<AddLineBody> items;
+
+  /// Optional selling region selected by the storefront.
+  final String? regionId;
+}
+
 /// The contact and destinations retained while checkout is in progress.
 @Derive([ToString(), Eq(), Validate(), Serialize(), Deserialize()])
 @SerDe(renameAll: SerDeRename.snakeCase)
@@ -102,7 +121,7 @@ class AddLineBody with _$AddLineBody {
   /// generated deserialiser requires every non-nullable key unless a
   /// `defaultValue` says what a missing one means.
   @SerDe(defaultValue: 1)
-  @Validate(range: Range(min: 1), message: 'Order at least one')
+  @Validate(range: Range(min: 1, max: 100), message: 'Order 1 to 100')
   final int quantity;
 
   /// The variant being added.

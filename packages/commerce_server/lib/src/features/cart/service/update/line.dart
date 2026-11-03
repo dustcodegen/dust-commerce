@@ -39,7 +39,7 @@ Future<Result<Option<AddLineFailure>, SqlxError>> addLine(
   required String Function() nextId,
 }) =>
     database.transaction(
-      (tx) => _addLine(
+      (tx) => addLineInTransaction(
         CartReadRepository(tx),
         CartUpdateRepository(tx),
         CartShippingRepository(tx),
@@ -51,7 +51,8 @@ Future<Result<Option<AddLineFailure>, SqlxError>> addLine(
       ),
     );
 
-Future<Result<Option<AddLineFailure>, SqlxError>> _addLine(
+/// Adds one line inside an already-open cart transaction.
+Future<Result<Option<AddLineFailure>, SqlxError>> addLineInTransaction(
   CartReadRepository reads,
   CartUpdateRepository writes,
   CartShippingRepository shipping,
