@@ -80,7 +80,7 @@ WHERE product_id = 'prod_sweatpants' ORDER BY id
     expect(
       rows
           .singleWhere((row) => row.readIndex<String>(0) == 'img_sweatpants_1')
-          .readIndex<String?>(1),
+          .readIndex<DateTime?>(1),
       isNotNull,
     );
     expect(

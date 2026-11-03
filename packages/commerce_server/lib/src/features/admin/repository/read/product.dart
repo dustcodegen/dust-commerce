@@ -77,7 +77,7 @@ SELECT product.id, product.title, product.subtitle, product.handle,
            WHERE link.product_id = product.id
              AND link.deleted_at IS NULL
              AND option.deleted_at IS NULL
-           ORDER BY link.id
+           ORDER BY link.created_at, link.id
          ) ordered
        ), '[]')::text AS options,
        coalesce((

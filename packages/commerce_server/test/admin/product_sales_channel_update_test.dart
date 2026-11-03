@@ -53,11 +53,11 @@ ORDER BY sales_channel_id
 ''');
     expect(links, hasLength(2));
     expect(links.first.readIndex<String>(0), 'sc_web');
-    expect(links.first.readIndex<int>(1), 0);
+    expect(links.first.readIndex<bool>(1), isFalse);
     expect(links.last.readIndex<String>(0), 'sc_wholesale');
-    expect(links.last.readIndex<int>(1), 1);
-    expect(links.last.readIndex<String>(2), isNotEmpty);
-    expect(links.last.readIndex<String>(3), isNotEmpty);
+    expect(links.last.readIndex<bool>(1), isTrue);
+    expect(links.last.readIndex<DateTime>(2), isNotNull);
+    expect(links.last.readIndex<DateTime>(3), isNotNull);
   });
 
   test('empty selection removes every active product channel', () async {

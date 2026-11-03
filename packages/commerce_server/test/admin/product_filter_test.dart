@@ -53,10 +53,10 @@ void main() {
   test('product list applies inclusive UTC date ranges', () async {
     await harness.raw(
       "UPDATE products SET created_at = CASE id "
-      "WHEN 'prod_tshirt' THEN '2026-01-01T00:00:00.000Z' "
-      "WHEN 'prod_sweatshirt' THEN '2026-01-02T00:00:00.000Z' "
-      "WHEN 'prod_sweatpants' THEN '2026-01-03T00:00:00.000Z' "
-      "ELSE '2026-01-04T00:00:00.000Z' END",
+      "WHEN 'prod_tshirt' THEN TIMESTAMPTZ '2026-01-01T00:00:00.000Z' "
+      "WHEN 'prod_sweatshirt' THEN TIMESTAMPTZ '2026-01-02T00:00:00.000Z' "
+      "WHEN 'prod_sweatpants' THEN TIMESTAMPTZ '2026-01-03T00:00:00.000Z' "
+      "ELSE TIMESTAMPTZ '2026-01-04T00:00:00.000Z' END",
     );
     final range = jsonEncode({
       r'$gte': '2026-01-02T00:00:00+00:00',
@@ -78,10 +78,10 @@ void main() {
   test('product list applies exclusive updated-time bounds', () async {
     await harness.raw(
       "UPDATE products SET updated_at = CASE id "
-      "WHEN 'prod_tshirt' THEN '2026-02-01T00:00:00.000Z' "
-      "WHEN 'prod_sweatshirt' THEN '2026-02-02T00:00:00.000Z' "
-      "WHEN 'prod_sweatpants' THEN '2026-02-03T00:00:00.000Z' "
-      "ELSE '2026-02-04T00:00:00.000Z' END",
+      "WHEN 'prod_tshirt' THEN TIMESTAMPTZ '2026-02-01T00:00:00.000Z' "
+      "WHEN 'prod_sweatshirt' THEN TIMESTAMPTZ '2026-02-02T00:00:00.000Z' "
+      "WHEN 'prod_sweatpants' THEN TIMESTAMPTZ '2026-02-03T00:00:00.000Z' "
+      "ELSE TIMESTAMPTZ '2026-02-04T00:00:00.000Z' END",
     );
     final range = jsonEncode({
       r'$gt': '2026-02-01T00:00:00Z',

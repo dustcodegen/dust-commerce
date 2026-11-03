@@ -23,7 +23,7 @@ SELECT product.id AS product_id, product.handle, product.title,
            FROM product_product_options link
            JOIN product_options option ON option.id = link.product_option_id
            WHERE link.product_id = product.id AND link.deleted_at IS NULL
-             AND option.deleted_at IS NULL ORDER BY link.id
+             AND option.deleted_at IS NULL ORDER BY link.created_at, link.id
          ) ordered
        ), '[]') AS options_json,
        coalesce((

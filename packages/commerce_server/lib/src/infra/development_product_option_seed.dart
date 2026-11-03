@@ -19,13 +19,14 @@ ON CONFLICT DO NOTHING
 '''),
   const _Statement(r'''
 INSERT INTO product_product_options
-  (id, product_id, product_option_id)
+  (id, product_id, product_option_id, created_at)
 VALUES
-  ('prodopt_tshirt_size', 'prod_tshirt', 'opt_size'),
-  ('prodopt_tshirt_color', 'prod_tshirt', 'opt_color'),
-  ('prodopt_sweatshirt_size', 'prod_sweatshirt', 'opt_size'),
-  ('prodopt_sweatpants_size', 'prod_sweatpants', 'opt_size'),
-  ('prodopt_shorts_size', 'prod_shorts', 'opt_size')
+  ('prodopt_tshirt_size', 'prod_tshirt', 'opt_size', CURRENT_TIMESTAMP),
+  ('prodopt_tshirt_color', 'prod_tshirt', 'opt_color',
+   CURRENT_TIMESTAMP + INTERVAL '1 microsecond'),
+  ('prodopt_sweatshirt_size', 'prod_sweatshirt', 'opt_size', CURRENT_TIMESTAMP),
+  ('prodopt_sweatpants_size', 'prod_sweatpants', 'opt_size', CURRENT_TIMESTAMP),
+  ('prodopt_shorts_size', 'prod_shorts', 'opt_size', CURRENT_TIMESTAMP)
 ON CONFLICT DO NOTHING
 '''),
   const _Statement(r'''

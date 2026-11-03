@@ -18,7 +18,7 @@ void main() {
   test('product update replaces supported fields and returns fresh detail',
       () async {
     await harness.raw(
-      "UPDATE products SET updated_at = '2000-01-01T00:00:00.000Z' "
+      "UPDATE products SET updated_at = TIMESTAMPTZ '2000-01-01T00:00:00.000Z' "
       "WHERE id = 'prod_sweatpants'",
     );
     final token = await harness.adminToken();
@@ -56,8 +56,8 @@ void main() {
     expect(stored.single.readIndex<String>(2), 'Built for daily wear.');
     expect(stored.single.readIndex<String>(3), 'Cotton twill');
     expect(stored.single.readIndex<String>(4), 'draft');
-    expect(
-        stored.single.readIndex<String>(5), isNot('2000-01-01T00:00:00.000Z'));
+    expect(stored.single.readIndex<DateTime>(5),
+        isNot(DateTime.parse('2000-01-01T00:00:00.000Z')));
     expect(stored.single.readIndex<String>(6), 'A softer name');
     expect(stored.single.readIndex<int>(7), 0);
   });
