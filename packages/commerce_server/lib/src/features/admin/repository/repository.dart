@@ -84,7 +84,7 @@ SELECT option.id, option.title, option.is_exclusive = 1 AS is_exclusive,
            WHERE value.option_id = option.id AND value.deleted_at IS NULL
            ORDER BY value.rank, value.id
          ) ordered
-       ), '[]') AS "values",
+       ), '[]'::json)::text AS "values",
        coalesce((
          SELECT json_agg(dust_json_value(ordered.product_json))
          FROM (
@@ -119,7 +119,7 @@ SELECT option.id, option.title, option.is_exclusive = 1 AS is_exclusive,
              AND link.deleted_at IS NULL AND product.deleted_at IS NULL
            ORDER BY product.created_at DESC, product.id
          ) ordered
-       ), '[]') AS products
+       ), '[]'::json)::text AS products
 FROM product_options option
 WHERE option.id = $1 AND option.deleted_at IS NULL
 ''')

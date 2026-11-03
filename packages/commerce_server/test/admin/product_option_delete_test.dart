@@ -42,8 +42,8 @@ void main() {
       "WHERE option.id = '$id'",
     );
     expect(rows, hasLength(2));
-    expect(rows.every((row) => row.readIndex<String?>(0) != null), isTrue);
-    expect(rows.every((row) => row.readIndex<String?>(1) != null), isTrue);
+    expect(rows.every((row) => row.readIndex<DateTime?>(0) != null), isTrue);
+    expect(rows.every((row) => row.readIndex<DateTime?>(1) != null), isTrue);
   });
 
   test('linked and missing product options are not deleted', () async {
