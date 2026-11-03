@@ -19,7 +19,7 @@ SELECT option.id AS option_id, option.name,
        json_build_object(
          'amount', option.amount,
          'currency_code', option.currency_code
-       ) AS amount,
+       )::text AS amount,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.rule_json))
          FROM (
@@ -33,7 +33,7 @@ SELECT option.id AS option_id, option.name,
              AND rule.deleted_at IS NULL
            ORDER BY rule.id
          ) ordered
-       ), '[]') AS price_rules
+       ), '[]')::text AS price_rules
 FROM shipping_options option
 WHERE option.region_id = $1 AND option.deleted_at IS NULL
 ORDER BY option.amount, option.id
@@ -48,7 +48,7 @@ SELECT option.id AS option_id, option.name,
        json_build_object(
          'amount', option.amount,
          'currency_code', option.currency_code
-       ) AS amount,
+       )::text AS amount,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.rule_json))
          FROM (
@@ -62,7 +62,7 @@ SELECT option.id AS option_id, option.name,
              AND rule.deleted_at IS NULL
            ORDER BY rule.id
          ) ordered
-       ), '[]') AS price_rules
+       ), '[]')::text AS price_rules
 FROM shipping_options option
 WHERE option.id = $1 AND option.region_id = $2
   AND option.deleted_at IS NULL

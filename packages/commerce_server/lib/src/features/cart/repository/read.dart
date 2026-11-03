@@ -14,7 +14,7 @@ abstract final class CartReadRepository {
 
   /// Whether the cart's retained provider is still enabled for its region.
   @Query(r'''
-SELECT EXISTS (
+SELECT CASE WHEN EXISTS (
   SELECT 1
   FROM carts
   JOIN cart_payment_sessions
@@ -24,7 +24,7 @@ SELECT EXISTS (
    AND region_payment_providers.provider_id = cart_payment_sessions.provider_id
    AND region_payment_providers.enabled = 1
   WHERE carts.id = $1
-)
+  ) THEN 1 ELSE 0 END
 ''')
   Future<Result<int, SqlxError>> hasEnabledPaymentProvider(String cartId);
 
@@ -42,7 +42,7 @@ SELECT c.id, c.customer_id, c.email,
          'tax_rate', r.tax_rate,
          'tax_inclusive', r.tax_inclusive = 1,
          'countries', string_to_array(r.countries, ',')
-       ) AS region,
+       )::text AS region,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.line_json))
          FROM (
@@ -64,7 +64,7 @@ SELECT c.id, c.customer_id, c.email,
            WHERE line.cart_id = c.id
            ORDER BY line.id
          ) ordered
-       ), '[]') AS items,
+       ), '[]')::text AS items,
        coalesce((
          SELECT json_build_object(
            'option_id', method.option_id,
@@ -76,12 +76,12 @@ SELECT c.id, c.customer_id, c.email,
          )
          FROM cart_shipping_methods method
          WHERE method.cart_id = c.id
-       ), 'null') AS shipping_method,
+       ), 'null')::text AS shipping_method,
        coalesce((
          SELECT json_build_object('provider_id', session.provider_id)
          FROM cart_payment_sessions session
          WHERE session.cart_id = c.id
-       ), 'null') AS payment_session,
+       ), 'null')::text AS payment_session,
        coalesce((
          SELECT json_build_object(
            'first_name', address.first_name,
@@ -97,7 +97,7 @@ SELECT c.id, c.customer_id, c.email,
          )
          FROM cart_addresses address
          WHERE address.cart_id = c.id AND address.kind = 'shipping'
-       ), 'null') AS shipping_address,
+       ), 'null')::text AS shipping_address,
        coalesce((
          SELECT json_build_object(
            'first_name', address.first_name,
@@ -113,7 +113,7 @@ SELECT c.id, c.customer_id, c.email,
          )
          FROM cart_addresses address
          WHERE address.cart_id = c.id AND address.kind = 'billing'
-       ), 'null') AS billing_address,
+       ), 'null')::text AS billing_address,
        coalesce((
          SELECT json_agg(dust_json_value(ordered.promotion_json))
          FROM (
@@ -132,7 +132,7 @@ SELECT c.id, c.customer_id, c.email,
            WHERE promotion.cart_id = c.id
            ORDER BY promotion.promotion_id
          ) ordered
-       ), '[]') AS promotions
+       ), '[]')::text AS promotions
 FROM carts c
 JOIN regions r ON r.id = c.region_id
 WHERE c.id = $1
@@ -142,7 +142,7 @@ WHERE c.id = $1
   /// The lines of [cartId], in insertion order.
   @Query(r'''
 SELECT id, variant_id, product_id, product_handle, thumbnail, title, variant_title,
-       json_build_object('amount', unit_amount, 'currency_code', currency_code) AS unit_price,
+       json_build_object('amount', unit_amount, 'currency_code', currency_code)::text AS unit_price,
        quantity
 FROM line_items
 WHERE cart_id = $1
@@ -156,7 +156,7 @@ SELECT method.option_id, method.name,
        json_build_object(
          'amount', method.amount,
          'currency_code', region.currency_code
-       ) AS amount
+       )::text AS amount
 FROM cart_shipping_methods method
 JOIN carts cart ON cart.id = method.cart_id
 JOIN regions region ON region.id = cart.region_id
@@ -173,7 +173,7 @@ SELECT promotion.promotion_id AS id, promotion.code, promotion.type,
        json_build_object(
          'amount', amount,
          'currency_code', region.currency_code
-       ) AS amount
+       )::text AS amount
 FROM cart_promotions promotion
 JOIN carts cart ON cart.id = promotion.cart_id
 JOIN regions region ON region.id = cart.region_id
@@ -199,7 +199,7 @@ WHERE code = UPPER($1)
   /// The line for [variantId] in [cartId], if the cart already holds one.
   @Query(r'''
 SELECT id, variant_id, product_id, product_handle, thumbnail, title, variant_title,
-       json_build_object('amount', unit_amount, 'currency_code', currency_code)
+       json_build_object('amount', unit_amount, 'currency_code', currency_code)::text
          AS unit_price,
        quantity
 FROM line_items
@@ -214,7 +214,7 @@ WHERE cart_id = $1 AND variant_id = $2
   @Query(r'''
 SELECT id, variant_id, product_id, product_handle, thumbnail, title,
        variant_title,
-       json_build_object('amount', unit_amount, 'currency_code', currency_code)
+       json_build_object('amount', unit_amount, 'currency_code', currency_code)::text
          AS unit_price,
        quantity
 FROM line_items
