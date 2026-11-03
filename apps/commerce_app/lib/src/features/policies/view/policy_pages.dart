@@ -1,5 +1,6 @@
 import 'package:commerce_app/commerce_app.dart';
 import 'package:commerce_app/route.dart';
+import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
 /// Shipping information route from the Medusa storefront.
@@ -9,10 +10,16 @@ final class ShippingPage extends StatelessWidget {
   const ShippingPage({super.key});
 
   @override
-  Widget build(BuildContext context) => const _PolicyPage(
-        title: 'Shipping information',
-        summary:
-            'Shipping methods and final costs are calculated for your destination at checkout.',
+  Widget build(BuildContext context) => _PolicyPage(
+        title: context.tr(
+          'shop_policy_shipping_title',
+          defaultText: 'Shipping information',
+        ),
+        summary: context.tr(
+          'shop_policy_shipping_summary',
+          defaultText:
+              'Shipping methods and final costs are calculated for your destination at checkout.',
+        ),
       );
 }
 
@@ -23,10 +30,16 @@ final class ReturnsPage extends StatelessWidget {
   const ReturnsPage({super.key});
 
   @override
-  Widget build(BuildContext context) => const _PolicyPage(
-        title: 'Return policy',
-        summary:
-            'Return eligibility and instructions are confirmed by customer service for each order.',
+  Widget build(BuildContext context) => _PolicyPage(
+        title: context.tr(
+          'shop_policy_returns_title',
+          defaultText: 'Return policy',
+        ),
+        summary: context.tr(
+          'shop_policy_returns_summary',
+          defaultText:
+              'Return eligibility and instructions are confirmed by customer service for each order.',
+        ),
       );
 }
 
@@ -37,10 +50,16 @@ final class PrivacyPage extends StatelessWidget {
   const PrivacyPage({super.key});
 
   @override
-  Widget build(BuildContext context) => const _PolicyPage(
-        title: 'Privacy policy',
-        summary:
-            'Privacy details are not configured for this storefront yet. Contact support for the current policy.',
+  Widget build(BuildContext context) => _PolicyPage(
+        title: context.tr(
+          'shop_policy_privacy_title',
+          defaultText: 'Privacy policy',
+        ),
+        summary: context.tr(
+          'shop_policy_privacy_summary',
+          defaultText:
+              'Privacy details are not configured for this storefront yet. Contact support for the current policy.',
+        ),
       );
 }
 
@@ -51,10 +70,16 @@ final class TermsPage extends StatelessWidget {
   const TermsPage({super.key});
 
   @override
-  Widget build(BuildContext context) => const _PolicyPage(
-        title: 'Terms of service',
-        summary:
-            'Purchase terms are not configured for this storefront yet. Contact support before placing an order.',
+  Widget build(BuildContext context) => _PolicyPage(
+        title: context.tr(
+          'shop_policy_terms_title',
+          defaultText: 'Terms of service',
+        ),
+        summary: context.tr(
+          'shop_policy_terms_summary',
+          defaultText:
+              'Purchase terms are not configured for this storefront yet. Contact support before placing an order.',
+        ),
       );
 }
 
@@ -87,7 +112,10 @@ final class _PolicyPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          'Policy information unavailable',
+                          context.tr(
+                            'shop_policy_unavailable',
+                            defaultText: 'Policy information unavailable',
+                          ),
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         const SizedBox(height: 8),
@@ -104,7 +132,12 @@ final class _PolicyPage extends StatelessWidget {
                           child: FilledButton(
                             onPressed: () =>
                                 context.navigator.customerService().go(),
-                            child: const Text('Contact customer service'),
+                            child: Text(
+                              context.tr(
+                                'shop_policy_contact_customer_service',
+                                defaultText: 'Contact customer service',
+                              ),
+                            ),
                           ),
                         ),
                       ],

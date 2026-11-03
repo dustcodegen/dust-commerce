@@ -575,6 +575,26 @@
   "@account_terms": {
     "description": "Registration legal acknowledgement."
   },
+  "account_policy_prefix": "အကောင့်ဖန်တီးခြင်းဖြင့် Morrow ၏ ",
+  "@account_policy_prefix": {
+    "description": "Registration legal acknowledgement before the privacy link."
+  },
+  "account_policy_privacy": "ကိုယ်ရေးအချက်အလက်မူဝါဒ",
+  "@account_policy_privacy": {
+    "description": "Registration privacy-policy link label."
+  },
+  "account_policy_and": " နှင့် ",
+  "@account_policy_and": {
+    "description": "Registration legal acknowledgement conjunction."
+  },
+  "account_policy_terms": "အသုံးပြုမှုစည်းမျဉ်းများ",
+  "@account_policy_terms": {
+    "description": "Registration terms link label."
+  },
+  "account_policy_end": "။",
+  "@account_policy_end": {
+    "description": "Registration legal acknowledgement punctuation."
+  },
   "account_title": "အကောင့်",
   "@account_title": {
     "description": "Customer account navigation label."
@@ -1535,6 +1555,19 @@
   "@search_products": {
     "description": "Translation for `shop_search_products`."
   },
+  "search_results_for": "\"{query}\" အတွက် ရှာဖွေမှုရလဒ်များ",
+  "@search_results_for": {
+    "description": "Search-results page heading.",
+    "placeholders": {
+      "query": {
+        "example": "tee"
+      }
+    }
+  },
+  "search_no_match": "ရှာဖွေမှုနှင့် ကိုက်ညီသော ပစ္စည်းမရှိပါ။ အခြားသော စကားလုံးဖြင့် ထပ်ရှာပါ။",
+  "@search_no_match": {
+    "description": "Search-results empty state."
+  },
   "search_start": "ပစ္စည်းရှာရန် စာရိုက်ပါ။",
   "@search_start": {
     "description": "Translation for `shop_search_start`."
@@ -1559,6 +1592,46 @@
   "select_variant": "အမျိုးအစား ရွေးချယ်ပါ",
   "@select_variant": {
     "description": "Prompts for a complete option selection."
+  },
+  "policy_shipping_title": "ပို့ဆောင်မှုအချက်အလက်",
+  "@policy_shipping_title": {
+    "description": "Shipping policy page title."
+  },
+  "policy_shipping_summary": "သင့်ပို့ဆောင်မည့်နေရာအပေါ်မူတည်၍ ပို့ဆောင်နည်းလမ်းနှင့် နောက်ဆုံးကုန်ကျစရိတ်ကို အော်ဒါတင်ချိန်တွင် တွက်ချက်ပါမည်။",
+  "@policy_shipping_summary": {
+    "description": "Shipping policy page summary."
+  },
+  "policy_returns_title": "ပြန်အပ်မှုမူဝါဒ",
+  "@policy_returns_title": {
+    "description": "Return policy page title."
+  },
+  "policy_returns_summary": "အော်ဒါတစ်ခုချင်းစီအတွက် ပြန်အပ်နိုင်မှုနှင့် လုပ်ဆောင်ရမည့်အဆင့်များကို ဖောက်သည်ဝန်ဆောင်မှုက အတည်ပြုပါမည်။",
+  "@policy_returns_summary": {
+    "description": "Return policy page summary."
+  },
+  "policy_privacy_title": "ကိုယ်ရေးအချက်အလက်မူဝါဒ",
+  "@policy_privacy_title": {
+    "description": "Privacy policy page title."
+  },
+  "policy_privacy_summary": "ဤစတိုးအတွက် ကိုယ်ရေးအချက်အလက်အသေးစိတ်ကို မသတ်မှတ်ရသေးပါ။ လက်ရှိမူဝါဒအတွက် အကူအညီကို ဆက်သွယ်ပါ။",
+  "@policy_privacy_summary": {
+    "description": "Privacy policy page summary."
+  },
+  "policy_terms_title": "ဝန်ဆောင်မှုအသုံးပြုမှုစည်းမျဉ်းများ",
+  "@policy_terms_title": {
+    "description": "Terms page title."
+  },
+  "policy_terms_summary": "ဝယ်ယူမှုစည်းမျဉ်းများကို ဤစတိုးအတွက် မသတ်မှတ်ရသေးပါ။ အော်ဒါမတင်မီ အကူအညီကို ဆက်သွယ်ပါ။",
+  "@policy_terms_summary": {
+    "description": "Terms page summary."
+  },
+  "policy_unavailable": "မူဝါဒအချက်အလက် မရရှိနိုင်ပါ",
+  "@policy_unavailable": {
+    "description": "Policy page unavailable heading."
+  },
+  "policy_contact_customer_service": "ဖောက်သည်ဝန်ဆောင်မှုကို ဆက်သွယ်ပါ",
+  "@policy_contact_customer_service": {
+    "description": "Policy page support action."
   },
   "shipping_returns": "ပို့ဆောင်မှုနှင့် ပြန်အပ်မှု",
   "@shipping_returns": {

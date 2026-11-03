@@ -1,4 +1,5 @@
 import 'package:commerce_app/route.dart';
+import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
 /// Registration consent copy with the same actionable policy links as Medusa.
@@ -11,23 +12,35 @@ final class AccountPolicyNotice extends StatelessWidget {
         alignment: WrapAlignment.center,
         crossAxisAlignment: WrapCrossAlignment.center,
         children: [
-          const Text(
-            "By creating an account, you agree to Morrow's ",
+          Text(
+            context.tr(
+              'shop_account_policy_prefix',
+              defaultText: "By creating an account, you agree to Morrow's ",
+            ),
             style: TextStyle(fontSize: 12, height: 20 / 12),
           ),
           _AccountPolicyLink(
-            label: 'Privacy Policy',
+            label: context.tr(
+              'shop_account_policy_privacy',
+              defaultText: 'Privacy Policy',
+            ),
             onPressed: () => context.navigator.privacy().go(),
           ),
-          const Text(
-            ' and ',
+          Text(
+            context.tr('shop_account_policy_and', defaultText: ' and '),
             style: TextStyle(fontSize: 12, height: 20 / 12),
           ),
           _AccountPolicyLink(
-            label: 'Terms of Use',
+            label: context.tr(
+              'shop_account_policy_terms',
+              defaultText: 'Terms of Use',
+            ),
             onPressed: () => context.navigator.terms().go(),
           ),
-          const Text('.', style: TextStyle(fontSize: 12, height: 20 / 12)),
+          Text(
+            context.tr('shop_account_policy_end', defaultText: '.'),
+            style: const TextStyle(fontSize: 12, height: 20 / 12),
+          ),
         ],
       );
 }

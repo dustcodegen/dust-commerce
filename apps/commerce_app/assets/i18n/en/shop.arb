@@ -575,6 +575,26 @@
   "@account_terms": {
     "description": "Registration legal acknowledgement."
   },
+  "account_policy_prefix": "By creating an account, you agree to Morrow's ",
+  "@account_policy_prefix": {
+    "description": "Registration legal acknowledgement before the privacy link."
+  },
+  "account_policy_privacy": "Privacy Policy",
+  "@account_policy_privacy": {
+    "description": "Registration privacy-policy link label."
+  },
+  "account_policy_and": " and ",
+  "@account_policy_and": {
+    "description": "Registration legal acknowledgement conjunction."
+  },
+  "account_policy_terms": "Terms of Use",
+  "@account_policy_terms": {
+    "description": "Registration terms link label."
+  },
+  "account_policy_end": ".",
+  "@account_policy_end": {
+    "description": "Registration legal acknowledgement punctuation."
+  },
   "account_title": "Account",
   "@account_title": {
     "description": "Customer account navigation label."
@@ -1535,6 +1555,19 @@
   "@search_products": {
     "description": "Translation for `shop_search_products`."
   },
+  "search_results_for": "Search results for \"{query}\"",
+  "@search_results_for": {
+    "description": "Search-results page heading.",
+    "placeholders": {
+      "query": {
+        "example": "tee"
+      }
+    }
+  },
+  "search_no_match": "No products match your search. Try a different keyword.",
+  "@search_no_match": {
+    "description": "Search-results empty state."
+  },
   "search_start": "Start typing to search for products.",
   "@search_start": {
     "description": "Translation for `shop_search_start`."
@@ -1559,6 +1592,46 @@
   "select_variant": "Select variant",
   "@select_variant": {
     "description": "Prompts for a complete option selection."
+  },
+  "policy_shipping_title": "Shipping information",
+  "@policy_shipping_title": {
+    "description": "Shipping policy page title."
+  },
+  "policy_shipping_summary": "Shipping methods and final costs are calculated for your destination at checkout.",
+  "@policy_shipping_summary": {
+    "description": "Shipping policy page summary."
+  },
+  "policy_returns_title": "Return policy",
+  "@policy_returns_title": {
+    "description": "Return policy page title."
+  },
+  "policy_returns_summary": "Return eligibility and instructions are confirmed by customer service for each order.",
+  "@policy_returns_summary": {
+    "description": "Return policy page summary."
+  },
+  "policy_privacy_title": "Privacy policy",
+  "@policy_privacy_title": {
+    "description": "Privacy policy page title."
+  },
+  "policy_privacy_summary": "Privacy details are not configured for this storefront yet. Contact support for the current policy.",
+  "@policy_privacy_summary": {
+    "description": "Privacy policy page summary."
+  },
+  "policy_terms_title": "Terms of service",
+  "@policy_terms_title": {
+    "description": "Terms page title."
+  },
+  "policy_terms_summary": "Purchase terms are not configured for this storefront yet. Contact support before placing an order.",
+  "@policy_terms_summary": {
+    "description": "Terms page summary."
+  },
+  "policy_unavailable": "Policy information unavailable",
+  "@policy_unavailable": {
+    "description": "Policy page unavailable heading."
+  },
+  "policy_contact_customer_service": "Contact customer service",
+  "@policy_contact_customer_service": {
+    "description": "Policy page support action."
   },
   "shipping_returns": "Shipping & Returns",
   "@shipping_returns": {

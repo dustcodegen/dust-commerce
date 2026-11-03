@@ -66,7 +66,10 @@ final class _SearchPageState extends State<SearchPage> {
       return StoreScaffold(
         body: Center(
           child: Text(
-            'Could not search products.',
+            context.tr(
+              'shop_search_failed',
+              defaultText: 'Could not search products.',
+            ),
             style: TextStyle(color: StoreColors.danger),
           ),
         ),
@@ -86,8 +89,15 @@ final class _SearchPageState extends State<SearchPage> {
                     children: [
                       Text(
                         query.isEmpty
-                            ? 'Search'
-                            : 'Search results for "$query"',
+                            ? context.tr(
+                                'shop_search_title',
+                                defaultText: 'Search',
+                              )
+                            : context.tr(
+                                'shop_search_results_for',
+                                defaultText: 'Search results for "$query"',
+                                args: {'query': query},
+                              ),
                         style: const TextStyle(
                           fontSize: 30,
                           height: 1.35,
@@ -102,10 +112,14 @@ final class _SearchPageState extends State<SearchPage> {
                             .go(),
                       ),
                       if (query.isEmpty)
-                        const Padding(
+                        Padding(
                           padding: EdgeInsets.symmetric(vertical: 24),
                           child: Text(
-                            'Start typing to search for products.',
+                            context.tr(
+                              'shop_search_start',
+                              defaultText:
+                                  'Start typing to search for products.',
+                            ),
                             style: TextStyle(
                               color: StoreColors.foregroundMuted,
                             ),
@@ -115,7 +129,7 @@ final class _SearchPageState extends State<SearchPage> {
                         const Padding(
                           padding: EdgeInsets.symmetric(vertical: 24),
                           child: TranslatedText(
-                            'shop_no_products_matched',
+                            'shop_search_no_match',
                             defaultText:
                                 'No products match your search. Try a different keyword.',
                             style: TextStyle(
