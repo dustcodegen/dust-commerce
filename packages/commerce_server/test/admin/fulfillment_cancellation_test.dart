@@ -35,7 +35,7 @@ void main() {
     expect(fulfillment['shipped_at'], isNull);
     expect(fulfillment['delivered_at'], isNull);
     expect(await _canceledBy(harness), 'admin_1');
-    expect(DateTime.parse(await _canceledAt(harness)).isUtc, isTrue);
+    expect((await _canceledAt(harness)).isUtc, isTrue);
   });
 
   test('rejects unavailable notification before cancellation writes', () async {
@@ -101,12 +101,12 @@ void main() {
 const _path = '/admin/orders/ord_detail/fulfillments/ful_detail/cancel';
 const _body = <String, Object?>{'no_notification': true};
 
-Future<String> _canceledAt(AdminHarness harness) async {
+Future<DateTime> _canceledAt(AdminHarness harness) async {
   final rows = await harness.raw(
     "SELECT canceled_at FROM fulfillments "
     "WHERE id = 'ful_detail' AND canceled_at IS NOT NULL",
   );
-  return rows.single.readIndex<String>(0);
+  return rows.single.readIndex<DateTime>(0).toUtc();
 }
 
 Future<String> _canceledBy(AdminHarness harness) async {

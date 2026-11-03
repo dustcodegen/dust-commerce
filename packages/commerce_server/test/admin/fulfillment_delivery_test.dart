@@ -34,7 +34,7 @@ void main() {
     expect(
         DateTime.parse(fulfillment['delivered_at']! as String).isUtc, isTrue);
     expect(fulfillment['shipped_at'], isNull);
-    expect(DateTime.parse(await _deliveredAt(harness)).isUtc, isTrue);
+    expect((await _deliveredAt(harness)).isUtc, isTrue);
   });
 
   test('rejects unavailable notification before delivery writes', () async {
@@ -92,12 +92,12 @@ const _path =
     '/admin/orders/ord_detail/fulfillments/ful_detail/mark-as-delivered';
 const _body = <String, Object?>{'no_notification': true};
 
-Future<String> _deliveredAt(AdminHarness harness) async {
+Future<DateTime> _deliveredAt(AdminHarness harness) async {
   final rows = await harness.raw(
     "SELECT delivered_at FROM fulfillments "
     "WHERE id = 'ful_detail' AND delivered_at IS NOT NULL",
   );
-  return rows.single.readIndex<String>(0);
+  return rows.single.readIndex<DateTime>(0).toUtc();
 }
 
 Future<bool> _hasDeliveredAt(AdminHarness harness) async {
