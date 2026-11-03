@@ -48,7 +48,7 @@ SELECT customer.id,
            ORDER BY is_default_shipping DESC, is_default_billing DESC,
                     created_at, id
          ) address
-       ), '[]') AS addresses_json
+       ), '[]'::json)::text AS addresses_json
 FROM customers customer
 WHERE customer.id = $1 AND customer.deleted_at IS NULL
 ''')

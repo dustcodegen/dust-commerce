@@ -41,9 +41,9 @@ void main() {
 SELECT created_at, updated_at FROM customer_addresses
 WHERE customer_id = 'cus_ada' AND deleted_at IS NULL
 ''');
-    final createdAt = timestamps.single.readIndex<String>(0);
-    expect(DateTime.parse(createdAt).isUtc, isTrue);
-    expect(timestamps.single.readIndex<String>(1), createdAt);
+    final createdAt = timestamps.single.readIndex<DateTime>(0).toUtc();
+    expect(createdAt.isUtc, isTrue);
+    expect(timestamps.single.readIndex<DateTime>(1).toUtc(), createdAt);
   });
 
   test('selecting a new default atomically clears the previous default',

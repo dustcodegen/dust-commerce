@@ -42,10 +42,10 @@ void main() {
     final rows = await harness.raw(r'''
 SELECT deleted_at, updated_at FROM customer_addresses WHERE id = 'addr_home'
 ''');
-    final deletedAt = rows.single.readIndexNullable<String>(0);
+    final deletedAt = rows.single.readIndexNullable<DateTime>(0)?.toUtc();
     expect(deletedAt, isNotNull);
-    expect(DateTime.parse(deletedAt!).isUtc, isTrue);
-    expect(rows.single.readIndex<String>(1), deletedAt);
+    expect(deletedAt!.isUtc, isTrue);
+    expect(rows.single.readIndex<DateTime>(1).toUtc(), deletedAt);
   });
 
   test('cannot delete an address through a different parent', () async {

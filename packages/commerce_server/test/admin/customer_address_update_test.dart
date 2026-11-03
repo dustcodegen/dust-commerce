@@ -48,10 +48,11 @@ void main() {
     final rows = await harness.raw(r'''
 SELECT created_at, updated_at FROM customer_addresses WHERE id = 'addr_home'
 ''');
-    expect(rows.single.readIndex<String>(0), '2026-09-10T10:00:00.000Z');
-    final updatedAt = rows.single.readIndex<String>(1);
-    expect(updatedAt, isNot('2026-09-10T10:00:00.000Z'));
-    expect(DateTime.parse(updatedAt).isUtc, isTrue);
+    final createdAt = rows.single.readIndex<DateTime>(0).toUtc();
+    expect(createdAt, DateTime.utc(2026, 9, 10, 10));
+    final updatedAt = rows.single.readIndex<DateTime>(1).toUtc();
+    expect(updatedAt, isNot(createdAt));
+    expect(updatedAt.isUtc, isTrue);
   });
 
   test('selecting a new default atomically clears the previous default',
@@ -111,10 +112,22 @@ SELECT count(*) FROM customer_addresses WHERE city = 'Changed'
 
   test('storage failure rolls back default and field changes', () async {
     await harness.raw(r'''
+CREATE OR REPLACE FUNCTION reject_address_update()
+RETURNS TRIGGER
+LANGUAGE PLPGSQL
+AS $$
+BEGIN
+  IF NEW.id = 'addr_work' THEN
+    RAISE EXCEPTION 'injected failure';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+''');
+    await harness.raw(r'''
 CREATE TRIGGER reject_address_update
 BEFORE UPDATE ON customer_addresses
-WHEN NEW.id = 'addr_work'
-BEGIN SELECT RAISE(ABORT, 'injected failure'); END
+FOR EACH ROW EXECUTE FUNCTION reject_address_update();
 ''');
     final request = harness.client.post(_path('cus_ada', 'addr_work'))
       ..bearer(await harness.adminToken())

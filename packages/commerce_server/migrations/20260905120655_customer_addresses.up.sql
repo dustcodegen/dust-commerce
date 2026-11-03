@@ -51,6 +51,36 @@ ON customer_addresses (customer_id)
 WHERE deleted_at IS NULL AND is_default_billing = 1;
 
 -- Selecting a new default atomically clears the previous active destination.
+CREATE OR REPLACE FUNCTION customer_addresses_normalize_defaults()
+RETURNS TRIGGER
+LANGUAGE PLPGSQL
+AS $$
+BEGIN
+  IF NEW.deleted_at IS NULL AND NEW.is_default_shipping = 1 THEN
+    UPDATE customer_addresses
+    SET is_default_shipping = 0
+    WHERE customer_id = NEW.customer_id
+      AND id <> NEW.id
+      AND deleted_at IS NULL
+      AND is_default_shipping = 1;
+  END IF;
+  IF NEW.deleted_at IS NULL AND NEW.is_default_billing = 1 THEN
+    UPDATE customer_addresses
+    SET is_default_billing = 0
+    WHERE customer_id = NEW.customer_id
+      AND id <> NEW.id
+      AND deleted_at IS NULL
+      AND is_default_billing = 1;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER customer_addresses_normalize_defaults
+BEFORE INSERT OR UPDATE OF customer_id, is_default_shipping, is_default_billing,
+  deleted_at ON customer_addresses
+FOR EACH ROW
+EXECUTE FUNCTION customer_addresses_normalize_defaults();
 
 
 
