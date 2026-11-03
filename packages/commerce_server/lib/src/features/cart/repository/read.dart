@@ -135,7 +135,7 @@ SELECT c.id, c.customer_id, c.email,
        ), '[]')::text AS promotions
 FROM carts c
 JOIN regions r ON r.id = c.region_id
-WHERE c.id = $1 AND c.completed_at IS NULL AND c.deleted_at IS NULL
+WHERE c.id = $1
 ''')
   Future<Result<CartResponse?, SqlxError>> findCart(String id);
 

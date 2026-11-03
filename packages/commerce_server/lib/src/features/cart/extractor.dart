@@ -1,6 +1,7 @@
 import 'package:commerce_server/src/features/account/extractor.dart';
 import 'package:commerce_server/src/features/cart/deps.dart';
 import 'package:commerce_server/src/features/cart/model/cart.dart';
+import 'package:commerce_server/src/features/cart/repository/activity.dart';
 import 'package:commerce_server/src/features/cart/service/service.dart';
 import 'package:dust_dart/db.dart';
 import 'package:dust_server/server.dart';
@@ -34,6 +35,13 @@ final class CartAccessExtractor implements FromRequestParts<CartAccess> {
     final state = await const StateExtractable<CartDeps>().extract(request);
     if (state case Err(:final error)) return Err(error);
     final deps = (state as Ok<CartDeps, Rejection>).value;
+    final active = await CartActivityRepository(deps.database.executor).active(
+      id,
+    );
+    if (active case Err()) return const Err(Rejection.internal());
+    if ((active as Ok<int?, SqlxError>).value == null) {
+      return Err(Rejection.notFound('Cart "$id"'));
+    }
     final loaded = await loadCart(deps.reads, id);
     if (loaded case Err()) return const Err(Rejection.internal());
 
