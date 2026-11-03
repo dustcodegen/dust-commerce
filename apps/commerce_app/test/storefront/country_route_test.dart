@@ -31,6 +31,21 @@ void main() {
     );
   });
 
+  test('country-prefixed policy links normalize to their public route', () {
+    final router = CommerceRouter(
+      initialLocation: Uri.parse('/dk/shipping'),
+      account: testAccount(const _UnusedApi()),
+      cart: testCart(const _UnusedApi()),
+    );
+
+    final parsed = router.parseRouteInformation(
+      RouteInformation(uri: Uri.parse('/')),
+    );
+
+    expect(parsed.uri.toString(), '/shipping');
+    expect(parseCommerceRoute(parsed.uri), isA<ShippingRoute>());
+  });
+
   test('router normalizes Medusa catch-all category links', () {
     final router = CommerceRouter(
       initialLocation: Uri.parse('/categories/clothing/shirts?page=2'),
