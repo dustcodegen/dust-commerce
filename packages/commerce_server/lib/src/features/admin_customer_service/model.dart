@@ -95,11 +95,11 @@ final class AdminCustomerServiceListResponse
 }
 
 final class _AdminCustomerServiceDateTime
-    implements SqlxTryFrom<DateTime, String> {
+    implements SqlxTryFrom<DateTime, DateTime> {
   const _AdminCustomerServiceDateTime();
 
   @override
-  DateTime decode(String value) => DateTime.parse(value);
+  DateTime decode(DateTime value) => value.toUtc();
 }
 
 final class _AdminCustomerServiceStatus
