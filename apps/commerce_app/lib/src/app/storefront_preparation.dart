@@ -10,6 +10,9 @@ extension on _CommerceAppState {
         await _cart.restore();
         await _cart.changeRegion(region.id);
         await _shell.selectCountry(country);
+      } else {
+        // Do not turn an unknown country prefix into a valid unprefixed route.
+        _router.setInitialLocation(widget.initialLocation);
       }
     }
     if (!mounted) return;

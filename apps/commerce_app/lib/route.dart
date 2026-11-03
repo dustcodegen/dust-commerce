@@ -29,8 +29,14 @@ final class CommerceRouter extends $CommerceRouter {
 
   /// Cart capability used by the public checkout route guard.
   final CartViewModel cartSession;
-  final Uri _initialLocation;
+  Uri _initialLocation;
   bool _initialLocationRead = false;
+
+  /// Restores a country prefix when region discovery rejects it.
+  void setInitialLocation(Uri location) {
+    if (_initialLocationRead) return;
+    _initialLocation = location;
+  }
 
   @override
   Listenable get refreshListenable => customerSession;

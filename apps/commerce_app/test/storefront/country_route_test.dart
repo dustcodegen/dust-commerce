@@ -30,6 +30,22 @@ void main() {
       '/products/t-shirt?v_id=var_tshirt_m_white#details',
     );
   });
+
+  test('unknown country prefixes remain on the not-found route', () {
+    final location = Uri.parse('/ZZ/products/t-shirt');
+    final router = CommerceRouter(
+      initialLocation: location,
+      account: testAccount(const _UnusedApi()),
+      cart: testCart(const _UnusedApi()),
+    );
+
+    router.setInitialLocation(location);
+    final parsed = router.parseRouteInformation(
+      RouteInformation(uri: Uri.parse('/')),
+    );
+
+    expect(parsed.uri.toString(), '/ZZ/products/t-shirt');
+  });
 }
 
 final class _UnusedApi implements CommerceApi {
