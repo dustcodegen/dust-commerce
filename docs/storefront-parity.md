@@ -56,6 +56,12 @@ values as the current Medusa seed for both local regions. Existing custom
 metadata is preserved; only a missing region value is filled, so local policy
 pages render useful defaults without overwriting merchant settings.
 
+Release-browser smoke on 2026-11-03 used a fresh PostgreSQL database and the
+current Dust API: `/dk/shipping` normalized to `/shipping` and rendered `EUR 10`,
+`0-1` handling days and `2-3` delivery days; `/dk/returns` rendered the
+30-day paid-return copy. The temporary browser port was allowed explicitly in
+CORS and was not used as a repository development port.
+
 ## Theme and selection map
 
 These values come from the light tokens in
