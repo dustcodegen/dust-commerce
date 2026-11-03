@@ -102,4 +102,8 @@ VALUES
    'usd', 2000, 0, 2000, '2026-09-11T10:00:00.000Z',
    '2026-09-11T10:00:00.000Z', '2026-09-11T10:05:00.000Z')
 ''', const []);
+  await database.connection.execute(r'''
+INSERT INTO order_sales_channels (order_id, sales_channel_id)
+VALUES ('ord_web', 'sc_web'), ('ord_wholesale', 'sc_wholesale')
+''', const []);
 }
