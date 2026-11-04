@@ -310,10 +310,11 @@ render remains the visual source baseline.
 
 ## Open findings
 
-- P2 — Capture the Dust and pinned-source confirmation states from the local
-  same-state stack, then judge visible differences before declaring rendered
-  parity; Dust Review is now captured, while the pinned source's cart route
-  currently fails before checkout and the public preview remains unavailable.
+- P2 — Capture the pinned-source confirmation state from the local same-state
+  stack, then judge visible differences before declaring rendered parity; Dust
+  Review and order confirmation are already captured, while the pinned
+  source's cart route currently fails before checkout and the public preview
+  remains unavailable.
 - P2 — Repeat the verification success/failure capture against the live Medusa
   preview when its route is reachable, because its current cart failure is a
   separate runtime issue.
