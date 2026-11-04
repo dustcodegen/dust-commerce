@@ -2343,6 +2343,9 @@ seed. The API ran on `3878` and the Store ran on `13001`.
 - The full Store Flutter suite passed: 168 tests.
 - Flutter analysis passed with no issues; Dust checks reported 194 clean Store
   outputs and 166 clean server outputs.
+- GitHub CI run `41791467479` passed the full verification job, including Dust
+  regeneration and policy, SQLx up/down, analysis, format, all Dart/Flutter
+  tests, the 180-line budget and backend structure checks.
 - The browser harness's initial white canvas was its `Enable accessibility`
   bridge state, not a Store/API failure; the enabled semantics tree and render
   matched the expected routes above.
