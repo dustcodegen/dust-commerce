@@ -53,6 +53,14 @@ void main() {
       regionMetadata.single.read<String>('metadata'),
       '{"return_window_days":30,"free_returns":false,"shipping_rate":10,"handling_days_min":0,"handling_days_max":1,"transit_days_min":2,"transit_days_max":3}',
     );
+    final regionCountries = await queryRaw(
+      "SELECT countries FROM regions WHERE id = 'reg_eu'",
+      const [],
+    ).fetch(database.connection as Executor);
+    expect(
+      regionCountries.single.read<String>('countries'),
+      'gb,de,dk,se,fr,es,it',
+    );
     expect(await _count(database, 'sales_channels'), 2);
     expect(await _count(database, 'region_payment_providers'), 2);
     expect(await _count(database, 'return_reasons'), 5);
