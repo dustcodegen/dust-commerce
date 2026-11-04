@@ -24,7 +24,7 @@ final class CustomerAddressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        constraints: const BoxConstraints(minHeight: 220),
+        height: 220,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           border: Border.all(color: StoreColors.border),
