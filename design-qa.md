@@ -2234,4 +2234,45 @@ editor was implemented but not mounted on `/account/profile`.
 Store authenticated profile password editor result: functional route and local
 browser composition passed; authenticated Medusa visual comparison remains open
 
+## Store authenticated saved-address checkout
+
+This slice verifies the saved-address path end to end against the local Store
+and API, including the server-owned checkout state rather than only the form
+presentation.
+
+**Browser evidence**
+
+- A QA customer signed in through the Store and received a saved address from
+  the real customer-address API.
+- The account address book rendered the saved card and its Edit/Remove actions.
+  The card now has an explicit 220px height because its action row uses a
+  `Spacer`; this keeps the column finite inside the address-book scroll view
+  and removes the Flutter unbounded-constraints assertion/visual overlap.
+- Checkout opened the saved-address selector. Selecting the saved address
+  copied the server-owned name, street, city, postal code, country and phone
+  into the checkout fields.
+- Continuing to Delivery persisted `cart_addresses` in PostgreSQL. The direct
+  `?step=delivery` route restored the address and showed Standard, Express and
+  Free delivery options.
+- Standard shipping and Manual Payment were selected, and the flow reached
+  `http://127.0.0.1:13001/checkout?step=review`. A hard reload retained the
+  review route and produced no new browser warning or error logs.
+
+**Evidence limits**
+
+- A same-state authenticated Medusa checkout raster remains unavailable, so
+  this pass proves local route/data behavior and source-shaped composition,
+  not final pixel parity.
+
+**Validation**
+
+- The focused saved-address, address-book and checkout ViewModel tests passed:
+  5 tests.
+- Scoped account/checkout analysis passed with no issues.
+- No widget test was added.
+
+Store authenticated saved-address checkout result: server-backed address
+selection, persistence, delivery/payment progression and reload passed; the
+authenticated Medusa visual comparison remains open
+
 final result: blocked
