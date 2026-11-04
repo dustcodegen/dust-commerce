@@ -1,7 +1,11 @@
 import 'package:commerce_server/src/features/catalog/deps.dart';
 import 'package:commerce_server/src/features/catalog/model.dart';
 import 'package:commerce_server/src/features/catalog/service/service.dart';
+import 'package:commerce_server/src/features/region/deps.dart';
+import 'package:commerce_server/src/features/region/model.dart';
+import 'package:commerce_server/src/features/region/service.dart';
 import 'package:commerce_server/src/http/http.dart';
+import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_server/server.dart';
 
 /// `GET /products/{handle}` — one published product.
@@ -32,4 +36,91 @@ Future<Result<ProductResponse, Rejection>> readProductHandler(
     Ok(value: None()) => Err(Rejection.notFound('Product "$handle"')),
     Err() => const Err(Rejection.internal()),
   };
+}
+
+/// `GET /products/{handle}/markdown` — a public Markdown product projection.
+Future<Object?> readProductMarkdownHandler(Request request) async {
+  final handle = pathParametersOf(request)['handle'];
+  if (handle == null || handle.isEmpty) {
+    return const Rejection.badRequest('A product handle is required');
+  }
+
+  final country = request.requestedUri.queryParameters['country']?.trim();
+  if (country != null && !RegExp(r'^[A-Za-z]{2}$').hasMatch(country)) {
+    return const Rejection.badRequest('country must be an ISO country code');
+  }
+  final countryCode = (country ?? 'us').toLowerCase();
+
+  final catalogState = await catalogDeps(request);
+  if (catalogState case Err(:final error)) return error;
+  final catalog = (catalogState as Ok<CatalogDeps, Rejection>).value;
+
+  var currencyCode = currencyOf(request);
+  StoreRegionPolicy? policy;
+  final regionState = await regionDeps(request);
+  if (regionState case Err(:final error)) return error;
+  final regions = await listSellingRegions(
+    (regionState as Ok<RegionDeps, Rejection>).value.regions,
+  );
+  final SellingRegionListResponse listing;
+  switch (regions) {
+    case Err():
+      return const Rejection.internal();
+    case Ok(:final value):
+      listing = value;
+  }
+  final region = listing.regions
+      .where((candidate) => candidate.countries.contains(countryCode))
+      .firstOrNull;
+  if (region != null) {
+    currencyCode = region.currencyCode;
+    policy = region.policy;
+  } else if (country != null && listing.regions.isNotEmpty) {
+    return Rejection.notFound('Country "$countryCode"');
+  }
+
+  final productResult = await findProduct(
+    catalog.reads,
+    handle: handle,
+    currencyCode: currencyCode,
+  );
+  final ProductResponse product;
+  switch (productResult) {
+    case Err():
+      return const Rejection.internal();
+    case Ok(value: None()):
+      return Rejection.notFound('Product "$handle"');
+    case Ok(value: Some(:final value)):
+      product = value;
+  }
+
+  final origin = _requestOrigin(request);
+  return Response(
+    200,
+    body: renderProductMarkdown(
+      product,
+      origin: origin,
+      countryCode: countryCode,
+      currencyCode: currencyCode,
+      policy: policy,
+    ),
+    headers: const {
+      'cache-control':
+          'public, max-age=0, s-maxage=60, stale-while-revalidate=600',
+      'content-type': 'text/markdown; charset=utf-8',
+      'vary': 'Accept',
+    },
+  );
+}
+
+String _requestOrigin(Request request) {
+  final forwardedProto = request.headers['x-forwarded-proto'];
+  final proto = forwardedProto == null || forwardedProto.isEmpty
+      ? 'http'
+      : forwardedProto.split(',').first.trim();
+  final forwardedHost = request.headers['x-forwarded-host'];
+  final host = forwardedHost == null || forwardedHost.isEmpty
+      ? request.headers['host'] ?? 'localhost'
+      : forwardedHost.split(',').first.trim();
+  return '$proto://$host';
 }
