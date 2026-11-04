@@ -2,7 +2,7 @@
 library;
 
 export 'create.dart';
-export 'activity.dart';
+export 'read/active.dart';
 export 'list.dart';
 export 'read.dart';
 export 'update/update.dart';

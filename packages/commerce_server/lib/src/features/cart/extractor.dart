@@ -1,7 +1,7 @@
 import 'package:commerce_server/src/features/account/extractor.dart';
 import 'package:commerce_server/src/features/cart/deps.dart';
 import 'package:commerce_server/src/features/cart/model/cart.dart';
-import 'package:commerce_server/src/features/cart/repository/activity.dart';
+import 'package:commerce_server/src/features/cart/repository/read/active.dart';
 import 'package:commerce_server/src/features/cart/service/service.dart';
 import 'package:dust_dart/db.dart';
 import 'package:dust_server/server.dart';

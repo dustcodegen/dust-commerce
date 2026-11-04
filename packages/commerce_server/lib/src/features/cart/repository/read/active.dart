@@ -1,11 +1,11 @@
 import 'package:dust_dart/db.dart';
 
-part 'activity.g.dart';
+part 'active.g.dart';
 
-/// The minimal cart-state read used by the public capability guard.
+/// The active-cart capability read.
 @SqlxDao()
 abstract final class CartActivityRepository {
-  /// Binds the queries to [db].
+  /// Binds the query to [db].
   const factory CartActivityRepository(Executor db) = _$CartActivityRepository;
 
   /// Returns a row only while the cart can still be mutated or resumed.
