@@ -63,6 +63,22 @@ void main() {
     expect(model.state.order!.id, placedId);
     expect(model.state.order!.paymentStatus, PaymentStatus.captured);
   });
+
+  test('reset drops payment state after the selling region changes', () async {
+    final model = context.checkout()..prepare();
+    await saveTestAddress(model);
+    await model.loadDelivery();
+    await model.chooseDelivery('ship_standard');
+    expect(await model.loadPaymentMethods(), isTrue);
+    expect(await model.selectPayment('manual'), isTrue);
+
+    model.reset();
+
+    expect(model.state.status, CheckoutStatus.idle);
+    expect(model.state.paymentProviders, isEmpty);
+    expect(model.state.paymentProvidersLoaded, isFalse);
+    expect(model.state.hasPaymentMethod, isFalse);
+  });
 }
 
 final class _FailFirstCaptureApi implements CommerceApi {

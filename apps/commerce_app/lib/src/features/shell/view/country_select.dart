@@ -109,6 +109,8 @@ final class StoreCountrySelect extends StatelessWidget {
       ));
       return;
     }
+    // A region change invalidates the old checkout provider and step state.
+    context.readCheckoutViewModel().reset();
     final selected = await shell.selectCountry(countryCode);
     if (selected && context.mounted) Navigator.of(context).pop();
   }
