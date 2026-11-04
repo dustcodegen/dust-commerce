@@ -778,14 +778,15 @@ paging are comparable.
 
 **Findings**
 
-- [P2] Query controls are incomplete
+- Query controls are implemented and server-backed
   Location: Shipping Profiles table toolbar.
-  Evidence: the official Medusa raster shows Add filter on the left and a sort
-  menu beside Search. Morrow currently renders only server-backed Search.
-  Impact: merchants cannot reproduce Medusa's name, type, created or updated
-  filtering and ordering workflow.
-  Fix: add validated filter/order query contracts, SQLx conditions, generated
-  client state and working toolbar controls before repeating visual QA.
+  Evidence: Morrow renders Add filter on the left and an allowlisted sort menu
+  beside Search. Name, Type, Created at and Updated at filters normalize through
+  the Admin contract, persist as active chips, clear independently or together,
+  and reset paging. The API validates date bounds and order values before the
+  SQLx query executes.
+  Result: the Medusa query-control workflow is functionally covered; only the
+  combined visual-export limitation below remains.
 
 - [P2] Combined comparison export was blocked
   Location: in-app browser evidence board.
@@ -818,8 +819,9 @@ URL policy, so no pass is claimed from separate views.
 
 **Focused region comparison evidence**
 
-No valid combined focused crop exists. The table toolbar is therefore retained
-as an explicit P2 blocker.
+No valid combined focused crop exists because the browser policy rejected the
+comparison data URL. This is an evidence-export limitation, not a missing
+toolbar implementation.
 
 **Comparison history**
 
@@ -828,9 +830,19 @@ as an explicit P2 blocker.
 - Live browser QA passed list, create, detail, typed delete, refresh and product
   link navigation. A hot-reload-only scope error was resolved by the required
   hot restart; no browser errors occurred afterward.
-- Official raster review exposed the missing Add filter and sort controls.
+- Official raster review originally exposed the missing Add filter and sort
+  controls. The current implementation now exposes both controls and the
+  focused ViewModel/API tests pass.
 
-Admin Shipping Profiles settings result: blocked
+**Validation**
+
+- `flutter test apps/admin_app/test/shipping_profile/admin_shipping_profile_view_model_test.dart apps/admin_app/test/shipping_profile/admin_shipping_profile_detail_view_model_test.dart` passed: 6 tests.
+- The authenticated browser list rendered Add filter, Search and sort controls;
+  the same session reached the server-backed profile detail route.
+- No widget test was added.
+
+Admin Shipping Profiles settings result: functional list/query/detail passed;
+combined visual-export evidence remains open
 
 ## Store home responsive layout and typography
 
