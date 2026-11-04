@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:commerce_server/commerce_server.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -23,6 +24,10 @@ void main() {
     final versions =
         ups.map((file) => file.uri.pathSegments.last.split('_').first).toList();
     expect(versions.toSet(), hasLength(versions.length));
+    expect(
+      versions,
+      commerceSqlxMigrationVersions.map((version) => '$version').toList(),
+    );
 
     for (final up in ups) {
       final name = up.uri.pathSegments.last;
