@@ -2166,4 +2166,36 @@ Store order confirmation help links result: passed for current source-code
 composition, compact browser behavior, contact prefill and browser-log
 cleanliness; same-state live Medusa confirmation remains unavailable
 
+## Store authenticated profile password editor
+
+This slice closes the functional gap where the existing password-rotation
+editor was implemented but not mounted on `/account/profile`.
+
+**Browser evidence**
+
+- A fresh PostgreSQL database, full SQLx migration set and opt-in development
+  seed ran behind API `3878`; the Store ran on `13001`.
+- A QA customer signed in successfully through the Store account route. The
+  authenticated profile rendered the `PASSWORD` row with the source copy, and
+  `Edit` opened `Old password`, `New password`, `Confirm password`, `Cancel`
+  and `Save changes` controls.
+- The editor was inspected without submitting a password change, so no
+  credential mutation was performed during browser QA.
+
+**Evidence limits**
+
+- This proves the route wiring and local rendered composition. A same-state
+  authenticated Medusa raster remains unavailable, so pixel parity is still
+  pending.
+
+**Validation**
+
+- `dart analyze apps/commerce_app` passed with no issues.
+- The three account ViewModel/guard suites passed with Flutter: 13 tests.
+- `flutter build web --release` passed.
+- No widget test was added.
+
+Store authenticated profile password editor result: functional route and local
+browser composition passed; authenticated Medusa visual comparison remains open
+
 final result: blocked
