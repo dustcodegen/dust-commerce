@@ -11,6 +11,7 @@ import 'account_section.dart';
 import 'profile_billing_address_editor.dart';
 import 'profile_email_info.dart';
 import 'profile_name_editor.dart';
+import 'profile_password_editor.dart';
 import 'profile_phone_editor.dart';
 
 /// Authenticated Medusa profile-information route.
@@ -95,6 +96,8 @@ final class _ProfileContent extends StatelessWidget {
             customer: customer,
             state: addresses,
           ),
+          const _ProfileDivider(),
+          const ProfilePasswordEditor(),
         ],
       );
 }
