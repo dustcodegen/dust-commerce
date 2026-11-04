@@ -210,6 +210,18 @@ console contained no warnings or errors. The implementation passes all 127
 non-widget storefront tests, Flutter analysis, and all 50 generated Dust
 checks; no widget test was added.
 
+## Store listing desktop alignment slice
+
+The current Medusa DTC source at `913d4482641da21c9a219c92a5aa6b959af9bfd7`
+places the Store title, search field, and product grid in the product column
+beside the refinement sidebar. A fresh disposable PostgreSQL database with the
+opt-in development seed and a release-mode Flutter web build were inspected at
+the same `1686 × 772` desktop viewport. Dust now follows that composition: the
+`All products` heading begins above the search row at the grid's left edge,
+instead of spanning above the sidebar. Four-column card geometry and sidebar
+placement matched the source capture; the corrected layout is committed as
+`3665bfbf`.
+
 ## Admin return receipt slice
 
 The pinned Admin source has no standalone Returns page. Order detail queries
