@@ -325,8 +325,10 @@ payload and current catalogue identities, then creates or updates product,
 variant, option, price, tag and image graphs in one SQLx transaction. Exact
 integer minor-unit prices avoid floating-point conversion; expiry, repeated
 confirmation, foreign ownership and identity/SKU conflicts are rejected before
-catalogue writes. The Admin drawer still keeps Import disabled until the next
-stacked UI slice wires this route through its generated client.
+catalogue writes. The Admin drawer now sends the staged transaction id through
+the generated authenticated client, closes only after a successful `202`,
+reloads the product list and reports the result without exposing the response
+object.
 
 Order detail now opens from the Medusa-shaped order table through a dedicated
 generated Admin client that reuses the Dio authorization interceptor. Its
