@@ -27,12 +27,14 @@ final class StoreCountrySelect extends StatelessWidget {
           ));
     final code = (selected as Some<String>).value;
     final cart = context.watchCartViewModel().value;
+    final checkout = context.watchCheckoutViewModel().value;
     final changing = cart.operation == CartOperation.region &&
         cart.status == CartStatus.loading;
+    final busy = changing || checkout.isBusy;
     final popupHeight = math.min(442.0, options.length * 36.0);
 
     return PopupMenuButton<String>(
-      enabled: !changing,
+      enabled: !busy,
       color: Colors.white,
       surfaceTintColor: Colors.transparent,
       elevation: 4,
