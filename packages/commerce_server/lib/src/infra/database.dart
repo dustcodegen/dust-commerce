@@ -120,6 +120,7 @@ const commerceSqlxMigrationVersions = <int>[
   20260914170001,
   20260915100000,
   20260915110000,
+  20261104120000,
 ];
 
 /// Legacy alias retained for migration-ownership tests.
