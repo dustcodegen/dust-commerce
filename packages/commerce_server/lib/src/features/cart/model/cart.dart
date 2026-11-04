@@ -139,6 +139,11 @@ final class OptionalShippingMethodFromJson
       optionId: json['option_id']! as String,
       name: json['name']! as String,
       amount: Money.fromJson(json['amount']! as Map<String, Object?>),
+      fulfillmentType: ShippingFulfillmentType.values.byName(
+        json['fulfillment_type']! as String,
+      ),
+      pickupAddress: json['pickup_address'] as String?,
+      pickupName: json['pickup_name'] as String?,
     );
   }
 }

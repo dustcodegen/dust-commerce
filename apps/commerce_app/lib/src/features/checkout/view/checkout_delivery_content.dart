@@ -27,32 +27,72 @@ final class CheckoutDeliveryChoices extends StatelessWidget {
   final CheckoutState state;
 
   @override
-  Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const TranslatedText(
-            'shop_checkout_shipping_method',
-            defaultText: 'Shipping method',
-            style: TextStyle(
-              fontSize: 14,
-              height: 20 / 14,
-              fontWeight: FontWeight.w500,
-            ),
+  Widget build(BuildContext context) {
+    final shippingOptions = cart.shippingOptions.where(
+      (option) => option.fulfillmentType == ShippingFulfillmentType.shipping,
+    );
+    final pickupOptions = cart.shippingOptions.where(
+      (option) => option.fulfillmentType == ShippingFulfillmentType.pickup,
+    );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const TranslatedText(
+          'shop_checkout_shipping_method',
+          defaultText: 'Shipping method',
+          style: TextStyle(
+            fontSize: 14,
+            height: 20 / 14,
+            fontWeight: FontWeight.w500,
           ),
-          const TranslatedText(
-            'shop_checkout_delivery_prompt',
-            defaultText: 'How would you like your order delivered',
-            style: TextStyle(
-              color: StoreColors.foregroundMuted,
-              fontSize: 14,
-              height: 20 / 14,
-            ),
+        ),
+        const TranslatedText(
+          'shop_checkout_delivery_prompt',
+          defaultText: 'How would you like your order delivered',
+          style: TextStyle(
+            color: StoreColors.foregroundMuted,
+            fontSize: 14,
+            height: 20 / 14,
           ),
-          const SizedBox(height: 16),
-          if (cart.shippingOptions.isEmpty && state.isBusy)
-            const Center(child: CircularProgressIndicator())
-          else
-            for (final option in cart.shippingOptions) ...[
+        ),
+        const SizedBox(height: 16),
+        if (cart.shippingOptions.isEmpty && state.isBusy)
+          const Center(child: CircularProgressIndicator())
+        else ...[
+          for (final option in shippingOptions) ...[
+            CheckoutDeliveryChoice(
+              option: option,
+              selected: selected?.optionId == option.optionId,
+              available: option.isAvailableFor(cart.cart!.subtotal),
+              enabled: !state.isBusy,
+              onTap: () => context
+                  .readCheckoutViewModel()
+                  .chooseDelivery(option.optionId),
+            ),
+            const SizedBox(height: 8),
+          ],
+          if (pickupOptions.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            const TranslatedText(
+              'shop_checkout_pickup_store',
+              defaultText: 'Store',
+              style: TextStyle(
+                fontSize: 14,
+                height: 20 / 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const TranslatedText(
+              'shop_checkout_pickup_prompt',
+              defaultText: 'Choose a store near you',
+              style: TextStyle(
+                color: StoreColors.foregroundMuted,
+                fontSize: 14,
+                height: 20 / 14,
+              ),
+            ),
+            const SizedBox(height: 16),
+            for (final option in pickupOptions) ...[
               CheckoutDeliveryChoice(
                 option: option,
                 selected: selected?.optionId == option.optionId,
@@ -64,6 +104,7 @@ final class CheckoutDeliveryChoices extends StatelessWidget {
               ),
               const SizedBox(height: 8),
             ],
+          ],
           if (state.status == CheckoutStatus.failed &&
               state.operation == CheckoutOperation.delivery) ...[
             StoreErrorMessage(state.message!),
@@ -81,64 +122,21 @@ final class CheckoutDeliveryChoices extends StatelessWidget {
               ),
             ),
           ],
-          const SizedBox(height: 24),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: CheckoutPrimaryAction(
-              label: context.tr(
-                'shop_checkout_continue_payment',
-                defaultText: 'Continue to payment',
-              ),
-              onPressed: selected == null || state.isBusy
-                  ? null
-                  : () => context.pushCheckoutStep('payment'),
+        ],
+        const SizedBox(height: 24),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: CheckoutPrimaryAction(
+            label: context.tr(
+              'shop_checkout_continue_payment',
+              defaultText: 'Continue to payment',
             ),
+            onPressed: selected == null || state.isBusy
+                ? null
+                : () => context.pushCheckoutStep('payment'),
           ),
-        ],
-      );
-}
-
-/// Collapsed delivery method accepted by the server-owned cart.
-final class CheckoutDeliverySummary extends StatelessWidget {
-  /// Creates a delivery summary.
-  const CheckoutDeliverySummary({required this.selected, super.key});
-
-  /// Shipping method selected on the cart.
-  final ShippingMethod? selected;
-
-  @override
-  Widget build(BuildContext context) {
-    final method = selected;
-    if (method == null) return const SizedBox.shrink();
-    return FractionallySizedBox(
-      widthFactor: 1 / 3,
-      alignment: Alignment.centerLeft,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const TranslatedText(
-            'shop_checkout_method',
-            defaultText: 'Method',
-            style: _deliverySummaryTitleStyle,
-          ),
-          Text(
-            '${method.name} ${formatMoney(method.amount)}',
-            style: _deliverySummaryValueStyle,
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
-
-const _deliverySummaryTitleStyle = TextStyle(
-  fontSize: 14,
-  height: 20 / 14,
-  fontWeight: FontWeight.w600,
-);
-
-const _deliverySummaryValueStyle = TextStyle(
-  color: StoreColors.foregroundSubtle,
-  fontSize: 14,
-  height: 20 / 14,
-);

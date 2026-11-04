@@ -16,6 +16,9 @@ abstract final class CartListRepository {
   /// remember to check.
   @Query(r'''
 SELECT option.id AS option_id, option.name,
+       coalesce(fulfillment.fulfillment_type, 'shipping') AS fulfillment_type,
+       fulfillment.pickup_name,
+       fulfillment.pickup_address,
        json_build_object(
          'amount', option.amount,
          'currency_code', option.currency_code
@@ -35,6 +38,8 @@ SELECT option.id AS option_id, option.name,
          ) ordered
        ), '[]')::text AS price_rules
 FROM shipping_options option
+LEFT JOIN shipping_option_fulfillments fulfillment
+  ON fulfillment.shipping_option_id = option.id
 WHERE option.region_id = $1 AND option.deleted_at IS NULL
 ORDER BY option.amount, option.id
 ''')
@@ -45,6 +50,9 @@ ORDER BY option.amount, option.id
   /// One option, checked against the region that is allowed to use it.
   @Query(r'''
 SELECT option.id AS option_id, option.name,
+       coalesce(fulfillment.fulfillment_type, 'shipping') AS fulfillment_type,
+       fulfillment.pickup_name,
+       fulfillment.pickup_address,
        json_build_object(
          'amount', option.amount,
          'currency_code', option.currency_code
@@ -64,6 +72,8 @@ SELECT option.id AS option_id, option.name,
          ) ordered
        ), '[]')::text AS price_rules
 FROM shipping_options option
+LEFT JOIN shipping_option_fulfillments fulfillment
+  ON fulfillment.shipping_option_id = option.id
 WHERE option.id = $1 AND option.region_id = $2
   AND option.deleted_at IS NULL
 ''')

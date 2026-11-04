@@ -15,4 +15,5 @@ export 'promotion.dart';
 export 'return_reason.dart';
 export 'shipping_method.dart';
 export 'shipping_option.dart';
+export 'shipping_fulfillment_type.dart';
 export 'shipping_price_rule.dart';

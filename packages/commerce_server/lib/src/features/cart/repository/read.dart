@@ -72,9 +72,15 @@ SELECT c.id, c.customer_id, c.email,
            'amount', json_build_object(
              'amount', method.amount,
              'currency_code', r.currency_code
-           )
+           ),
+           'fulfillment_type',
+             coalesce(fulfillment.fulfillment_type, 'shipping'),
+           'pickup_name', fulfillment.pickup_name,
+           'pickup_address', fulfillment.pickup_address
          )
          FROM cart_shipping_methods method
+         LEFT JOIN shipping_option_fulfillments fulfillment
+           ON fulfillment.shipping_option_id = method.option_id
          WHERE method.cart_id = c.id
        ), 'null')::text AS shipping_method,
        coalesce((
@@ -156,10 +162,15 @@ SELECT method.option_id, method.name,
        json_build_object(
          'amount', method.amount,
          'currency_code', region.currency_code
-       )::text AS amount
+       )::text AS amount,
+       coalesce(fulfillment.fulfillment_type, 'shipping') AS fulfillment_type,
+       fulfillment.pickup_name,
+       fulfillment.pickup_address
 FROM cart_shipping_methods method
 JOIN carts cart ON cart.id = method.cart_id
 JOIN regions region ON region.id = cart.region_id
+LEFT JOIN shipping_option_fulfillments fulfillment
+  ON fulfillment.shipping_option_id = method.option_id
 WHERE method.cart_id = $1
 ''')
   Future<Result<ShippingMethodResponse?, SqlxError>> shippingMethodOf(

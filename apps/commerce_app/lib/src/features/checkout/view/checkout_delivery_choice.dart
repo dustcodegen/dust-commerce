@@ -33,7 +33,11 @@ final class CheckoutDeliveryChoice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final price = available ? formatMoney(option.amount) : '-';
+    final price = option.fulfillmentType == ShippingFulfillmentType.pickup
+        ? '-'
+        : available
+            ? formatMoney(option.amount)
+            : '-';
     return Semantics(
       button: true,
       checked: selected,
@@ -62,13 +66,32 @@ final class CheckoutDeliveryChoice extends StatelessWidget {
                   CheckoutRadioMark(selected: selected, enabled: available),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: Text(
-                      option.name,
-                      style: TextStyle(
-                        color: available
-                            ? StoreColors.foreground
-                            : StoreColors.foregroundDisabled,
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          option.fulfillmentType ==
+                                  ShippingFulfillmentType.pickup
+                              ? option.pickupName ?? option.name
+                              : option.name,
+                          style: TextStyle(
+                            color: available
+                                ? StoreColors.foreground
+                                : StoreColors.foregroundDisabled,
+                          ),
+                        ),
+                        if (option.fulfillmentType ==
+                                ShippingFulfillmentType.pickup &&
+                            option.pickupAddress != null)
+                          Text(
+                            option.pickupAddress!,
+                            style: const TextStyle(
+                              color: StoreColors.foregroundMuted,
+                              fontSize: 14,
+                              height: 20 / 14,
+                            ),
+                          ),
+                      ],
                     ),
                   ),
                   Text(price),

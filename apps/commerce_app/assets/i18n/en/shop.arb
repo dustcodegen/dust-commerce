@@ -905,6 +905,14 @@
   "@checkout_delivery_prompt": {
     "description": "Translation for `shop_checkout_delivery_prompt`."
   },
+  "checkout_pickup_prompt": "Choose a store near you",
+  "@checkout_pickup_prompt": {
+    "description": "Translation for `shop_checkout_pickup_prompt`."
+  },
+  "checkout_pickup_store": "Store",
+  "@checkout_pickup_store": {
+    "description": "Translation for `shop_checkout_pickup_store`."
+  },
   "checkout_discount": "Discount",
   "@checkout_discount": {
     "description": "Translation for `shop_checkout_discount`."

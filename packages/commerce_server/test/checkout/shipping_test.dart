@@ -81,6 +81,37 @@ void main() {
     expect(order.total, Money.of(2749, 'usd'));
     expect(order.shippingMethod?.name, 'Standard');
   });
+
+  test('exposes pickup options with their safe store details', () async {
+    final created = await (client.post('/store/carts')
+          ..json({'region_id': 'reg_us'}))
+        .send();
+    final cartId =
+        CartView.fromJson(created.json! as Map<String, Object?>).cart.id;
+
+    final response =
+        await client.get('/store/carts/$cartId/shipping-options').send();
+
+    response.assertOk();
+    final options = ShippingOptionsView.fromJson(
+      response.json! as Map<String, Object?>,
+    );
+    final pickup = options.shippingOptions.singleWhere(
+      (option) => option.fulfillmentType == ShippingFulfillmentType.pickup,
+    );
+    expect(pickup.pickupName, 'Morrow New York');
+    expect(pickup.pickupAddress, '100 Broadway, New York, NY');
+
+    final chosen = await (client.post(
+      '/store/carts/$cartId/shipping-method',
+    )..json({'option_id': 'so_pickup'}))
+        .send();
+    chosen.assertOk();
+    final cart = CartView.fromJson(chosen.json! as Map<String, Object?>).cart;
+    expect(
+        cart.shippingMethod?.fulfillmentType, ShippingFulfillmentType.pickup);
+    expect(cart.shippingMethod?.pickupName, 'Morrow New York');
+  });
 }
 
 Future<void> _seed(CommerceDatabase database) async {
@@ -101,7 +132,14 @@ Future<void> _seed(CommerceDatabase database) async {
     r" VALUES "
     r"('so_standard', 'reg_us', 'Standard', 500, 'usd'), "
     r"('so_express', 'reg_us', 'Express', 1500, 'usd'), "
+    r"('so_pickup', 'reg_us', 'Store pickup', 0, 'usd'), "
     r"('so_eu_only', 'reg_eu', 'EU post', 400, 'eur')",
+  );
+  await run(
+    r"INSERT INTO shipping_option_fulfillments "
+    r"(shipping_option_id, fulfillment_type, pickup_name, pickup_address) "
+    r"VALUES ('so_pickup', 'pickup', 'Morrow New York', "
+    r"'100 Broadway, New York, NY')",
   );
   await run(
     r"INSERT INTO products (id, title, handle, status) VALUES "
