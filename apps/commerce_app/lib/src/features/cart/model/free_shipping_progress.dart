@@ -32,23 +32,30 @@ Option<FreeShippingProgress> freeShippingProgressOf(
     }
     for (final rule in option.priceRules) {
       if (rule.attribute != ShippingPriceRuleAttribute.itemTotal) continue;
-      final target = switch (rule.operator) {
-        ShippingPriceRuleOperator.gt => Some(rule.value + 1),
-        ShippingPriceRuleOperator.gte => Some(rule.value),
-        _ => const None<int>(),
+      final current = cart.subtotal.amount;
+      final target = rule.value;
+      final reached = switch (rule.operator) {
+        ShippingPriceRuleOperator.gt => current > target,
+        ShippingPriceRuleOperator.gte => current >= target,
+        ShippingPriceRuleOperator.lt => current < target,
+        ShippingPriceRuleOperator.lte => current <= target,
+        ShippingPriceRuleOperator.eq => current == target,
       };
-      if (target case Some<int>(value: final minimum)) {
-        final current = cart.subtotal.amount;
-        final reached = current >= minimum;
-        final remaining = reached ? 0 : minimum - current;
-        final fraction =
-            minimum == 0 ? 1.0 : (current / minimum).clamp(0.0, 1.0);
-        return Some(FreeShippingProgress(
-          remaining: Money.of(remaining, cart.subtotal.currencyCode),
-          fraction: fraction,
-          targetReached: reached,
-        ));
-      }
+      final remaining = switch (rule.operator) {
+        ShippingPriceRuleOperator.gt => reached ? 0 : target + 1 - current,
+        ShippingPriceRuleOperator.gte => reached ? 0 : target - current,
+        ShippingPriceRuleOperator.lt => reached ? 0 : current + 1 - target,
+        ShippingPriceRuleOperator.lte => reached ? 0 : current - target,
+        ShippingPriceRuleOperator.eq => (current - target).abs(),
+      };
+      final fraction = target == 0
+          ? (reached ? 1.0 : 0.0)
+          : (current / target).clamp(0.0, 1.0);
+      return Some(FreeShippingProgress(
+        remaining: Money.of(remaining, cart.subtotal.currencyCode),
+        fraction: fraction,
+        targetReached: reached,
+      ));
     }
   }
   return const None<FreeShippingProgress>();

@@ -61,6 +61,62 @@ void main() {
     );
   });
 
+  test('supports every declared Medusa comparison operator', () {
+    const lt = ShippingOption(
+      optionId: 'lt',
+      name: 'Free below limit',
+      amount: Money(amount: 0, currencyCode: 'usd'),
+      priceRules: [
+        ShippingPriceRule(
+          attribute: ShippingPriceRuleAttribute.itemTotal,
+          operator: ShippingPriceRuleOperator.lt,
+          value: 10000,
+        ),
+      ],
+    );
+    const lte = ShippingOption(
+      optionId: 'lte',
+      name: 'Free at limit',
+      amount: Money(amount: 0, currencyCode: 'usd'),
+      priceRules: [
+        ShippingPriceRule(
+          attribute: ShippingPriceRuleAttribute.itemTotal,
+          operator: ShippingPriceRuleOperator.lte,
+          value: 10000,
+        ),
+      ],
+    );
+    const eq = ShippingOption(
+      optionId: 'eq',
+      name: 'Free exact total',
+      amount: Money(amount: 0, currencyCode: 'usd'),
+      priceRules: [
+        ShippingPriceRule(
+          attribute: ShippingPriceRuleAttribute.itemTotal,
+          operator: ShippingPriceRuleOperator.eq,
+          value: 10000,
+        ),
+      ],
+    );
+
+    final ltProgress = freeShippingProgressOf(_cart(2500), const [lt]);
+    final lteProgress = freeShippingProgressOf(_cart(10000), const [lte]);
+    final eqProgress = freeShippingProgressOf(_cart(9000), const [eq]);
+
+    expect(
+      (ltProgress as Some<FreeShippingProgress>).value.targetReached,
+      isTrue,
+    );
+    expect(
+      (lteProgress as Some<FreeShippingProgress>).value.targetReached,
+      isTrue,
+    );
+    expect(
+      (eqProgress as Some<FreeShippingProgress>).value.remaining,
+      Money.of(1000, 'usd'),
+    );
+  });
+
   test('dismissal is scoped to one cart capability', () {
     const state = CartState(
       dismissedFreeShippingCartId: Some('cart_1'),
