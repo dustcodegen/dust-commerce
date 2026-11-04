@@ -291,11 +291,24 @@ preview showed the variant, quantity `1`, `€10.00`, and subtotal `€10.00`.
 This is now the same-state source baseline for local pixel and flow
 comparison; the public preview remains a separate broken fixture.
 
+The same-day Dust run used the seeded `Essential T-Shirt`, `M / Black`,
+Standard shipping and Manual Payment on `13001`/`3878`. The address save now
+advances directly from `?step=address` to `?step=delivery` without disposing
+the form, and the completed Review state shows the source-ordered address,
+delivery, payment, totals, legal acknowledgement and `Place order` action.
+The fix keeps an active checkout mounted while a cart mutation is loading;
+the browser run reached Review after a hard reload with no console warnings or
+errors. The local pinned source could not provide the matching flow in this
+run because its no-JavaScript `/dk/cart/add` route throws
+`cookies was called outside a request scope` under Next 16; its product/detail
+render remains the visual source baseline.
+
 ## Open findings
 
-- P2 — Capture the Dust and pinned-source Review and confirmation states from
-  the local same-state stack, then judge visible differences before declaring
-  rendered parity; the public preview remains unavailable for this comparison.
+- P2 — Capture the Dust and pinned-source confirmation states from the local
+  same-state stack, then judge visible differences before declaring rendered
+  parity; Dust Review is now captured, while the pinned source's cart route
+  currently fails before checkout and the public preview remains unavailable.
 - P2 — Repeat the verification success/failure capture against the live Medusa
   preview when its route is reachable, because its current cart failure is a
   separate runtime issue.
