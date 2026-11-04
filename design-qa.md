@@ -2299,4 +2299,23 @@ Store authenticated saved-address checkout result: server-backed address
 selection, persistence, delivery/payment progression and reload passed; the
 authenticated Medusa visual comparison remains open
 
+## Store checkout deep-link guard hardening
+
+The pinned Medusa Review step only becomes actionable when the server cart has
+the shipping address, shipping method and payment collection required by the
+previous steps. The local route previously inferred those gates from the
+checkout draft, which could become stale after another cart mutation or a
+direct deep link.
+
+The guard now reads the server-owned cart projection for all three gates. A
+stale `?step=review` therefore falls back to Address, Delivery or Payment
+without exposing the Place order action against incomplete cart state.
+
+Validation: the checkout route-guard and ViewModel suites passed (4 tests),
+Flutter analysis passed, and the Store Dust check reported 194 clean generated
+files. No widget test was added.
+
+Store checkout deep-link guard result: server-authoritative step gating passed;
+same-state Medusa visual comparison remains open
+
 final result: blocked
