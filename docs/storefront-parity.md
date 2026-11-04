@@ -8,11 +8,14 @@ to the dust-commerce API. Visual tokens are pinned to
 `@medusajs/ui-preset@2.21.2`, the version used by that source revision.
 
 Rendered comparisons remain pinned to the source revision above. The current
-behavior audit was refreshed against Medusa DTC `913d4482641da21c9a219c92a5aa6b959af9bfd7`
-(`main`, 2026-10-30), which adds storefront search in the nav, `/store` page,
-right-side drawer, country-prefixed links and the `/buy/[items]` route; this
-repository tracks those as tested slices instead of treating an older raster
-comparison as frozen truth.
+behavior audit was refreshed against Medusa DTC `4a1d53dc434ed124a78c4e2c9f312e1f47d4e9eb`
+(`main`, 2026-11-04). The only change after the prior audit commit
+`913d4482641da21c9a219c92a5aa6b959af9bfd7` is the dependency-only
+`@medusajs/*` `v2.22.3` update, so no storefront route or component parity
+claim changes. The audited source adds storefront search in the nav, `/store`
+page, right-side drawer, country-prefixed links and the `/buy/[items]` route;
+this repository tracks those as tested slices instead of treating an older
+raster comparison as frozen truth.
 
 This document is the current storefront parity ledger. The public repository
 currently has no linked issue or milestone for this work, so status claims here
