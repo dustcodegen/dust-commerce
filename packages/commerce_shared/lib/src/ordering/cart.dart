@@ -1,10 +1,14 @@
 import 'package:commerce_shared/src/money.dart';
+import 'package:commerce_shared/src/customers/address.dart';
+import 'package:commerce_shared/src/ordering/cart_payment_session.dart';
 import 'package:commerce_shared/src/ordering/line_item.dart';
+import 'package:commerce_shared/src/ordering/promotion.dart';
 import 'package:commerce_shared/src/ordering/shipping_method.dart';
 import 'package:commerce_shared/src/region.dart';
 import 'package:dust_dart/serde.dart';
 
 part 'cart.g.dart';
+part 'cart_operations.dart';
 
 /// The lines a customer has chosen, in one region's currency.
 ///
@@ -20,10 +24,13 @@ class Cart with _$Cart {
     required this.id,
     required this.region,
     required this.items,
+    this.promotions = const [],
     this.email,
     this.customerId,
+    this.shippingAddress,
+    this.billingAddress,
     this.shippingMethod,
-    this.discount,
+    this.paymentSession,
   });
 
   /// Creates a [Cart], rejecting lines that do not belong in it.
@@ -36,8 +43,11 @@ class Cart with _$Cart {
     List<LineItem> items = const [],
     String? email,
     String? customerId,
+    Address? shippingAddress,
+    Address? billingAddress,
     ShippingMethod? shippingMethod,
-    Money? discount,
+    CartPaymentSession? paymentSession,
+    List<CartPromotion> promotions = const [],
   }) {
     final ids = items.map((item) => item.id).toList();
     if (ids.toSet().length != ids.length) {
@@ -60,18 +70,26 @@ class Cart with _$Cart {
         'shipping is not priced in ${region.currencyCode}',
       );
     }
-    if (discount != null) {
-      if (discount.currencyCode != region.currencyCode) {
+    final promotionIds = promotions.map((promotion) => promotion.id).toList();
+    if (promotionIds.toSet().length != promotionIds.length) {
+      throw ArgumentError.value(
+        promotions,
+        'promotions',
+        'duplicate applied promotion id',
+      );
+    }
+    for (final promotion in promotions) {
+      if (promotion.amount.currencyCode != region.currencyCode) {
         throw ArgumentError.value(
-          discount.currencyCode,
-          'discount',
-          'a discount is not priced in ${region.currencyCode}',
+          promotion.amount.currencyCode,
+          'promotions',
+          'promotion ${promotion.code} is not priced in ${region.currencyCode}',
         );
       }
-      if (discount.isNegative) {
+      if (promotion.amount.isNegative) {
         throw ArgumentError.value(
-          discount,
-          'discount',
+          promotion.amount,
+          'promotions',
           'a negative discount is a surcharge, which this is not',
         );
       }
@@ -82,8 +100,11 @@ class Cart with _$Cart {
       items: items,
       email: email,
       customerId: customerId,
+      shippingAddress: shippingAddress,
+      billingAddress: billingAddress,
       shippingMethod: shippingMethod,
-      discount: discount,
+      paymentSession: paymentSession,
+      promotions: List.unmodifiable(promotions),
     );
   }
 
@@ -92,6 +113,9 @@ class Cart with _$Cart {
 
   /// The customer this cart belongs to, once known.
   final String? customerId;
+
+  /// Separate invoice destination, absent when shipping is reused.
+  final Address? billingAddress;
 
   /// Contact address, which a guest checkout collects before an account.
   final String? email;
@@ -102,78 +126,18 @@ class Cart with _$Cart {
   /// The chosen lines.
   final List<LineItem> items;
 
-  /// What has been taken off, before tax. Never more than the goods.
-  final Money? discount;
+  /// Customer-facing snapshots of promotions already applied to this cart.
+  final List<CartPromotion> promotions;
+
+  /// Public payment provider choice retained across checkout reloads.
+  final CartPaymentSession? paymentSession;
 
   /// The selling territory, fixing currency and tax.
   final Region region;
 
+  /// Delivery destination retained before the cart becomes an order.
+  final Address? shippingAddress;
+
   /// How the goods are to be delivered, once chosen.
   final ShippingMethod? shippingMethod;
-
-  /// Whether this cart holds nothing.
-  bool get isEmpty => items.isEmpty;
-
-  /// The number of units across every line, which is what a badge shows.
-  int get itemCount => items.fold(0, (count, item) => count + item.quantity);
-
-  /// The sum of every line, before tax.
-  Money get subtotal => items.fold(
-        Money.zero(region.currencyCode),
-        (running, item) => running + item.subtotal,
-      );
-
-  /// What has actually been taken off the goods.
-  ///
-  /// A discount worth more than the cart holds is capped at the cart. Handing
-  /// back the difference as a negative total would be paying the customer to
-  /// shop, and the shipping is a cost the courier charges regardless — so a
-  /// discount reduces the goods and stops there.
-  Money get discountTotal {
-    final asked = discount;
-    if (asked == null) return Money.zero(region.currencyCode);
-    return asked > subtotal ? subtotal : asked;
-  }
-
-  /// What delivery adds.
-  Money get shippingTotal =>
-      shippingMethod?.amount ?? Money.zero(region.currencyCode);
-
-  /// The amount tax is worked out on: goods plus shipping, less the discount.
-  ///
-  /// Shipping is taxed with the goods, which is what most jurisdictions do and
-  /// what Medusa does. The discount comes off before tax rather than after, so
-  /// a customer is not taxed on money they did not pay.
-  Money get taxableTotal => subtotal + shippingTotal - discountTotal;
-
-  /// The tax on [taxableTotal], under the region's rule.
-  Money get tax => region.taxOn(taxableTotal);
-
-  /// What the customer pays.
-  Money get total => region.withTax(taxableTotal);
-
-  /// This cart with [line] added.
-  ///
-  /// A line for a variant already present merges into it, keeping the earlier
-  /// line's id and price snapshot. Adding the same variant twice is one
-  /// customer intending one line at a higher quantity, and the price they
-  /// first saw is the one they are held to.
-  Cart withLine(LineItem line) {
-    final existing =
-        items.where((item) => item.variantId == line.variantId).firstOrNull;
-    if (existing == null) {
-      return copyWith(items: [...items, line]);
-    }
-    final merged = existing.withQuantity(existing.quantity + line.quantity);
-    return copyWith(
-      items: [
-        for (final item in items) item.id == existing.id ? merged : item,
-      ],
-    );
-  }
-
-  /// This cart without the line identified by [lineId].
-  Cart withoutLine(String lineId) => copyWith(
-        items: items.where((item) => item.id != lineId).toList(),
-      );
 }

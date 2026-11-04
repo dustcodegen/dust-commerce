@@ -16,7 +16,7 @@ void main() {
   setUp(() async {
     counter = 0;
     directory = await Directory.systemTemp.createTemp('commerce_co_promo');
-    database = CommerceDatabase.open(
+    database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );
@@ -53,6 +53,14 @@ void main() {
   test('freezes the discount and counts the redemption', () async {
     final cartId = await cartWorth();
     await apply(cartId, 'SAVE10');
+    (await (client.post('/store/carts/$cartId/shipping-method')
+              ..json({'option_id': 'ship_standard'}))
+            .send())
+        .assertOk();
+    (await (client.post('/store/carts/$cartId/payment-sessions')
+              ..json({'provider_id': 'manual'}))
+            .send())
+        .assertOk();
 
     final placed = await (client.post('/store/checkout')
           ..json({
@@ -64,7 +72,7 @@ void main() {
               'line1': '12 Analytical Way',
               'city': 'London',
               'postal_code': 'EC1A',
-              'country_code': 'gb',
+              'country_code': 'us',
             },
           }))
         .send();
@@ -76,10 +84,14 @@ void main() {
     expect(order.total, Money.of(1980, 'usd'));
 
     final rows = await queryRaw(
-      r"SELECT usage_count FROM promotions WHERE code = 'SAVE10'",
-      [],
+      r"SELECT promotion.usage_count, orders.promotion_code "
+      r"FROM promotions promotion "
+      r"JOIN orders ON orders.cart_id = $1 "
+      r"WHERE promotion.code = 'SAVE10'",
+      [cartId],
     ).fetch(database.connection as Executor);
     expect(rows.single.readIndex<int>(0), 1);
+    expect(rows.single.readIndex<String>(1), 'SAVE10');
   });
 }
 
@@ -90,6 +102,14 @@ Future<void> _seed(CommerceDatabase database) async {
   await run(
     r"INSERT INTO regions (id, name, currency_code, tax_rate, countries) "
     r"VALUES ('reg_us', 'United States', 'usd', 1000, 'us')",
+  );
+  await run(
+    r"INSERT INTO region_payment_providers (region_id, provider_id) "
+    r"VALUES ('reg_us', 'manual')",
+  );
+  await run(
+    r"INSERT INTO shipping_options (id, region_id, name, amount, currency_code) "
+    r"VALUES ('ship_standard', 'reg_us', 'Standard', 0, 'usd')",
   );
   await run(
     r"INSERT INTO products (id, title, handle, status) VALUES "

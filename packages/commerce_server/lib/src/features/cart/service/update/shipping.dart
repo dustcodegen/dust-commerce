@@ -1,5 +1,6 @@
 import 'package:commerce_server/src/features/cart/model/model.dart';
 import 'package:commerce_server/src/features/cart/repository/repository.dart';
+import 'package:commerce_server/src/infra/option.dart';
 import 'package:dust_dart/db.dart';
 
 /// Why a delivery method could not be chosen.
@@ -9,6 +10,9 @@ enum ChooseShippingFailure {
 
   /// The option does not exist, or belongs to another region.
   noOption,
+
+  /// The option exists but its cart-value rules are not satisfied yet.
+  notEligible,
 }
 
 /// Chooses [optionId] as the cart's delivery method.
@@ -20,30 +24,44 @@ enum ChooseShippingFailure {
 /// The price and name are snapshotted onto the cart, like a line item's price.
 /// A shipping option repriced afterwards must not change what this cart was
 /// quoted.
-Future<Result<ChooseShippingFailure?, SqlxError>> chooseShipping(
+Future<Result<Option<ChooseShippingFailure>, SqlxError>> chooseShipping(
   CartReadRepository reads,
   CartListRepository lists,
-  CartUpdateRepository writes, {
+  CartShippingRepository writes, {
   required String cartId,
   required String optionId,
 }) async {
   final found = await reads.findCart(cartId);
   if (found case Err(:final error)) return Err(error);
-  final cart = (found as Ok<CartRow?, SqlxError>).value;
-  if (cart == null) return const Ok(ChooseShippingFailure.noCart);
+  final cartOption = optionOf((found as Ok<CartResponse?, SqlxError>).value);
+  if (cartOption case None()) {
+    return const Ok(Some(ChooseShippingFailure.noCart));
+  }
+  final cart = (cartOption as Some<CartResponse>).value;
 
-  final offered = await lists.shippingOptionFor(optionId, cart.regionId);
+  final offered = await lists.shippingOptionFor(optionId, cart.region.id);
   if (offered case Err(:final error)) return Err(error);
-  final option = (offered as Ok<ShippingOptionRow?, SqlxError>).value;
-  if (option == null) return const Ok(ChooseShippingFailure.noOption);
+  final optionValue = optionOf(
+    (offered as Ok<ShippingOptionResponse?, SqlxError>).value,
+  );
+  if (optionValue case None()) {
+    return const Ok(Some(ChooseShippingFailure.noOption));
+  }
+  final option = (optionValue as Some<ShippingOptionResponse>).value;
+  if (!option.isAvailableFor(cart.subtotal)) {
+    return const Ok(Some(ChooseShippingFailure.notEligible));
+  }
 
   final written = await writes.setShippingMethod(
     cartId,
-    option.id,
+    option.optionId,
     option.name,
-    option.amount,
+    option.amount.amount,
   );
   if (written case Err(:final error)) return Err(error);
+  if ((written as Ok<ExecResult, SqlxError>).value.rowsAffected == 0) {
+    return const Ok(Some(ChooseShippingFailure.notEligible));
+  }
 
-  return const Ok(null);
+  return const Ok(None<ChooseShippingFailure>());
 }

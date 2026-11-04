@@ -1,31 +1,29 @@
-import 'package:commerce_server/src/features/cart/model/model.dart';
 import 'package:commerce_server/src/features/checkout/model.dart';
 import 'package:commerce_server/src/features/checkout/repository/repository.dart';
-import 'package:commerce_shared/commerce_shared.dart';
+import 'package:commerce_server/src/infra/option.dart';
 import 'package:dust_dart/db.dart';
 
-/// One order by id, or `Ok(null)` when there is none.
-Future<Result<Order?, SqlxError>> loadOrder(
+/// One complete order by id, or [None] when there is no matching order.
+Future<Result<Option<OrderResponse>, SqlxError>> loadOrder(
   CheckoutReadRepository reads,
   String orderId,
 ) async {
   final found = await reads.findOrder(orderId);
-  if (found case Err(:final error)) return Err(error);
+  return switch (found) {
+    Ok(:final value) => Ok(optionOf<OrderResponse>(value)),
+    Err(:final error) => Err(error),
+  };
+}
 
-  final row = (found as Ok<OrderRow?, SqlxError>).value;
-  if (row == null) return const Ok(null);
-
-  final items = await reads.itemsOf(orderId);
-  if (items case Err(:final error)) return Err(error);
-
-  final addresses = await reads.addressesOf(orderId);
-  if (addresses case Err(:final error)) return Err(error);
-
-  return Ok(
-    orderOf(
-      row,
-      (items as Ok<List<LineItemRow>, SqlxError>).value,
-      (addresses as Ok<List<OrderAddressRow>, SqlxError>).value,
-    ),
-  );
+/// One complete order owned by [customerId], or [None] when none matches.
+Future<Result<Option<OrderResponse>, SqlxError>> loadCustomerOrder(
+  CheckoutCustomerReadRepository reads,
+  String orderId,
+  String customerId,
+) async {
+  final found = await reads.findCustomerOrder(orderId, customerId);
+  return switch (found) {
+    Ok(:final value) => Ok(optionOf<OrderResponse>(value)),
+    Err(:final error) => Err(error),
+  };
 }

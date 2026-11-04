@@ -1,5 +1,5 @@
 name: commerce_server
-description: HTTP API for the commerce showcase, on dust_server and SQLite.
+description: HTTP API for the commerce showcase, on dust_server and PostgreSQL.
 publish_to: none
 version: 0.1.0
 
@@ -9,10 +9,17 @@ environment:
 resolution: workspace
 
 dependencies:
+  commerce_admin_shared: ^0.1.0
   commerce_shared: ^0.1.0
-  dust_dart: ^0.1.4
-  dust_db_sqlite3: ^0.1.4
-  dust_server: ^0.1.0-beta.3
+  # RFC 4180 parsing for merchant catalogue imports.
+  csv: ^6.0.0
+  # Password hashing and token generation.
+  cryptography: ^2.9.0
+  dust_dart: ^0.3.1
+  dust_db_postgres: ^0.3.1
+  dust_server: ^0.3.1
+  intl: ^0.20.2
+  mailer: ^7.2.0
 
 dev_dependencies:
   test: ^1.26.0

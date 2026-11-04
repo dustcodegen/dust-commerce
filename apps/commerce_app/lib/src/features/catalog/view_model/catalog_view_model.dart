@@ -1,5 +1,7 @@
 import 'package:commerce_app/src/core/api/api.dart';
 import 'package:commerce_app/src/features/catalog/model/catalog_state.dart';
+import 'package:commerce_app/src/features/catalog/model/featured_product_rail.dart';
+import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_flutter/state.dart';
 
 part 'catalog_view_model.g.dart';
@@ -29,7 +31,7 @@ class CatalogViewModel extends $CatalogViewModel {
 
   /// Loads the first page of the catalogue.
   ///
-  /// A failure sets [CatalogStatus.failed] with a message rather than throwing.
+  /// A failure sets [CatalogStatus.failed] rather than throwing into the view.
   /// A screen cannot render an exception, and a storefront that shows a blank
   /// page when the network drops has lost the customer either way.
   Future<void> load({String? currency}) async {
@@ -38,24 +40,25 @@ class CatalogViewModel extends $CatalogViewModel {
       state.copyWith(
         status: CatalogStatus.loading,
         currencyCode: wanted,
-        message: null,
       ),
     );
 
     try {
-      final page = await args.api.products(currency: wanted);
+      final collections = await args.api.collections(limit: 100);
+      final rails = await Future.wait([
+        for (final collection in collections.collections)
+          _loadRail(collection, wanted),
+      ]);
       emit(
         state.copyWith(
           status: CatalogStatus.ready,
-          products: page.products,
-          total: page.total,
+          rails: rails,
         ),
       );
-    } on Object catch (error) {
+    } on Object {
       emit(
         state.copyWith(
           status: CatalogStatus.failed,
-          message: 'Could not load the catalogue: $error',
         ),
       );
     }
@@ -63,4 +66,19 @@ class CatalogViewModel extends $CatalogViewModel {
 
   /// Reloads the catalogue in [currency].
   Future<void> changeCurrency(String currency) => load(currency: currency);
+
+  Future<FeaturedProductRail> _loadRail(
+    ProductCollection collection,
+    String currency,
+  ) async {
+    final page = await args.api.products(
+      currency: currency,
+      collection: collection.handle,
+      limit: 12,
+    );
+    return FeaturedProductRail(
+      collection: collection,
+      products: page.products,
+    );
+  }
 }

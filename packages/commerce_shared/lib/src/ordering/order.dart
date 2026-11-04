@@ -1,25 +1,30 @@
 import 'package:commerce_shared/src/customers/address.dart';
 import 'package:commerce_shared/src/money.dart';
 import 'package:commerce_shared/src/ordering/cart.dart';
-import 'package:commerce_shared/src/ordering/line_item.dart';
+import 'package:commerce_shared/src/ordering/order_line_item.dart';
+import 'package:commerce_shared/src/ordering/order_fulfillment_status.dart';
 import 'package:commerce_shared/src/ordering/shipping_method.dart';
 import 'package:commerce_shared/src/region.dart';
 import 'package:dust_dart/serde.dart';
 
 part 'order.g.dart';
+part 'order_values.dart';
 
 /// Where an order sits in its lifecycle.
 @Derive([Serialize(), Deserialize()])
 @SerDe(renameAll: SerDeRename.snakeCase)
 enum OrderStatus {
-  /// Placed, not yet paid for.
+  /// Placed and not yet completed, independent of payment state.
   pending,
 
-  /// Paid and done.
+  /// Explicitly completed after its post-purchase work finishes.
   completed,
 
-  /// Called off before payment.
-  cancelled,
+  /// Called off before completion.
+  canceled,
+
+  /// Removed from active operations after reaching an eligible final state.
+  archived,
 }
 
 /// Whether the money has moved.
@@ -36,18 +41,41 @@ enum PaymentStatus {
   refunded,
 }
 
+/// Public payment facts needed to explain a paid order to its buyer.
+/// Provider metadata and credentials stay server-side.
+@Derive([ToString(), Eq(), CopyWith(), Serialize(), Deserialize()])
+@SerDe(renameAll: SerDeRename.snakeCase)
+class OrderPayment with _$OrderPayment {
+  /// Creates a safe payment receipt.
+  const OrderPayment({
+    required this.providerId,
+    required this.amount,
+    required this.createdAt,
+  });
+
+  /// Creates a payment receipt from JSON.
+  factory OrderPayment.fromJson(Map<String, Object?> json) =>
+      _$OrderPaymentFromJson(json);
+
+  /// Amount authorised against the frozen order total.
+  final Money amount;
+
+  /// When the provider payment record was created.
+  final DateTime createdAt;
+
+  /// Public adapter identifier used to select its display treatment.
+  final String providerId;
+}
+
 /// A cart, frozen at the moment it was placed.
-///
-/// Every amount here is stored, not derived. An order recomputed from today's
-/// prices, tax rates, or catalogue would change what a customer was charged
-/// months after they were charged it, which is the one thing an order exists
-/// to prevent. The region is kept for the record, not to recalculate with.
+/// Amounts and region are frozen so later catalogue changes cannot alter it.
 @Derive([ToString(), Eq(), CopyWith(), Serialize(), Deserialize()])
 @SerDe(renameAll: SerDeRename.snakeCase)
 class Order with _$Order {
   /// Creates an [Order] from already-frozen values.
   const Order({
     required this.id,
+    required this.displayId,
     required this.email,
     required this.region,
     required this.items,
@@ -60,50 +88,31 @@ class Order with _$Order {
     required this.billingAddress,
     required this.placedAt,
     this.customerId,
+    this.payment,
     this.shippingMethod,
     this.status = OrderStatus.pending,
+    this.fulfillmentStatus = OrderFulfillmentStatus.notFulfilled,
     this.paymentStatus = PaymentStatus.awaiting,
   });
 
   /// Places [cart] as an order, freezing its lines and totals.
-  ///
-  /// Throws [ArgumentError] when the cart is empty or carries no email. Both
-  /// are states a cart is allowed to be in and an order is not.
+  /// Throws [ArgumentError] when the cart is empty or carries no email.
   factory Order.fromCart({
     required String id,
+    required int displayId,
     required Cart cart,
     required Address shippingAddress,
     required DateTime placedAt,
     Address? billingAddress,
-  }) {
-    if (cart.isEmpty) {
-      throw ArgumentError.value(cart, 'cart', 'an empty cart is not an order');
-    }
-    final email = cart.email;
-    if (email == null || email.isEmpty) {
-      throw ArgumentError.value(
-        cart,
-        'cart',
-        'an order needs an email to reach the buyer on',
+  }) =>
+      _orderFromCart(
+        id: id,
+        displayId: displayId,
+        cart: cart,
+        shippingAddress: shippingAddress,
+        billingAddress: billingAddress,
+        placedAt: placedAt,
       );
-    }
-    return Order(
-      id: id,
-      email: email,
-      customerId: cart.customerId,
-      region: cart.region,
-      items: List<LineItem>.unmodifiable(cart.items),
-      subtotal: cart.subtotal,
-      shippingTotal: cart.shippingTotal,
-      discountTotal: cart.discountTotal,
-      shippingMethod: cart.shippingMethod,
-      tax: cart.tax,
-      total: cart.total,
-      shippingAddress: shippingAddress,
-      billingAddress: billingAddress ?? shippingAddress,
-      placedAt: placedAt,
-    );
-  }
 
   /// Creates an [Order] from JSON.
   factory Order.fromJson(Map<String, Object?> json) => _$OrderFromJson(json);
@@ -117,14 +126,27 @@ class Order with _$Order {
   /// Contact address for the buyer.
   final String email;
 
+  /// Short monotonically increasing identifier shown to people.
+  final int displayId;
+
   /// Unique identifier.
   final String id;
 
+  /// Real progress derived from active fulfillment records.
+  @SerDe(
+    defaultValue: OrderFulfillmentStatus.notFulfilled,
+    using: OrderFulfillmentStatusCodec(),
+  )
+  final OrderFulfillmentStatus fulfillmentStatus;
+
   /// The lines as they stood at checkout.
-  final List<LineItem> items;
+  final List<OrderLineItem> items;
 
   /// Whether the money has moved.
   final PaymentStatus paymentStatus;
+
+  /// Safe provider receipt once a payment has been started.
+  final OrderPayment? payment;
 
   /// When this was placed.
   final DateTime placedAt;
@@ -155,35 +177,4 @@ class Order with _$Order {
 
   /// The frozen amount charged.
   final Money total;
-
-  /// Whether the money has been taken.
-  bool get isPaid => paymentStatus == PaymentStatus.captured;
-
-  /// The number of units ordered.
-  int get itemCount => items.fold(0, (count, item) => count + item.quantity);
-
-  /// This order with payment captured, which completes it.
-  ///
-  /// Throws [StateError] when the order was cancelled: taking money for
-  /// something called off is the failure this guard exists to prevent.
-  Order captured() {
-    if (status == OrderStatus.cancelled) {
-      throw StateError('cannot capture payment on a cancelled order');
-    }
-    return copyWith(
-      status: OrderStatus.completed,
-      paymentStatus: PaymentStatus.captured,
-    );
-  }
-
-  /// This order cancelled.
-  ///
-  /// Throws [StateError] once payment has been captured; that path is a
-  /// refund, which is a different operation with different accounting.
-  Order cancelled() {
-    if (isPaid) {
-      throw StateError('a paid order is refunded, not cancelled');
-    }
-    return copyWith(status: OrderStatus.cancelled);
-  }
 }

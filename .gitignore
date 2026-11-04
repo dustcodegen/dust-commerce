@@ -11,6 +11,11 @@ build/
 !crates/**/src/**/build/
 !crates/**/src/**/build/**
 **/pubspec.lock
+!pubspec.lock
+**/*.g.dart
+**/.dust_sql/
+.data/
+artifacts/
 
 # Examples & Fixtures
 examples/benchmark_project/lib/generated_models/
@@ -28,6 +33,7 @@ examples/benchmark_project/lib/generated_models/
 coverage/
 .coverage/
 .pr/
+commerce.db*
 
 # Profiling output
 flamegraph.svg

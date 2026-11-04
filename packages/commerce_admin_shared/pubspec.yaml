@@ -1,0 +1,16 @@
+name: commerce_admin_shared
+description: Private admin API contracts shared by dust-commerce server and admin app.
+publish_to: none
+version: 0.1.0
+
+environment:
+  sdk: ">=3.6.0 <4.0.0"
+
+resolution: workspace
+
+dependencies:
+  dust_dart: ^0.3.1
+
+dev_dependencies:
+  test: ^1.26.0
+  very_good_analysis: ^10.3.0

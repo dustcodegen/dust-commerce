@@ -21,10 +21,12 @@ class LineItem with _$LineItem {
     required this.id,
     required this.variantId,
     required this.productId,
+    required this.productHandle,
     required this.title,
     required this.unitPrice,
     required this.quantity,
     this.variantTitle,
+    this.thumbnail,
   });
 
   /// Creates a [LineItem], rejecting a quantity below one or a negative price.
@@ -32,10 +34,12 @@ class LineItem with _$LineItem {
     required String id,
     required String variantId,
     required String productId,
+    required String productHandle,
     required String title,
     required Money unitPrice,
     required int quantity,
     String? variantTitle,
+    String? thumbnail,
   }) {
     if (quantity < 1) {
       throw ArgumentError.value(quantity, 'quantity', 'expected at least one');
@@ -51,8 +55,10 @@ class LineItem with _$LineItem {
       id: id,
       variantId: variantId,
       productId: productId,
+      productHandle: productHandle,
       title: title,
       variantTitle: variantTitle,
+      thumbnail: thumbnail,
       unitPrice: unitPrice,
       quantity: quantity,
     );
@@ -65,10 +71,12 @@ class LineItem with _$LineItem {
   factory LineItem.fromVariant({
     required String id,
     required String productId,
+    required String productHandle,
     required String productTitle,
     required ProductVariant variant,
     required String currencyCode,
     required int quantity,
+    String? thumbnail,
   }) {
     final price = variant.priceIn(currencyCode);
     if (price == null) {
@@ -82,8 +90,10 @@ class LineItem with _$LineItem {
       id: id,
       variantId: variant.id,
       productId: productId,
+      productHandle: productHandle,
       title: productTitle,
       variantTitle: variant.title,
+      thumbnail: thumbnail,
       unitPrice: price,
       quantity: quantity,
     );
@@ -99,11 +109,17 @@ class LineItem with _$LineItem {
   /// The product this line came from.
   final String productId;
 
+  /// URL-safe product route captured when the line was added.
+  final String productHandle;
+
   /// Units ordered.
   final int quantity;
 
   /// The product name at the time of adding.
   final String title;
+
+  /// Primary product image captured when the line was added.
+  final String? thumbnail;
 
   /// The price of one unit at the time of adding.
   final Money unitPrice;
@@ -122,8 +138,10 @@ class LineItem with _$LineItem {
         id: id,
         variantId: variantId,
         productId: productId,
+        productHandle: productHandle,
         title: title,
         variantTitle: variantTitle,
+        thumbnail: thumbnail,
         unitPrice: unitPrice,
         quantity: quantity,
       );

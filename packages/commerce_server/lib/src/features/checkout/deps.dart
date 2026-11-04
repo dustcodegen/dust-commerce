@@ -9,6 +9,7 @@ final class CheckoutDeps {
   const CheckoutDeps({
     required this.database,
     required this.reads,
+    required this.customerReads,
     required this.lists,
     required this.clock,
   });
@@ -18,6 +19,9 @@ final class CheckoutDeps {
 
   /// The database, for the placing transaction.
   final CommerceDatabase database;
+
+  /// Loading an order through its proven customer owner.
+  final CheckoutCustomerReadRepository customerReads;
 
   /// Listing somebody's orders.
   final CheckoutListRepository lists;

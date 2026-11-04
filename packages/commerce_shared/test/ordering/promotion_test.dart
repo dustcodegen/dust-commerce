@@ -131,6 +131,7 @@ void main() {
           id: id,
           variantId: 'var_$id',
           productId: 'prod_1',
+          productHandle: 'thing',
           title: 'Thing',
           unitPrice: Money.of(unitPrice, 'usd'),
           quantity: quantity,

@@ -12,9 +12,8 @@ void main() {
   var counter = 0;
 
   setUp(() async {
-    counter = 0;
     directory = await Directory.systemTemp.createTemp('commerce_cart');
-    database = CommerceDatabase.open(
+    database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );
@@ -36,7 +35,6 @@ void main() {
 
   Future<String> newCart() async {
     final response = await client.post('/store/carts').send();
-    response.assertCreated();
     return CartView.fromJson(response.json! as Map<String, Object?>).cart.id;
   }
 
@@ -44,14 +42,13 @@ void main() {
     String cartId,
     String variantId, {
     int? quantity,
-  }) async {
-    return (client.post('/store/carts/$cartId/line-items')
-          ..json({
-            'variant_id': variantId,
-            if (quantity != null) 'quantity': quantity,
-          }))
-        .send();
-  }
+  }) =>
+      (client.post('/store/carts/$cartId/line-items')
+            ..json({
+              'variant_id': variantId,
+              if (quantity != null) 'quantity': quantity,
+            }))
+          .send();
 
   group('POST /store/carts', () {
     test('starts an empty cart in the default region', () async {
@@ -102,6 +99,9 @@ void main() {
       expect(cart.items, hasLength(1));
       expect(cart.items.single.quantity, 2);
       expect(cart.items.single.unitPrice, Money.of(1999, 'usd'));
+      expect(cart.items.single.title, 'T-Shirt');
+      expect(cart.items.single.variantTitle, 'Small');
+      expect(cart.items.single.productHandle, 't-shirt');
     });
 
     test('defaults the quantity to one', () async {

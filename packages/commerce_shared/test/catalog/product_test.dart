@@ -20,6 +20,14 @@ void main() {
         title: 'T-Shirt',
         handle: 'T-Shirt',
         status: status,
+        details: const ProductDetails(weight: 400),
+        images: const [
+          StoreProductImage(
+            id: 'img_shirt',
+            url: 'https://example.test/shirt.png',
+            rank: 0,
+          ),
+        ],
         options: [
           ProductOption.of(
             id: 'opt_size',
@@ -96,6 +104,26 @@ void main() {
       expect(product().cheapestIn('usd'), Money.of(1999, 'usd'));
       expect(product().cheapestIn('gbp'), isNull);
     });
+
+    test('reports original price for the cheapest sale variant', () {
+      final subject = Product.of(
+        id: 'prod_sale',
+        title: 'Sale Shirt',
+        handle: 'sale-shirt',
+        status: ProductStatus.published,
+        variants: [
+          ProductVariant.of(
+            id: 'v_sale',
+            title: 'Sale',
+            prices: [Money.of(1500, 'usd')],
+            originalPrices: [Money.of(2500, 'usd')],
+          ),
+        ],
+      );
+
+      expect(subject.cheapestOriginalIn('usd'), Money.of(2500, 'usd'));
+      expect(subject.isOnSaleIn('usd'), isTrue);
+    });
   });
 
   group('json', () {
@@ -107,6 +135,59 @@ void main() {
 
     test('encodes status as its wire name', () {
       expect(product().toJson()['status'], 'published');
+    });
+
+    test('preserves gallery and product information', () {
+      final decoded = Product.fromJson(product().toJson());
+
+      expect(
+        decoded.images.map((image) => image.url),
+        ['https://example.test/shirt.png'],
+      );
+      expect(decoded.details.weight, 400);
+    });
+
+    test('filters associated variant images like the Medusa starter', () {
+      const front = StoreProductImage(
+        id: 'img_front',
+        url: 'https://example.test/front.png',
+        rank: 0,
+      );
+      const back = StoreProductImage(
+        id: 'img_back',
+        url: 'https://example.test/back.png',
+        rank: 1,
+      );
+      final subject = product(
+        variants: [
+          variant('v_small', 'Small'),
+          ProductVariant.of(
+            id: 'v_large',
+            title: 'Large / Black',
+            prices: [Money.of(1999, 'usd')],
+            optionValues: const {'opt_size': 'Large'},
+            images: const [back],
+          ),
+        ],
+      ).copyWith(images: const [front, back]);
+
+      expect(subject.imagesForVariant(null), [front, back]);
+      expect(subject.imagesForVariant('v_small'), [front, back]);
+      expect(subject.imagesForVariant('v_large'), [back]);
+      expect(subject.imagesForVariant('unknown'), [front, back]);
+    });
+  });
+
+  group('preview image', () {
+    test('uses thumbnail before falling back to the first gallery image', () {
+      expect(
+        product()
+            .copyWith(thumbnail: 'https://example.test/thumb.png')
+            .previewImageUrl,
+        'https://example.test/thumb.png',
+      );
+      expect(product().previewImageUrl, 'https://example.test/shirt.png');
+      expect(product().copyWith(images: const []).previewImageUrl, isNull);
     });
   });
 }

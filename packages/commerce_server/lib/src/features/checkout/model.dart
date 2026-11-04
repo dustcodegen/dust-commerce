@@ -1,232 +1,189 @@
+import 'dart:convert';
+
 import 'package:commerce_server/src/features/cart/model/model.dart';
 import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_dart/db.dart';
+import 'package:dust_dart/serde.dart';
+
+import 'order_item_response.dart';
+import 'order_payment_response.dart';
+
+export 'order_list_response.dart';
 
 part 'model.g.dart';
+part 'order_response_values.dart';
 
-/// One row of `orders`, joined with the region it was sold under.
-@Derive([ToString(), Eq(), FromRow()])
-final class OrderRow with _$OrderRow {
-  /// Creates an [OrderRow].
-  const OrderRow({
-    required this.id,
-    required this.email,
+/// Complete order response populated directly by one SQLx query.
+///
+/// Serialization is an explicit allowlist. This class does not inherit the
+/// domain order, so new internal order fields cannot appear on the wire.
+@Derive([FromRow()])
+final class OrderResponse implements Serializable {
+  /// Constructs the final response directly from frozen database values.
+  OrderResponse({
+    required this.orderId,
+    required this.displayId,
+    required this.orderEmail,
     required this.currencyCode,
-    required this.subtotal,
-    required this.shippingTotal,
-    required this.discountTotal,
-    required this.tax,
-    required this.total,
-    required this.status,
-    required this.paymentStatus,
+    required this.orderSubtotal,
+    required this.orderShippingTotal,
+    required this.orderDiscountTotal,
+    required this.orderTax,
+    required this.orderTotal,
+    required this.storedStatus,
+    required this.storedFulfillmentStatus,
+    required this.storedPaymentStatus,
     required this.placedAt,
     required this.regionId,
     required this.regionName,
-    required this.taxRate,
-    required this.taxInclusive,
-    required this.countries,
-    this.customerId,
+    required this.regionTaxRate,
+    required this.regionTaxInclusive,
+    required this.regionCountries,
+    required this.items,
+    required this.shippingAddressJson,
+    required this.billingAddressJson,
+    this.orderCustomerId,
+    this.paymentAmount,
+    this.paymentCreatedAt,
+    this.paymentProvider,
     this.shippingOptionId,
     this.shippingName,
   });
 
-  /// The countries the region serves, comma separated.
-  final String countries;
+  /// Billing address encoded by SQLite's JSON functions.
+  @Sqlx(rename: 'billing_address_json')
+  final String billingAddressJson;
 
-  /// The currency every amount is in.
+  /// Currency shared by every frozen monetary amount.
   @Sqlx(rename: 'currency_code')
   final String currencyCode;
 
-  /// The account that placed this, when there was one.
+  /// Immutable order lines decoded directly by the SQLx row response.
+  @Sqlx(rename: 'items_json', tryFrom: OrderLineItemsFromJson())
+  final List<OrderLineItemResponse> items;
+
+  /// Customer owner when the order was not placed as a guest.
   @Sqlx(rename: 'customer_id')
-  final String? customerId;
+  final String? orderCustomerId;
 
-  /// Contact address for the buyer.
-  final String email;
+  /// Contact email captured at checkout.
+  @Sqlx(rename: 'email')
+  final String orderEmail;
 
-  /// The primary key.
-  final String id;
+  /// Short monotonically increasing identifier shown to people.
+  @Sqlx(rename: 'display_id')
+  final int displayId;
 
-  /// Whether the money has moved.
-  @Sqlx(rename: 'payment_status')
-  final String paymentStatus;
+  /// Stable order identifier.
+  @Sqlx(rename: 'id')
+  final String orderId;
 
-  /// When this was placed, ISO-8601.
-  @Sqlx(rename: 'placed_at')
-  final String placedAt;
+  /// Authorised payment amount, absent before payment begins.
+  @Sqlx(rename: 'payment_amount')
+  final int? paymentAmount;
 
-  /// The region's identifier.
+  /// Provider record creation time, absent before payment begins.
+  @Sqlx(
+    rename: 'payment_created_at',
+    defaultValue: null,
+    tryFrom: _PostgresDateTime(),
+  )
+  final DateTime? paymentCreatedAt;
+
+  /// Public provider identifier, absent before payment begins.
+  @Sqlx(rename: 'payment_provider')
+  final String? paymentProvider;
+
+  /// Frozen discount in integer minor units.
+  @Sqlx(rename: 'discount_total')
+  final int orderDiscountTotal;
+
+  /// Frozen delivery amount in integer minor units.
+  @Sqlx(rename: 'shipping_total')
+  final int orderShippingTotal;
+
+  /// Frozen goods subtotal in integer minor units.
+  @Sqlx(rename: 'subtotal')
+  final int orderSubtotal;
+
+  /// Frozen tax in integer minor units.
+  @Sqlx(rename: 'tax')
+  final int orderTax;
+
+  /// Frozen charged amount in integer minor units.
+  @Sqlx(rename: 'total')
+  final int orderTotal;
+
+  /// Placement timestamp stored as a UTC instant.
+  @Sqlx(rename: 'placed_at', tryFrom: _PostgresDateTime())
+  final DateTime placedAt;
+
+  /// Region country codes decoded from PostgreSQL's text array.
+  @Sqlx(rename: 'countries')
+  final List<String> regionCountries;
+
+  /// Region identifier captured by the order.
   @Sqlx(rename: 'region_id')
   final String regionId;
 
-  /// The region's display name.
+  /// Region display name.
   @Sqlx(rename: 'region_name')
   final String regionName;
 
-  /// Lifecycle state.
-  final String status;
+  /// Whether the frozen region prices included tax.
+  @Sqlx(rename: 'tax_inclusive')
+  final bool regionTaxInclusive;
 
-  /// The frozen amount taken off the goods.
-  @Sqlx(rename: 'discount_total')
-  final int discountTotal;
+  /// Region tax rate in basis points.
+  @Sqlx(rename: 'tax_rate')
+  final int regionTaxRate;
 
-  /// The delivery service name at the time of ordering.
+  /// Shipping address encoded by SQLite's JSON functions.
+  @Sqlx(rename: 'shipping_address_json')
+  final String shippingAddressJson;
+
+  /// Delivery service name captured at checkout.
   @Sqlx(rename: 'shipping_name')
   final String? shippingName;
 
-  /// The option the delivery method came from.
+  /// Delivery option captured at checkout.
   @Sqlx(rename: 'shipping_option_id')
   final String? shippingOptionId;
 
-  /// The frozen cost of delivery.
-  @Sqlx(rename: 'shipping_total')
-  final int shippingTotal;
+  /// Payment lifecycle value stored in SQLite.
+  @Sqlx(rename: 'payment_status')
+  final String storedPaymentStatus;
 
-  /// The frozen sum of the lines, before shipping, discount and tax.
-  final int subtotal;
+  /// Fulfillment lifecycle derived by the order query.
+  @Sqlx(rename: 'fulfillment_status')
+  final String storedFulfillmentStatus;
 
-  /// The frozen tax.
-  final int tax;
+  /// Order lifecycle value stored in SQLite.
+  @Sqlx(rename: 'status')
+  final String storedStatus;
 
-  /// Whether the region's prices already contained tax.
-  @Sqlx(rename: 'tax_inclusive')
-  final int taxInclusive;
+  @override
+  Map<String, Object?> serialize() => _serializeOrderResponse(this);
 
-  /// The region's tax rate in basis points.
-  @Sqlx(rename: 'tax_rate')
-  final int taxRate;
-
-  /// The frozen amount charged.
-  final int total;
+  @override
+  Map<String, Object?> toJson() => serialize();
 }
 
-/// One row of `order_addresses`.
-@Derive([ToString(), Eq(), FromRow()])
-final class OrderAddressRow with _$OrderAddressRow {
-  /// Creates an [OrderAddressRow].
-  const OrderAddressRow({
-    required this.kind,
-    required this.firstName,
-    required this.lastName,
-    required this.line1,
-    required this.city,
-    required this.postalCode,
-    required this.countryCode,
-    this.line2,
-    this.province,
-    this.phone,
-  });
+/// Converts the SQL order-item aggregate directly into response DTOs.
+final class OrderLineItemsFromJson
+    implements SqlxTryFrom<List<OrderLineItemResponse>, String> {
+  /// Creates the stateless aggregate decoder.
+  const OrderLineItemsFromJson();
 
-  /// Town or city.
-  final String city;
-
-  /// ISO 3166-1 alpha-2 country code.
-  @Sqlx(rename: 'country_code')
-  final String countryCode;
-
-  /// Given name.
-  @Sqlx(rename: 'first_name')
-  final String firstName;
-
-  /// Whether this is the shipping or the billing address.
-  final String kind;
-
-  /// Family name.
-  @Sqlx(rename: 'last_name')
-  final String lastName;
-
-  /// Street address.
-  final String line1;
-
-  /// Apartment, suite, or similar.
-  final String? line2;
-
-  /// Contact number.
-  final String? phone;
-
-  /// Postal or ZIP code.
-  @Sqlx(rename: 'postal_code')
-  final String postalCode;
-
-  /// State, province, or region.
-  final String? province;
+  @override
+  List<OrderLineItemResponse> decode(String value) =>
+      _decodeOrderLineItems(value);
 }
 
-/// Builds the domain [Address] a row describes.
-Address addressOf(OrderAddressRow row) => Address(
-      firstName: row.firstName,
-      lastName: row.lastName,
-      line1: row.line1,
-      line2: row.line2,
-      city: row.city,
-      province: row.province,
-      postalCode: row.postalCode,
-      countryCode: row.countryCode,
-      phone: row.phone,
-    );
+/// Normalizes PostgreSQL TIMESTAMPTZ values at the row boundary.
+final class _PostgresDateTime implements SqlxTryFrom<DateTime, DateTime> {
+  const _PostgresDateTime();
 
-/// Assembles the domain [Order] from a header row, its lines and addresses.
-///
-/// The totals come from the header, not from re-adding the lines. They were
-/// frozen when the order was placed, and recomputing them here would quietly
-/// undo that the first time a tax rate changed.
-Order orderOf(
-  OrderRow row,
-  List<LineItemRow> items,
-  List<OrderAddressRow> addresses,
-) {
-  final shipping = addresses.where((it) => it.kind == 'shipping').first;
-  final billing =
-      addresses.where((it) => it.kind == 'billing').firstOrNull ?? shipping;
-
-  return Order(
-    id: row.id,
-    email: row.email,
-    customerId: row.customerId,
-    region: regionOf(
-      id: row.regionId,
-      name: row.regionName,
-      currencyCode: row.currencyCode,
-      taxRate: row.taxRate,
-      taxInclusive: row.taxInclusive,
-      countries: row.countries,
-    ),
-    items: items.map(lineOf).toList(growable: false),
-    subtotal: Money(amount: row.subtotal, currencyCode: row.currencyCode),
-    shippingTotal:
-        Money(amount: row.shippingTotal, currencyCode: row.currencyCode),
-    discountTotal:
-        Money(amount: row.discountTotal, currencyCode: row.currencyCode),
-    shippingMethod: row.shippingOptionId == null
-        ? null
-        : ShippingMethod(
-            optionId: row.shippingOptionId!,
-            name: row.shippingName ?? 'Delivery',
-            amount: Money(
-              amount: row.shippingTotal,
-              currencyCode: row.currencyCode,
-            ),
-          ),
-    tax: Money(amount: row.tax, currencyCode: row.currencyCode),
-    total: Money(amount: row.total, currencyCode: row.currencyCode),
-    shippingAddress: addressOf(shipping),
-    billingAddress: addressOf(billing),
-    placedAt: DateTime.parse(row.placedAt),
-    status: _orderStatus(row.status),
-    paymentStatus: _paymentStatus(row.paymentStatus),
-  );
-}
-
-OrderStatus _orderStatus(String stored) {
-  for (final status in OrderStatus.values) {
-    if (status.name == stored) return status;
-  }
-  return OrderStatus.pending;
-}
-
-PaymentStatus _paymentStatus(String stored) {
-  for (final status in PaymentStatus.values) {
-    if (status.name == stored) return status;
-  }
-  return PaymentStatus.awaiting;
+  @override
+  DateTime decode(DateTime value) => value.toUtc();
 }

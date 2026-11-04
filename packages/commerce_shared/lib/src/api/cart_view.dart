@@ -1,6 +1,6 @@
 import 'package:commerce_shared/src/money.dart';
 import 'package:commerce_shared/src/ordering/cart.dart';
-import 'package:commerce_shared/src/ordering/shipping_method.dart';
+import 'package:commerce_shared/src/ordering/shipping_option.dart';
 import 'package:dust_dart/serde.dart';
 
 part 'cart_view.g.dart';
@@ -76,7 +76,7 @@ class ShippingOptionsView with _$ShippingOptionsView {
       {required this.shippingOptions, required this.count});
 
   /// Builds the view of [options].
-  factory ShippingOptionsView.of(List<ShippingMethod> options) =>
+  factory ShippingOptionsView.of(List<ShippingOption> options) =>
       ShippingOptionsView(shippingOptions: options, count: options.length);
 
   /// Creates a [ShippingOptionsView] from JSON.
@@ -87,5 +87,5 @@ class ShippingOptionsView with _$ShippingOptionsView {
   final int count;
 
   /// What is offered, cheapest first.
-  final List<ShippingMethod> shippingOptions;
+  final List<ShippingOption> shippingOptions;
 }

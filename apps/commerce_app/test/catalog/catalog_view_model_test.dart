@@ -18,7 +18,7 @@ void main() {
 
   setUp(() async {
     directory = await Directory.systemTemp.createTemp('commerce_vm');
-    database = CommerceDatabase.open(
+    database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );
@@ -39,7 +39,7 @@ void main() {
   group('load', () {
     test('starts idle, holding nothing', () {
       expect(viewModel.state.status, CatalogStatus.idle);
-      expect(viewModel.state.products, isEmpty);
+      expect(viewModel.state.rails, isEmpty);
       expect(viewModel.state.isLoading, isFalse);
     });
 
@@ -47,10 +47,9 @@ void main() {
       await viewModel.load();
 
       expect(viewModel.state.status, CatalogStatus.ready);
-      expect(viewModel.state.products, hasLength(1));
-      expect(viewModel.state.total, 1);
-      expect(viewModel.state.products.single.handle, 't-shirt');
-      expect(viewModel.state.message, isNull);
+      expect(viewModel.state.rails, hasLength(1));
+      expect(viewModel.state.rails.single.collection.handle, 'featured');
+      expect(viewModel.state.rails.single.products.single.handle, 't-shirt');
     });
 
     test('passes through loading on the way', () async {
@@ -65,7 +64,8 @@ void main() {
     test('carries prices as the shared Money type, not strings', () async {
       await viewModel.load();
 
-      final price = viewModel.state.products.single.cheapestIn('usd');
+      final price =
+          viewModel.state.rails.single.products.single.cheapestIn('usd');
 
       expect(price, isA<Money>());
       expect(price, Money.of(1999, 'usd'));
@@ -79,14 +79,14 @@ void main() {
 
       expect(viewModel.state.currencyCode, 'eur');
       expect(
-        viewModel.state.products.single.cheapestIn('eur'),
+        viewModel.state.rails.single.products.single.cheapestIn('eur'),
         Money.of(1799, 'eur'),
       );
     });
   });
 
   group('failure', () {
-    test('reports a message rather than throwing at the screen', () async {
+    test('reports failure rather than throwing at the screen', () async {
       final broken = CatalogViewModel(
         CatalogViewModelArgs(
           api: CommerceApi(Dio(), baseUrl: 'http://127.0.0.1:1'),
@@ -96,7 +96,6 @@ void main() {
       await broken.load();
 
       expect(broken.state.status, CatalogStatus.failed);
-      expect(broken.state.message, isNotNull);
       expect(broken.state.isLoading, isFalse);
     });
 
@@ -136,12 +135,17 @@ Future<void> _seed(CommerceDatabase database) async {
       queryExecute(sql, []).execute(database.executor);
 
   await run(
+    r"INSERT INTO product_collections (id, title, handle) VALUES "
+    r"('col_featured', 'Featured', 'featured')",
+  );
+  await run(
     r"INSERT INTO regions (id, name, currency_code, tax_rate, countries) "
     r"VALUES ('reg_us', 'United States', 'usd', 1000, 'us')",
   );
   await run(
-    r"INSERT INTO products (id, title, handle, status) VALUES "
-    r"('prod_shirt', 'T-Shirt', 't-shirt', 'published')",
+    r"INSERT INTO products "
+    r"(id, collection_id, title, handle, status) VALUES "
+    r"('prod_shirt', 'col_featured', 'T-Shirt', 't-shirt', 'published')",
   );
   await run(
     r"INSERT INTO product_variants "

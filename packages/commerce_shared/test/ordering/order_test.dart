@@ -23,6 +23,7 @@ void main() {
         id: 'item_1',
         variantId: 'variant_1',
         productId: 'prod_1',
+        productHandle: 't-shirt',
         title: 'T-Shirt',
         unitPrice: Money.of(unitPrice, 'eur'),
         quantity: quantity,
@@ -37,6 +38,7 @@ void main() {
 
   Order placed({Cart? from}) => Order.fromCart(
         id: 'order_1',
+        displayId: 1,
         cart: from ?? cart(),
         shippingAddress: address,
         placedAt: DateTime.utc(2026, 9, 5),
@@ -47,6 +49,7 @@ void main() {
       final order = placed();
 
       expect(order.subtotal, Money.of(2000, 'eur'));
+      expect(order.displayId, 1);
       expect(order.tax, Money.of(400, 'eur'));
       expect(order.total, Money.of(2400, 'eur'));
     });
@@ -60,6 +63,7 @@ void main() {
       expect(emptied.items, isEmpty);
       expect(order.items, hasLength(1));
       expect(order.items.single.unitPrice, Money.of(1000, 'eur'));
+      expect(order.items.single, isA<OrderLineItem>());
     });
 
     test('refuses an empty cart, which is nothing to order', () {
@@ -79,6 +83,7 @@ void main() {
       final order = placed();
 
       expect(order.status, OrderStatus.pending);
+      expect(order.fulfillmentStatus, OrderFulfillmentStatus.notFulfilled);
       expect(order.paymentStatus, PaymentStatus.awaiting);
       expect(order.isPaid, isFalse);
     });
@@ -89,27 +94,35 @@ void main() {
   });
 
   group('lifecycle', () {
-    test('capturing payment marks it paid and completes the order', () {
+    test('capturing payment does not complete or deliver the order', () {
       final captured = placed().captured();
 
       expect(captured.paymentStatus, PaymentStatus.captured);
       expect(captured.isPaid, isTrue);
-      expect(captured.status, OrderStatus.completed);
+      expect(captured.status, OrderStatus.pending);
+      expect(captured.items.single.detail.deliveredQuantity, 0);
     });
 
     test('cancelling a pending order leaves the payment awaiting', () {
-      final cancelled = placed().cancelled();
+      final canceled = placed().canceled();
 
-      expect(cancelled.status, OrderStatus.cancelled);
-      expect(cancelled.paymentStatus, PaymentStatus.awaiting);
+      expect(canceled.status, OrderStatus.canceled);
+      expect(canceled.paymentStatus, PaymentStatus.awaiting);
     });
 
     test('refuses to cancel an order already paid', () {
-      expect(() => placed().captured().cancelled(), throwsStateError);
+      expect(() => placed().captured().canceled(), throwsStateError);
     });
 
-    test('refuses to capture an order already cancelled', () {
-      expect(() => placed().cancelled().captured(), throwsStateError);
+    test('refuses to capture an order already canceled', () {
+      expect(() => placed().canceled().captured(), throwsStateError);
+    });
+
+    test('refuses money and cancellation changes after archival', () {
+      final archived = placed().copyWith(status: OrderStatus.archived);
+
+      expect(archived.captured, throwsStateError);
+      expect(archived.canceled, throwsStateError);
     });
   });
 
@@ -118,9 +131,30 @@ void main() {
       expect(Order.fromJson(placed().toJson()), placed());
     });
 
+    test('round-trips the explicit payment receipt', () {
+      final order = placed().copyWith(
+        payment: OrderPayment(
+          providerId: 'manual',
+          amount: Money.of(2400, 'eur'),
+          createdAt: DateTime.utc(2026, 9, 5, 12, 30),
+        ),
+      );
+
+      expect(Order.fromJson(order.toJson()), order);
+      expect(order.toJson()['payment'], isA<Map<String, Object?>>());
+    });
+
     test('encodes status as its wire name', () {
       expect(placed().toJson()['status'], 'pending');
       expect(placed().toJson()['payment_status'], 'awaiting');
+      expect(placed().toJson()['fulfillment_status'], 'not_fulfilled');
+    });
+
+    test('round-trips Medusa archived status', () {
+      final archived = placed().copyWith(status: OrderStatus.archived);
+
+      expect(Order.fromJson(archived.toJson()), archived);
+      expect(archived.toJson()['status'], 'archived');
     });
   });
 }

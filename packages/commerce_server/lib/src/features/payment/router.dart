@@ -1,3 +1,4 @@
+import 'package:commerce_server/src/features/account/extractor.dart';
 import 'package:commerce_server/src/features/payment/handler/handler.dart';
 import 'package:dust_server/server.dart';
 
@@ -8,6 +9,7 @@ import 'package:dust_server/server.dart';
 /// only which path serves which function.
 Router paymentRoutes() {
   return Router()
+    ..routeLayer(fromExtractor(const OptionalCustomerAuth()))
     ..route('/orders/{id}/payments', post(authorizePaymentHandler, status: 201))
     ..route(
       '/orders/{id}/payments/capture',

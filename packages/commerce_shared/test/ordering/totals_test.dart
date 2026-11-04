@@ -14,6 +14,7 @@ void main() {
         id: 'item_1',
         variantId: 'var_1',
         productId: 'prod_1',
+        productHandle: 't-shirt',
         title: 'T-Shirt',
         unitPrice: Money.of(unitPrice, 'usd'),
         quantity: quantity,
@@ -29,7 +30,18 @@ void main() {
         region: region,
         items: items ?? [line(unitPrice: 2000)],
         shippingMethod: shipping,
-        discount: discount,
+        promotions: discount == null
+            ? const []
+            : [
+                CartPromotion(
+                  id: 'promo_1',
+                  code: 'SAVE',
+                  type: PromotionType.fixed,
+                  value: discount.amount,
+                  amount: discount,
+                  currencyCode: discount.currencyCode,
+                ),
+              ],
       );
 
   final standard = ShippingMethod.of(
@@ -67,7 +79,7 @@ void main() {
       expect(subject.total, Money.of(1760, 'usd'));
     });
 
-    test('all four together, in Medusa\'s order', () {
+    test("all four together, in Medusa's order", () {
       final subject = cart(shipping: standard, discount: Money.of(400, 'usd'));
 
       // taxable = 2000 + 500 - 400 = 2100, tax = 210

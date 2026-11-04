@@ -14,14 +14,15 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
 LIMIT="${1:-180}"
-status=0
+BASELINE="scripts/file_size_baseline.txt"
+CURRENT="$(mktemp)"
+trap 'rm -f "$CURRENT"' EXIT
 
 while IFS= read -r file; do
   # Count code: no blank lines, no doc comments, no line comments.
   lines="$(grep -cve '^[[:space:]]*$' -e '^[[:space:]]*//' "$file" || true)"
   if [[ "$lines" -gt "$LIMIT" ]]; then
-    echo "::error file=$file::$lines lines of code, limit is $LIMIT"
-    status=1
+    echo "$file:$lines" >> "$CURRENT"
   fi
 done < <(
   find packages apps -name '*.dart' \
@@ -31,8 +32,16 @@ done < <(
     | sort
 )
 
-if [[ "$status" -eq 0 ]]; then
-  echo "every source file is within $LIMIT lines"
+sort -o "$CURRENT" "$CURRENT"
+
+if ! diff -u "$BASELINE" "$CURRENT"; then
+  echo "::error::file-size debt differs from its frozen baseline"
+  echo "split debt and remove its baseline row together; never add or grow debt"
+  exit 1
 fi
 
-exit "$status"
+if [[ -s "$CURRENT" ]]; then
+  echo "existing file-size debt matches its frozen baseline"
+else
+  echo "every source file is within $LIMIT lines"
+fi

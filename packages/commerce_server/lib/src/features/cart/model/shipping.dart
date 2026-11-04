@@ -1,63 +1,132 @@
+import 'dart:convert';
+
 import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_dart/db.dart';
+import 'package:dust_dart/serde.dart';
 
 part 'shipping.g.dart';
 
-/// One row of `shipping_options`: what a region offers.
-@Derive([ToString(), Eq(), FromRow()])
-final class ShippingOptionRow with _$ShippingOptionRow {
-  /// Creates a [ShippingOptionRow].
-  const ShippingOptionRow({
-    required this.id,
-    required this.regionId,
+/// Explicit shipping-option response populated directly by SQLx.
+@Derive([Serialize(), FromRow()])
+@SerDe(renameAll: SerDeRename.snakeCase)
+final class ShippingOptionResponse with _$ShippingOptionResponse {
+  /// Creates an allowlisted option and its public eligibility rules.
+  const ShippingOptionResponse({
+    required this.optionId,
     required this.name,
     required this.amount,
-    required this.currencyCode,
+    required this.priceRules,
   });
 
-  /// What it costs, in minor units.
-  final int amount;
+  /// Delivery price when the option is eligible.
+  @Sqlx(tryFrom: ShippingMoneyFromJson())
+  final Money amount;
 
-  /// The currency that amount is in.
-  @Sqlx(rename: 'currency_code')
-  final String currencyCode;
-
-  /// The primary key.
-  final String id;
-
-  /// The service name shown to a customer.
+  /// Delivery service display name.
   final String name;
 
-  /// The region that offers it.
-  @Sqlx(rename: 'region_id')
-  final String regionId;
+  /// Stable shipping-option identifier.
+  @Sqlx(rename: 'option_id')
+  final String optionId;
+
+  /// Explicit conditions the cart must satisfy.
+  @Sqlx(
+    rename: 'price_rules',
+    tryFrom: ShippingPriceRulesFromJson(),
+  )
+  final List<ShippingPriceRuleResponse> priceRules;
+
+  /// Whether the server-authoritative [itemTotal] satisfies every rule.
+  bool isAvailableFor(Money itemTotal) {
+    if (itemTotal.currencyCode != amount.currencyCode) return false;
+    return priceRules.every((rule) => rule.accepts(itemTotal.amount));
+  }
 }
 
-/// One row of `cart_shipping_methods`: what a cart chose.
-@Derive([ToString(), Eq(), FromRow()])
-final class ShippingMethodRow with _$ShippingMethodRow {
-  /// Creates a [ShippingMethodRow].
-  const ShippingMethodRow({
+/// Explicit public comparison attached to a shipping option.
+@Derive([Serialize()])
+@SerDe(renameAll: SerDeRename.snakeCase)
+final class ShippingPriceRuleResponse with _$ShippingPriceRuleResponse {
+  /// Creates an allowlisted price rule.
+  const ShippingPriceRuleResponse({
+    required this.attribute,
+    required this.operator,
+    required this.value,
+  });
+
+  /// Public cart fact name.
+  final String attribute;
+
+  /// Public comparison name.
+  final String operator;
+
+  /// Threshold in integer minor currency units.
+  final int value;
+
+  /// Whether [itemTotal] satisfies this supported rule.
+  bool accepts(int itemTotal) {
+    if (attribute != 'item_total') return false;
+    return switch (operator) {
+      'gt' => itemTotal > value,
+      'gte' => itemTotal >= value,
+      'lt' => itemTotal < value,
+      'lte' => itemTotal <= value,
+      'eq' => itemTotal == value,
+      _ => false,
+    };
+  }
+}
+
+/// Explicit shipping-method response populated directly by SQLx.
+@Derive([Serialize(), FromRow()])
+@SerDe(renameAll: SerDeRename.snakeCase)
+final class ShippingMethodResponse with _$ShippingMethodResponse {
+  /// Creates an allowlisted shipping method.
+  const ShippingMethodResponse({
     required this.optionId,
     required this.name,
     required this.amount,
   });
 
-  /// The price snapshotted when it was chosen.
-  final int amount;
+  /// Delivery price snapshot.
+  @Sqlx(tryFrom: ShippingMoneyFromJson())
+  final Money amount;
 
-  /// The service name at the time of choosing.
+  /// Delivery service display name.
   final String name;
 
-  /// The option it came from.
+  /// Stable shipping-option identifier.
   @Sqlx(rename: 'option_id')
   final String optionId;
 }
 
-/// Builds the domain [ShippingMethod] a row describes.
-ShippingMethod methodOf(ShippingMethodRow row, String currencyCode) =>
-    ShippingMethod(
-      optionId: row.optionId,
-      name: row.name,
-      amount: Money(amount: row.amount, currencyCode: currencyCode),
-    );
+/// Converts the shipping amount selected as a JSON object.
+final class ShippingMoneyFromJson implements SqlxTryFrom<Money, String> {
+  /// Creates the stateless converter.
+  const ShippingMoneyFromJson();
+
+  @override
+  Money decode(String value) => Money.fromJson(
+        jsonDecode(value) as Map<String, Object?>,
+      );
+}
+
+/// Converts ordered SQL JSON rows into explicit response allowlists.
+final class ShippingPriceRulesFromJson
+    implements SqlxTryFrom<List<ShippingPriceRuleResponse>, String> {
+  /// Creates the stateless converter.
+  const ShippingPriceRulesFromJson();
+
+  @override
+  List<ShippingPriceRuleResponse> decode(String value) => [
+        for (final item in jsonDecode(value) as List<Object?>)
+          _decode(item! as Map<String, Object?>),
+      ];
+
+  static ShippingPriceRuleResponse _decode(Map<String, Object?> item) =>
+      ShippingPriceRuleResponse(
+        attribute: item['attribute']! as String,
+        operator: item['operator']! as String,
+        value: item['value']! as int,
+      );
+}

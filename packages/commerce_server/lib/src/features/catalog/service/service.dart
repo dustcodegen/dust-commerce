@@ -1,5 +1,5 @@
 /// Catalogue use cases, one file per operation.
 library;
 
-export 'list.dart';
+export 'list/list.dart';
 export 'read.dart';

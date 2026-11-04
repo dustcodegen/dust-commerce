@@ -3,5 +3,8 @@
 library;
 
 export 'cart.dart';
+export 'line_item.dart';
 export 'promotion.dart';
+export 'region.dart';
 export 'shipping.dart';
+export 'view.dart';

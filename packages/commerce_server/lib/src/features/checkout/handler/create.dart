@@ -1,4 +1,7 @@
+import 'package:commerce_server/src/features/account/extractor.dart';
 import 'package:commerce_server/src/features/checkout/deps.dart';
+import 'package:commerce_server/src/features/checkout/failure.dart';
+import 'package:commerce_server/src/features/checkout/model.dart';
 import 'package:commerce_server/src/features/checkout/service/service.dart';
 import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_server/server.dart';
@@ -15,7 +18,11 @@ const ValidatedExtractable<CheckoutRequest> _body = ValidatedExtractable(
 );
 
 /// `POST /checkout` — turn a cart into an order.
-Future<Result<Order, Rejection>> placeOrderHandler(Request request) async {
+Future<Result<OrderResponse, Rejection>> placeOrderHandler(
+  Request request,
+) async {
+  final context = await request.extract(const Extension<CustomerContext>());
+  final actor = context.authenticated;
   final decoded = await _body.extract(request);
   if (decoded case Err(:final error)) return Err(error);
   final input = (decoded as Ok<CheckoutRequest, Rejection>).value;
@@ -28,7 +35,11 @@ Future<Result<Order, Rejection>> placeOrderHandler(Request request) async {
   final result = await placeOrder(
     deps.database,
     cartId: input.cartId,
-    email: input.email,
+    email: actor.match(
+      some: (value) => value.customer.email,
+      none: () => input.email,
+    ),
+    customerId: actor.map((value) => value.customer.id),
     shippingAddress: shipping,
     billingAddress: input.billingAddress?.toAddress() ?? shipping,
     placedAt: deps.clock.now(),
@@ -36,15 +47,41 @@ Future<Result<Order, Rejection>> placeOrderHandler(Request request) async {
   );
 
   return switch (result) {
-    Ok(value: (final order?, _)) => Ok(order),
-    Ok(value: (_, CheckoutFailure.noCart)) =>
+    Ok(:final value) => Ok(value),
+    Err(error: CheckoutRejected(failure: CheckoutFailure.noCart)) =>
       Err(Rejection.notFound('Cart "${input.cartId}"')),
-    Ok(value: (_, CheckoutFailure.emptyCart)) =>
+    Err(error: CheckoutRejected(failure: CheckoutFailure.emptyCart)) =>
       const Err(Rejection.status(422, 'An empty cart cannot be ordered')),
-    Ok(value: (_, CheckoutFailure.outOfStock)) => const Err(
+    Err(error: CheckoutRejected(failure: CheckoutFailure.outOfStock)) =>
+      const Err(
         Rejection.conflict('Something in this cart sold out before checkout'),
       ),
-    Ok() => const Err(Rejection.internal()),
-    Err() => const Err(Rejection.internal()),
+    Err(error: CheckoutRejected(failure: CheckoutFailure.wrongCustomer)) =>
+      Err(Rejection.notFound('Cart "${input.cartId}"')),
+    Err(
+      error: CheckoutRejected(
+        failure: CheckoutFailure.countryNotInRegion,
+      ),
+    ) =>
+      const Err(
+        Rejection.status(422, 'Address country is not served by this cart'),
+      ),
+    Err(
+      error: CheckoutRejected(
+        failure: CheckoutFailure.shippingNotSelected,
+      ),
+    ) =>
+      const Err(
+        Rejection.status(422, 'Select a delivery method before checkout'),
+      ),
+    Err(
+      error: CheckoutRejected(
+        failure: CheckoutFailure.paymentNotSelected,
+      ),
+    ) =>
+      const Err(
+        Rejection.status(422, 'Select a payment method before checkout'),
+      ),
+    Err(error: CheckoutStorage()) => const Err(Rejection.internal()),
   };
 }

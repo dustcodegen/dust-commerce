@@ -6,6 +6,7 @@ void main() {
         id: 'item_1',
         variantId: 'variant_1',
         productId: 'prod_1',
+        productHandle: 't-shirt',
         title: 'T-Shirt',
         variantTitle: 'Small / Black',
         unitPrice: Money.of(unitPrice, 'usd'),
@@ -49,6 +50,7 @@ void main() {
       final added = LineItem.fromVariant(
         id: 'item_1',
         productId: 'prod_1',
+        productHandle: 't-shirt',
         productTitle: 'T-Shirt',
         variant: variant,
         currencyCode: 'usd',
@@ -73,6 +75,7 @@ void main() {
         () => LineItem.fromVariant(
           id: 'item_1',
           productId: 'prod_1',
+          productHandle: 't-shirt',
           productTitle: 'T-Shirt',
           variant: variant,
           currencyCode: 'gbp',

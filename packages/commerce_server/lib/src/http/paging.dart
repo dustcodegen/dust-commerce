@@ -34,3 +34,41 @@ String currencyOf(Request request, {String fallback = 'usd'}) {
   if (asked == null || asked.length != 3) return fallback;
   return asked.toLowerCase();
 }
+
+/// A trimmed non-empty query value represented explicitly rather than null.
+Option<String> queryOptionOf(Request request, String name) {
+  final value = request.requestedUri.queryParameters[name]?.trim();
+  return value == null || value.isEmpty
+      ? const None<String>()
+      : Some<String>(value);
+}
+
+/// Distinct, non-empty repeated query values, capped against request abuse.
+List<String> queryValuesOf(Request request, String name) {
+  final values = request.requestedUri.queryParametersAll[name] ?? const [];
+  final normalized = <String>{};
+  for (final raw in values) {
+    for (final part in raw.split(',')) {
+      final value = part.trim();
+      if (value.isNotEmpty) normalized.add(value);
+      if (normalized.length == maxLimit) return normalized.toList();
+    }
+  }
+  return normalized.toList();
+}
+
+/// Whether a query toggle is explicitly enabled.
+bool queryToggleOf(Request request, String name) {
+  final value = request.requestedUri.queryParameters[name]?.trim();
+  return value == 'true' || value == '1';
+}
+
+/// A non-negative minor-unit price query, represented explicitly.
+Result<Option<int>, Rejection> priceQueryOf(Request request, String name) {
+  final value = request.requestedUri.queryParameters[name]?.trim();
+  if (value == null || value.isEmpty) return const Ok(None<int>());
+  final parsed = int.tryParse(value);
+  return parsed == null || parsed < 0
+      ? Err(Rejection.badRequest('Invalid $name'))
+      : Ok(Some<int>(parsed));
+}

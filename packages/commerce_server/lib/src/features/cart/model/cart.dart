@@ -1,167 +1,180 @@
+import 'dart:convert';
+
+import 'package:commerce_server/src/features/cart/model/line_item.dart';
+import 'package:commerce_server/src/features/cart/model/promotion.dart';
+import 'package:commerce_server/src/features/cart/model/region.dart';
+import 'package:commerce_server/src/features/cart/model/shipping.dart';
 import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_dart/db.dart';
+import 'package:dust_dart/serde.dart';
 
 part 'cart.g.dart';
+part 'cart_totals.dart';
 
-/// One row of `carts`, joined with the region that fixes its currency.
-@Derive([ToString(), Eq(), FromRow()])
-final class CartRow with _$CartRow {
-  /// Creates a [CartRow].
-  const CartRow({
+/// Explicit cart response populated directly from the cart-and-region query.
+@Derive([Serialize(), FromRow()])
+@SerDe(renameAll: SerDeRename.snakeCase)
+final class CartResponse with _$CartResponse {
+  /// Creates an allowlisted cart response.
+  const CartResponse({
     required this.id,
-    required this.regionId,
-    required this.regionName,
-    required this.currencyCode,
-    required this.taxRate,
-    required this.taxInclusive,
-    required this.countries,
+    required this.region,
+    required this.items,
+    required this.promotions,
     this.customerId,
     this.email,
+    this.shippingAddress,
+    this.billingAddress,
+    this.shippingMethod,
+    this.paymentSession,
   });
 
-  /// The countries the region serves, comma separated.
-  final String countries;
+  /// Separate invoice destination, absent when shipping is reused.
+  @Sqlx(rename: 'billing_address', tryFrom: OptionalAddressFromJson())
+  final Address? billingAddress;
 
-  /// The currency every line must be priced in.
-  @Sqlx(rename: 'currency_code')
-  final String currencyCode;
-
-  /// The account this belongs to, when there is one.
+  /// Customer owner once this guest cart is claimed.
   @Sqlx(rename: 'customer_id')
   final String? customerId;
 
-  /// Contact address for a guest checkout.
+  /// Guest or customer contact email stored on the cart.
   final String? email;
 
-  /// The primary key.
+  /// Stable cart identifier.
   final String id;
 
-  /// The region's identifier.
-  @Sqlx(rename: 'region_id')
-  final String regionId;
+  /// Explicit line-item responses.
+  @Sqlx(tryFrom: LineItemsFromJson())
+  final List<LineItemResponse> items;
 
-  /// The region's display name.
-  @Sqlx(rename: 'region_name')
-  final String regionName;
+  /// Explicit customer-facing promotion snapshots.
+  @Sqlx(tryFrom: CartPromotionsSqlxJson())
+  final List<AppliedPromotionResponse> promotions;
 
-  /// Whether listed prices already contain tax.
-  @Sqlx(rename: 'tax_inclusive')
-  final int taxInclusive;
+  /// Explicit public payment choice retained during checkout.
+  @Sqlx(
+    rename: 'payment_session',
+    tryFrom: OptionalPaymentSessionFromJson(),
+  )
+  final CartPaymentSession? paymentSession;
 
-  /// The tax rate in basis points.
-  @Sqlx(rename: 'tax_rate')
-  final int taxRate;
+  /// Explicit selling-region response.
+  @Sqlx(tryFrom: RegionResponseFromJson())
+  final RegionResponse region;
+
+  /// Delivery destination retained during checkout.
+  @Sqlx(rename: 'shipping_address', tryFrom: OptionalAddressFromJson())
+  final Address? shippingAddress;
+
+  /// Explicit selected delivery response.
+  @Sqlx(
+    rename: 'shipping_method',
+    tryFrom: OptionalShippingMethodFromJson(),
+  )
+  final ShippingMethodResponse? shippingMethod;
 }
 
-/// One row of `line_items`.
-@Derive([ToString(), Eq(), FromRow()])
-final class LineItemRow with _$LineItemRow {
-  /// Creates a [LineItemRow].
-  const LineItemRow({
-    required this.id,
-    required this.variantId,
-    required this.productId,
-    required this.title,
-    required this.unitAmount,
-    required this.currencyCode,
-    required this.quantity,
-    this.variantTitle,
-  });
+/// Decodes an optional allowlisted cart payment-session response.
+final class OptionalPaymentSessionFromJson
+    implements SqlxTryFrom<CartPaymentSession?, String> {
+  /// Creates the stateless converter.
+  const OptionalPaymentSessionFromJson();
 
-  /// The currency the snapshot is in.
-  @Sqlx(rename: 'currency_code')
-  final String currencyCode;
-
-  /// The primary key.
-  final String id;
-
-  /// The product the line came from.
-  @Sqlx(rename: 'product_id')
-  final String productId;
-
-  /// Units ordered.
-  final int quantity;
-
-  /// The product name when the line was added.
-  final String title;
-
-  /// The price of one unit when the line was added, in minor units.
-  @Sqlx(rename: 'unit_amount')
-  final int unitAmount;
-
-  /// The variant being bought.
-  @Sqlx(rename: 'variant_id')
-  final String variantId;
-
-  /// The variant name when the line was added.
-  @Sqlx(rename: 'variant_title')
-  final String? variantTitle;
+  @override
+  CartPaymentSession? decode(String value) =>
+      value == 'null' ? null : CartPaymentSession.fromJson(_object(value));
 }
 
-/// One row of `regions`.
-@Derive([ToString(), Eq(), FromRow()])
-final class RegionRow with _$RegionRow {
-  /// Creates a [RegionRow].
-  const RegionRow({
-    required this.id,
-    required this.name,
-    required this.currencyCode,
-    required this.taxRate,
-    required this.taxInclusive,
-    required this.countries,
-  });
+/// Keeps PostgreSQL JSON transport explicit to the local FromRow resolver.
+final class CartPromotionsSqlxJson
+    implements SqlxTryFrom<List<AppliedPromotionResponse>, String> {
+  /// Creates the stateless adapter.
+  const CartPromotionsSqlxJson();
 
-  /// The countries served, comma separated.
-  final String countries;
-
-  /// The currency of every price in this region.
-  @Sqlx(rename: 'currency_code')
-  final String currencyCode;
-
-  /// The primary key.
-  final String id;
-
-  /// Display name.
-  final String name;
-
-  /// Whether listed prices already contain tax.
-  @Sqlx(rename: 'tax_inclusive')
-  final int taxInclusive;
-
-  /// The tax rate in basis points.
-  @Sqlx(rename: 'tax_rate')
-  final int taxRate;
+  @override
+  List<AppliedPromotionResponse> decode(String value) =>
+      const AppliedPromotionsFromJson().decode(value);
 }
 
-/// Builds the domain [Region] a row describes.
-Region regionOf({
-  required String id,
-  required String name,
-  required String currencyCode,
-  required int taxRate,
-  required int taxInclusive,
-  required String countries,
-}) {
-  return Region(
-    id: id,
-    name: name,
-    currencyCode: currencyCode,
-    taxRate: taxRate,
-    taxInclusive: taxInclusive != 0,
-    countries: countries.split(',').where((it) => it.isNotEmpty).toList(),
-  );
+/// Builds explicit line responses from a SQLite JSON aggregate.
+final class LineItemsFromJson
+    implements SqlxTryFrom<List<LineItemResponse>, String> {
+  /// Creates the stateless converter.
+  const LineItemsFromJson();
+
+  @override
+  List<LineItemResponse> decode(String value) => [
+        for (final item in jsonDecode(value) as List<Object?>)
+          decodeItem(item! as Map<String, Object?>),
+      ];
+
+  /// Decodes one line object reused by immutable order snapshots.
+  static LineItemResponse decodeItem(Map<String, Object?> item) =>
+      LineItemResponse(
+        id: item['id']! as String,
+        variantId: item['variant_id']! as String,
+        productId: item['product_id']! as String,
+        productHandle: item['product_handle']! as String,
+        title: item['title']! as String,
+        variantTitle: item['variant_title'] as String?,
+        thumbnail: item['thumbnail'] as String?,
+        unitPrice: Money.fromJson(
+          item['unit_price']! as Map<String, Object?>,
+        ),
+        quantity: item['quantity']! as int,
+      );
 }
 
-/// Builds the domain [LineItem] a row describes.
-LineItem lineOf(LineItemRow row) => LineItem(
-      id: row.id,
-      variantId: row.variantId,
-      productId: row.productId,
-      title: row.title,
-      variantTitle: row.variantTitle,
-      unitPrice: Money(
-        amount: row.unitAmount,
-        currencyCode: row.currencyCode,
-      ),
-      quantity: row.quantity,
+/// Decodes an optional explicit shipping-method response.
+final class OptionalShippingMethodFromJson
+    implements SqlxTryFrom<ShippingMethodResponse?, String> {
+  /// Creates the stateless converter.
+  const OptionalShippingMethodFromJson();
+
+  @override
+  ShippingMethodResponse? decode(String value) {
+    if (value == 'null') return null;
+    final json = _object(value);
+    return ShippingMethodResponse(
+      optionId: json['option_id']! as String,
+      name: json['name']! as String,
+      amount: Money.fromJson(json['amount']! as Map<String, Object?>),
     );
+  }
+}
+
+/// Decodes one optional checkout address selected as JSON.
+final class OptionalAddressFromJson implements SqlxTryFrom<Address?, String> {
+  /// Creates the stateless converter.
+  const OptionalAddressFromJson();
+
+  @override
+  Address? decode(String value) =>
+      value == 'null' ? null : Address.fromJson(_object(value));
+}
+
+/// Builds an explicit region response from a JSON object selected by SQLite.
+final class RegionResponseFromJson
+    implements SqlxTryFrom<RegionResponse, String> {
+  /// Creates the stateless converter.
+  const RegionResponseFromJson();
+
+  @override
+  RegionResponse decode(String value) {
+    final json = _object(value);
+    return RegionResponse(
+      id: json['id']! as String,
+      name: json['name']! as String,
+      currencyCode: json['currency_code']! as String,
+      taxRate: json['tax_rate']! as int,
+      countries: [
+        for (final country in json['countries']! as List<Object?>)
+          country! as String,
+      ],
+      taxInclusive: json['tax_inclusive']! as bool,
+    );
+  }
+}
+
+Map<String, Object?> _object(String value) =>
+    jsonDecode(value) as Map<String, Object?>;

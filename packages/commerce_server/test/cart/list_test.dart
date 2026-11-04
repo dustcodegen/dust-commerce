@@ -14,7 +14,7 @@ void main() {
   setUp(() async {
     counter = 0;
     directory = await Directory.systemTemp.createTemp('commerce_ship');
-    database = CommerceDatabase.open(
+    database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );
@@ -60,15 +60,29 @@ void main() {
 
       response
         ..assertOk()
-        ..assertJsonContains({'count': 2});
+        ..assertJsonContains({'count': 3});
 
       final body = response.json! as Map<String, Object?>;
+      final freeJson = (body['shipping_options']! as List<Object?>).first!
+          as Map<String, Object?>;
+      expect(
+        freeJson.keys.toSet(),
+        {'amount', 'name', 'option_id', 'price_rules'},
+      );
+      expect(
+        (freeJson['price_rules']! as List<Object?>).single,
+        {'attribute': 'item_total', 'operator': 'gte', 'value': 3998},
+      );
       final options = (body['shipping_options']! as List<Object?>)
-          .map((it) => ShippingMethod.fromJson(it! as Map<String, Object?>))
+          .map((it) => ShippingOption.fromJson(it! as Map<String, Object?>))
           .toList();
 
-      expect(options.map((it) => it.optionId), ['so_standard', 'so_express']);
-      expect(options.first.amount, Money.of(500, 'usd'));
+      expect(
+        options.map((it) => it.optionId),
+        ['so_free', 'so_standard', 'so_express'],
+      );
+      expect(options.first.amount, Money.zero('usd'));
+      expect(options.first.priceRules.single.value, 3998);
     });
 
     test("never offers another region's option", () async {
@@ -174,9 +188,15 @@ Future<void> _seed(CommerceDatabase database) async {
   await run(
     r"INSERT INTO shipping_options (id, region_id, name, amount, currency_code)"
     r" VALUES "
+    r"('so_free', 'reg_us', 'Free shipping', 0, 'usd'), "
     r"('so_standard', 'reg_us', 'Standard', 500, 'usd'), "
     r"('so_express', 'reg_us', 'Express', 1500, 'usd'), "
     r"('so_eu_only', 'reg_eu', 'EU post', 400, 'eur')",
+  );
+  await run(
+    r"INSERT INTO shipping_option_price_rules "
+    r"(id, shipping_option_id, attribute, operator, value) VALUES "
+    r"('rule_free', 'so_free', 'item_total', 'gte', 3998)",
   );
   await run(
     r"INSERT INTO products (id, title, handle, status) VALUES "

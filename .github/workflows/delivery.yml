@@ -1,0 +1,129 @@
+name: Delivery
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: delivery-main
+  cancel-in-progress: true
+
+env:
+  DUST_VERSION: v0.3.1
+  DUST_LINUX_X64_SHA256: e4626dfdf42682055aeb1d891db8138a8e9c242d5b5a77e5ec0322c84a950591
+  FLUTTER_VERSION: 3.44.1
+  DUST_DATABASE_URL: postgres://dust:dust@127.0.0.1:5432/dust_commerce?sslmode=disable
+
+jobs:
+  package:
+    name: Package release artifacts
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: dust
+          POSTGRES_PASSWORD: dust
+          POSTGRES_DB: dust_commerce
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U dust -d dust_commerce"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+    steps:
+      - name: Checkout the verified revision
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Resolve Dart and Dust package dependencies
+        run: flutter pub get --enforce-lockfile
+
+      - name: Download the verified Dust CLI
+        run: ./scripts/install_dust_cli.sh
+
+      - name: Validate Dust CLI and package compatibility
+        run: dust doctor
+
+      - name: Generate Dust output
+        run: ./scripts/generate.sh
+
+      - name: Generated output policy is enforced
+        run: ./scripts/check_generated_output.sh
+
+      - name: Validate the production API origin
+        env:
+          API_BASE_URL: ${{ vars.PRODUCTION_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          case "$API_BASE_URL" in
+            http://?*|https://?*) ;;
+            *)
+              echo "Set PRODUCTION_API_BASE_URL to an absolute HTTP(S) origin." >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Build the Store and Admin web apps
+        env:
+          API_BASE_URL: ${{ vars.PRODUCTION_API_BASE_URL }}
+        run: |
+          set -euo pipefail
+          (cd apps/commerce_app && flutter build web --release --no-pub \
+            --dart-define=API_BASE_URL="$API_BASE_URL")
+          (cd apps/admin_app && flutter build web --release --no-pub \
+            --dart-define=API_BASE_URL="$API_BASE_URL")
+          test -f apps/commerce_app/build/web/index.html
+          test -f apps/admin_app/build/web/index.html
+
+      - name: Build the Linux API bundle
+        run: |
+          set -euo pipefail
+          install_root="$RUNNER_TEMP/dust-commerce-server"
+          mkdir -p "$install_root"
+          dart compile exe packages/commerce_server/bin/server.dart \
+            -o "$install_root/dust-commerce-server"
+          cp LICENSE README.md "$install_root/"
+          cp -R packages/commerce_server/migrations "$install_root/"
+          tar -czf "$RUNNER_TEMP/dust-commerce-server-linux-x64.tar.gz" \
+            -C "$install_root" .
+
+      - name: Upload the Store artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: morrow-store-${{ github.event.workflow_run.head_sha }}
+          path: apps/commerce_app/build/web
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload the Admin artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: morrow-admin-${{ github.event.workflow_run.head_sha }}
+          path: apps/admin_app/build/web
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload the API artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dust-commerce-server-linux-x64-${{ github.event.workflow_run.head_sha }}
+          path: ${{ runner.temp }}/dust-commerce-server-linux-x64.tar.gz
+          if-no-files-found: error
+          retention-days: 14

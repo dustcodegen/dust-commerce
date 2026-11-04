@@ -1,4 +1,9 @@
+import 'package:commerce_shared/src/catalog/category.dart';
+import 'package:commerce_shared/src/catalog/collection.dart';
+import 'package:commerce_shared/src/catalog/details.dart';
+import 'package:commerce_shared/src/catalog/image.dart';
 import 'package:commerce_shared/src/catalog/option.dart';
+import 'package:commerce_shared/src/catalog/tag.dart';
 import 'package:commerce_shared/src/catalog/variant.dart';
 import 'package:commerce_shared/src/money.dart';
 import 'package:dust_dart/serde.dart';
@@ -44,8 +49,13 @@ class Product with _$Product {
     required this.status,
     required this.options,
     required this.variants,
+    this.categories = const [],
+    this.collection,
+    this.details = const ProductDetails(),
     this.description,
+    this.images = const [],
     this.thumbnail,
+    this.tags = const [],
   });
 
   /// Creates a [Product], checking every variant against the declared options.
@@ -58,8 +68,13 @@ class Product with _$Product {
     required String title,
     required String handle,
     ProductStatus status = ProductStatus.draft,
+    ProductDetails details = const ProductDetails(),
+    List<ProductCategory> categories = const [],
+    ProductCollection? collection,
     String? description,
+    List<StoreProductImage> images = const [],
     String? thumbnail,
+    List<ProductTag> tags = const [],
     List<ProductOption> options = const [],
     List<ProductVariant> variants = const [],
   }) {
@@ -75,8 +90,13 @@ class Product with _$Product {
       title: title,
       handle: _slugify(handle),
       status: status,
+      categories: categories,
+      collection: collection,
+      details: details,
       description: description,
+      images: images,
       thumbnail: thumbnail,
+      tags: tags,
       options: options,
       variants: variants,
     );
@@ -89,11 +109,23 @@ class Product with _$Product {
   /// Long-form copy.
   final String? description;
 
+  /// Public categories this product appears in.
+  final List<ProductCategory> categories;
+
+  /// Curated collection this product belongs to, when any.
+  final ProductCollection? collection;
+
+  /// Physical and merchandising facts shown below the description.
+  final ProductDetails details;
+
   /// URL-safe identifier the storefront routes on.
   final String handle;
 
   /// Unique identifier.
   final String id;
+
+  /// Ordered images approved for the customer storefront.
+  final List<StoreProductImage> images;
 
   /// The axes the variants vary along.
   final List<ProductOption> options;
@@ -107,6 +139,9 @@ class Product with _$Product {
   /// Primary image.
   final String? thumbnail;
 
+  /// Public discovery labels attached to this product.
+  final List<ProductTag> tags;
+
   /// The buyable configurations.
   final List<ProductVariant> variants;
 
@@ -118,16 +153,37 @@ class Product with _$Product {
   bool get isPurchasable =>
       status.isVisible && variants.any((variant) => variant.isInStock);
 
+  /// Product-card image, matching Medusa's thumbnail-then-gallery fallback.
+  String? get previewImageUrl =>
+      thumbnail ?? (images.isEmpty ? null : images.first.url);
+
   /// The lowest price across variants in [currencyCode], or null.
   Money? cheapestIn(String currencyCode) {
-    Money? cheapest;
+    return cheapestVariantIn(currencyCode)?.priceIn(currencyCode);
+  }
+
+  /// The variant with the lowest active price in [currencyCode], or null.
+  ProductVariant? cheapestVariantIn(String currencyCode) {
+    ProductVariant? cheapest;
     for (final variant in variants) {
       final price = variant.priceIn(currencyCode);
       if (price == null) continue;
-      if (cheapest == null || price < cheapest) cheapest = price;
+      final current = cheapest?.priceIn(currencyCode);
+      if (current == null || price < current) cheapest = variant;
     }
     return cheapest;
   }
+
+  /// Original price for the cheapest variant when that variant is on sale.
+  Money? cheapestOriginalIn(String currencyCode) {
+    final variant = cheapestVariantIn(currencyCode);
+    if (variant == null || !variant.isOnSaleIn(currencyCode)) return null;
+    return variant.originalPriceIn(currencyCode);
+  }
+
+  /// Whether any variant is discounted in [currencyCode].
+  bool isOnSaleIn(String currencyCode) =>
+      variants.any((variant) => variant.isOnSaleIn(currencyCode));
 
   /// The variant with [id], or null.
   ProductVariant? variantById(String id) {
@@ -135,6 +191,20 @@ class Product with _$Product {
       if (variant.id == id) return variant;
     }
     return null;
+  }
+
+  /// Images visible for the selected Medusa-compatible `v_id`.
+  ///
+  /// An unknown or unassociated variant falls back to the whole product
+  /// gallery. Once a variant has associations, only those images are shown.
+  List<StoreProductImage> imagesForVariant(String? variantId) {
+    if (variantId == null) return images;
+    final variant = variantById(variantId);
+    if (variant == null || variant.images.isEmpty) return images;
+    final visibleIds = variant.images.map((image) => image.id).toSet();
+    return images
+        .where((image) => visibleIds.contains(image.id))
+        .toList(growable: false);
   }
 
   /// The variant matching every option value in [selection], or null.

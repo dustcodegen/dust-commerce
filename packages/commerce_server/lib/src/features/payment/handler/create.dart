@@ -1,7 +1,8 @@
+import 'package:commerce_server/src/features/account/extractor.dart';
 import 'package:commerce_server/src/features/checkout/handler/read.dart';
+import 'package:commerce_server/src/features/checkout/model.dart';
 import 'package:commerce_server/src/features/payment/deps.dart';
 import 'package:commerce_server/src/features/payment/service/service.dart';
-import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_server/server.dart';
 
 /// `POST /orders/{id}/payments` — start paying for an order.
@@ -9,9 +10,8 @@ import 'package:dust_server/server.dart';
 /// A plain function, mounted as `post(authorizePaymentHandler)`, which is how
 /// dust_server's examples are written and what a generated route would emit.
 ///
-/// Scoped by the email the caller proves, like reading an order is: an order
-/// id alone must not be enough to attach a payment to somebody's order.
-Future<Result<Order, Rejection>> authorizePaymentHandler(
+/// A customer order requires its owner; a guest order uses its email capability.
+Future<Result<OrderResponse, Rejection>> authorizePaymentHandler(
   Request request,
 ) async {
   final orderId = pathParametersOf(request)['id'];
@@ -19,7 +19,12 @@ Future<Result<Order, Rejection>> authorizePaymentHandler(
     return const Err(Rejection.badRequest('An order id is required'));
   }
 
-  final email = emailOf(request);
+  final context = await request.extract(const Extension<CustomerContext>());
+  final customer = context.authenticated;
+  final email = customer.match(
+    some: (value) => Ok<String, Rejection>(value.customer.email),
+    none: () => emailOf(request),
+  );
   if (email case Err(:final error)) return Err(error);
 
   final state = await paymentDeps(request);
@@ -27,24 +32,21 @@ Future<Result<Order, Rejection>> authorizePaymentHandler(
   final deps = (state as Ok<PaymentDeps, Rejection>).value;
 
   final result = await authorizePayment(
-    deps.orders,
-    deps.reads,
-    deps.writes,
+    deps.database,
     orderId: orderId,
     email: (email as Ok<String, Rejection>).value,
+    customerId: customer.map((value) => value.customer.id),
     id: deps.clock.nextId(),
-    now: deps.clock.now(),
   );
 
   return switch (result) {
-    Ok(value: (final order?, _)) => Ok(order),
-    Ok(value: (_, AuthorizeFailure.noOrder)) =>
+    Ok(value: Ok(value: final order)) => Ok(order),
+    Ok(value: Err(error: AuthorizeFailure.noOrder)) =>
       Err(Rejection.notFound('Order "$orderId"')),
-    Ok(value: (_, AuthorizeFailure.cancelled)) =>
-      const Err(Rejection.conflict('A cancelled order cannot be paid for')),
-    Ok(value: (_, AuthorizeFailure.alreadyStarted)) =>
-      const Err(Rejection.conflict('A payment has already been started')),
-    Ok() => const Err(Rejection.internal()),
+    Ok(value: Err(error: AuthorizeFailure.canceled)) =>
+      const Err(Rejection.conflict('A canceled order cannot be paid for')),
+    Ok(value: Err(error: AuthorizeFailure.archived)) =>
+      const Err(Rejection.conflict('An archived order cannot be paid for')),
     Err() => const Err(Rejection.internal()),
   };
 }

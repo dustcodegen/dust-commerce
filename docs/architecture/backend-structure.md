@@ -88,6 +88,15 @@ features/<feature>/
 
 The dependency direction is `router → handler → service → repository`.
 
+## Result boundaries
+
+A service returns one `Result<T, FeatureFailure>`. It never exposes a nested
+`Result<Result<T, DomainFailure>, SqlxError>` to its handler. The feature
+failure type represents not-found, validation, conflict and internal/database
+outcomes in one exhaustive switch; the service flattens transaction errors at
+its boundary. This is the Dart equivalent of a Rust feature error enum with a
+`Database(sqlx::Error)` variant and `From<sqlx::Error>` for `?` propagation.
+
 ## Operation names
 
 Inside `handler/`, `service/` and `repository/` there are **five permitted file
@@ -125,6 +134,17 @@ Dust requires database row classes to live in libraries separate from the
 `@SqlxDatabase` root. They live in the feature's `model.dart`, beside the
 functions that turn them into domain types — `repository/` may hold only
 operation files, and a row class is not an operation.
+
+## Response boundaries
+
+An HTTP response class is an explicit public allowlist. A response must declare
+every serialized field directly and must not extend a domain or database model.
+This keeps a future internal field from becoming part of the wire contract
+without an API review.
+
+Composition is allowed only when the nested type is itself an explicitly public
+response contract. Generated serialization mixins do not count as model
+inheritance.
 
 ## One DAO per operation
 

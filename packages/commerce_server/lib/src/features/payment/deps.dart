@@ -1,5 +1,3 @@
-import 'package:commerce_server/src/features/checkout/repository/repository.dart';
-import 'package:commerce_server/src/features/payment/repository/repository.dart';
 import 'package:commerce_server/src/http/http.dart';
 import 'package:commerce_server/src/infra/database.dart';
 import 'package:dust_server/server.dart';
@@ -18,9 +16,6 @@ final class PaymentDeps {
   /// Creates a [PaymentDeps].
   const PaymentDeps({
     required this.database,
-    required this.orders,
-    required this.reads,
-    required this.writes,
     required this.clock,
   });
 
@@ -29,15 +24,6 @@ final class PaymentDeps {
 
   /// The database, for the capture transaction.
   final CommerceDatabase database;
-
-  /// Reading the order being paid for.
-  final CheckoutReadRepository orders;
-
-  /// Finding an existing payment.
-  final PaymentReadRepository reads;
-
-  /// Starting one.
-  final PaymentCreateRepository writes;
 }
 
 /// The payment dependencies, or the 500 that says they were never attached.

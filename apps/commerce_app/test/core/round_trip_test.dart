@@ -7,6 +7,8 @@ import 'package:dust_dart/http.dart';
 import 'package:dust_server/testing.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'support.dart';
+
 /// The claim this repository exists to make, checked end to end.
 ///
 /// The API is the real one, serving over a real socket. The client is the one
@@ -18,26 +20,28 @@ void main() {
   late Directory directory;
   late CommerceDatabase database;
   late TestClient server;
+  late Dio dio;
   late CommerceApi api;
   var counter = 0;
 
   setUp(() async {
     counter = 0;
     directory = await Directory.systemTemp.createTemp('commerce_round_trip');
-    database = CommerceDatabase.open(
+    database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );
-    await _seed(database);
+    await seedRoundTripCatalog(database);
 
     server = await TestClient.serve(
       buildApp(
         database,
         nextId: () => 'id_${++counter}',
-        now: () => DateTime.utc(2026, 9, 5, 12),
+        now: () => DateTime.utc(2100, 1, 1, 12),
       ),
     );
-    api = CommerceApi(Dio(), baseUrl: server.origin);
+    dio = Dio();
+    api = CommerceApi(dio, baseUrl: server.origin);
   });
 
   tearDown(() async {
@@ -58,6 +62,9 @@ void main() {
       expect(product.handle, 't-shirt');
       expect(product.cheapestIn('usd'), Money.of(1999, 'usd'));
       expect(product.isPurchasable, isTrue);
+      expect(product.collection?.handle, 'summer');
+      expect(product.categories.single.handle, 'clothing/shirts');
+      expect(product.tags.single.value, 'Cotton');
     });
 
     test('decodes one product, keeping money as integer minor units', () async {
@@ -77,11 +84,26 @@ void main() {
       expect(product.cheapestIn('eur'), Money.of(1799, 'eur'));
       expect(product.cheapestIn('usd'), isNull);
     });
+
+    test('decodes taxonomy endpoints and product filters', () async {
+      final collections = await api.collections(handle: 'summer');
+      final categories = await api.categories(handle: 'clothing/shirts');
+      final options = await api.productOptions();
+      final filtered = await api.products(
+        labels: const ['cotton'],
+        optionValueIds: const ['optval_small'],
+      );
+
+      expect(collections.collections.single.title, 'Summer');
+      expect(categories.categories.single.name, 'Shirts');
+      expect(options.productOptions.single.values.first.id, 'optval_small');
+      expect(filtered.products.single.handle, 't-shirt');
+    });
   });
 
   group('the cart', () {
     test('is created, added to, and totalled by the server', () async {
-      final created = await api.createCart();
+      final created = await api.createCart(const CreateCartBody());
       expect(created.cart.isEmpty, isTrue);
 
       final withLine = await api.addLine(
@@ -97,7 +119,7 @@ void main() {
     });
 
     test('agrees with the domain model computing the same totals', () async {
-      final created = await api.createCart();
+      final created = await api.createCart(const CreateCartBody());
       final response = await api.addLine(
         created.cart.id,
         const AddLineBody(variantId: 'var_small', quantity: 3),
@@ -117,10 +139,18 @@ void main() {
 
   group('checkout', () {
     test('places an order the client decodes as the shared Order', () async {
-      final cart = await api.createCart();
+      final cart = await api.createCart(const CreateCartBody());
       await api.addLine(
         cart.cart.id,
         const AddLineBody(variantId: 'var_small', quantity: 2),
+      );
+      await api.chooseShipping(
+        cart.cart.id,
+        const ChooseShippingBody(optionId: 'ship_standard'),
+      );
+      await api.choosePayment(
+        cart.cart.id,
+        const ChoosePaymentBody(providerId: 'manual'),
       );
 
       final order = await api.checkout(
@@ -133,7 +163,7 @@ void main() {
             line1: '12 Analytical Way',
             city: 'London',
             postalCode: 'EC1A',
-            countryCode: 'gb',
+            countryCode: 'us',
           ),
         ),
       );
@@ -147,11 +177,21 @@ void main() {
       expect(order.billingAddress, order.shippingAddress);
     });
 
-    test('reads the order back, and lists it for that email', () async {
-      final cart = await api.createCart();
+    test('reads and lists only the authenticated customer order', () async {
+      final authorization = 'Bearer ${await server.customerToken()}';
+      dio.options.headers['authorization'] = authorization;
+      final cart = await api.createCart(const CreateCartBody());
       await api.addLine(
         cart.cart.id,
         const AddLineBody(variantId: 'var_small'),
+      );
+      await api.chooseShipping(
+        cart.cart.id,
+        const ChooseShippingBody(optionId: 'ship_standard'),
+      );
+      await api.choosePayment(
+        cart.cart.id,
+        const ChoosePaymentBody(providerId: 'manual'),
       );
       final placed = await api.checkout(
         CheckoutRequest(
@@ -163,44 +203,18 @@ void main() {
             line1: '12 Analytical Way',
             city: 'London',
             postalCode: 'EC1A',
-            countryCode: 'gb',
+            countryCode: 'us',
           ),
         ),
       );
 
-      final fetched = await api.order(placed.id, email: 'ada@example.com');
+      final fetched = await api.order(placed.id);
       expect(fetched.id, placed.id);
       expect(fetched.total, placed.total);
 
-      final history = await api.orders(email: 'ada@example.com');
+      final history = await api.orders();
       expect(history.count, 1);
       expect(history.orders.single.id, placed.id);
     });
   });
-}
-
-Future<void> _seed(CommerceDatabase database) async {
-  Future<void> run(String sql) =>
-      queryExecute(sql, []).execute(database.executor);
-
-  await run(
-    r"INSERT INTO regions (id, name, currency_code, tax_rate, countries) "
-    r"VALUES ('reg_us', 'United States', 'usd', 1000, 'us')",
-  );
-  await run(
-    r"INSERT INTO products (id, title, handle, status) VALUES "
-    r"('prod_shirt', 'T-Shirt', 't-shirt', 'published')",
-  );
-  await run(
-    r"INSERT INTO product_variants "
-    r"(id, product_id, title, inventory_quantity) VALUES "
-    r"('var_small', 'prod_shirt', 'Small', 50), "
-    r"('var_large', 'prod_shirt', 'Large', 20)",
-  );
-  await run(
-    r"INSERT INTO variant_prices (variant_id, currency_code, amount) VALUES "
-    r"('var_small', 'usd', 1999), "
-    r"('var_large', 'usd', 2199), "
-    r"('var_small', 'eur', 1799)",
-  );
 }

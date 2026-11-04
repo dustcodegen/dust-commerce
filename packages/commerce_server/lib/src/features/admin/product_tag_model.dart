@@ -1,0 +1,63 @@
+import 'package:dust_dart/db.dart';
+import 'package:dust_dart/serde.dart';
+
+part 'product_tag_model.g.dart';
+
+/// One Admin product tag selected directly from its final table.
+@Derive([Serialize(), FromRow()])
+@SerDe(renameAll: SerDeRename.snakeCase)
+final class AdminProductTagResponse with _$AdminProductTagResponse {
+  /// Creates the explicit merchant allowlist.
+  const AdminProductTagResponse({
+    required this.id,
+    required this.value,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  /// Database-generated creation instant converted from PostgreSQL TIMESTAMPTZ.
+  @Sqlx(rename: 'created_at', tryFrom: _AdminUtcDateTime())
+  final DateTime createdAt;
+
+  /// Stable tag identifier accepted by `tag_id` filters.
+  final String id;
+
+  /// Database-generated mutation instant converted from PostgreSQL TIMESTAMPTZ.
+  @Sqlx(rename: 'updated_at', tryFrom: _AdminUtcDateTime())
+  final DateTime updatedAt;
+
+  /// Merchant-facing tag value.
+  final String value;
+}
+
+/// One bounded page of explicit product-tag responses.
+@Derive([Serialize()])
+@SerDe(renameAll: SerDeRename.snakeCase)
+final class AdminProductTagListResponse with _$AdminProductTagListResponse {
+  /// Creates list metadata and direct SQLx rows.
+  const AdminProductTagListResponse({
+    required this.productTags,
+    required this.count,
+    required this.limit,
+    required this.offset,
+  });
+
+  /// Total active rows matching the query.
+  final int count;
+
+  /// Maximum requested page size.
+  final int limit;
+
+  /// Number of matching rows skipped.
+  final int offset;
+
+  /// Explicit merchant product-tag rows.
+  final List<AdminProductTagResponse> productTags;
+}
+
+final class _AdminUtcDateTime implements SqlxTryFrom<DateTime, DateTime> {
+  const _AdminUtcDateTime();
+
+  @override
+  DateTime decode(DateTime value) => value.toUtc();
+}

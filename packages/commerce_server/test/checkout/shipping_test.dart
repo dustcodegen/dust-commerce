@@ -16,7 +16,7 @@ void main() {
   setUp(() async {
     counter = 0;
     directory = await Directory.systemTemp.createTemp('commerce_co_ship');
-    database = CommerceDatabase.open(
+    database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );
@@ -51,6 +51,10 @@ void main() {
               ..json({'option_id': 'so_standard'}))
             .send())
         .assertOk();
+    (await (client.post('/store/carts/$cartId/payment-sessions')
+              ..json({'provider_id': 'manual'}))
+            .send())
+        .assertOk();
 
     final placed = await (client.post('/store/checkout')
           ..json({
@@ -62,7 +66,7 @@ void main() {
               'line1': '12 Analytical Way',
               'city': 'London',
               'postal_code': 'EC1A',
-              'country_code': 'gb',
+              'country_code': 'us',
             },
           }))
         .send();
@@ -87,6 +91,10 @@ Future<void> _seed(CommerceDatabase database) async {
     r"INSERT INTO regions (id, name, currency_code, tax_rate, countries) "
     r"VALUES ('reg_us', 'United States', 'usd', 1000, 'us'), "
     r"('reg_eu', 'Europe', 'eur', 2000, 'de')",
+  );
+  await run(
+    r"INSERT INTO region_payment_providers (region_id, provider_id) "
+    r"VALUES ('reg_us', 'manual'), ('reg_eu', 'manual')",
   );
   await run(
     r"INSERT INTO shipping_options (id, region_id, name, amount, currency_code)"

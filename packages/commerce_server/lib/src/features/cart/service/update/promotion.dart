@@ -1,6 +1,7 @@
 import 'package:commerce_server/src/features/cart/model/model.dart';
 import 'package:commerce_server/src/features/cart/repository/repository.dart';
 import 'package:commerce_server/src/features/cart/service/read.dart';
+import 'package:commerce_server/src/infra/option.dart';
 import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_dart/db.dart';
 
@@ -26,7 +27,7 @@ enum ApplyPromotionFailure {
 /// with it — so this is recomputed on every line change by the caller — but
 /// what a cart was last told it saves must not silently drift between two
 /// reads of the same unchanged cart.
-Future<Result<ApplyPromotionFailure?, SqlxError>> applyPromotion(
+Future<Result<Option<ApplyPromotionFailure>, SqlxError>> applyPromotion(
   CartReadRepository reads,
   CartUpdateRepository writes, {
   required String cartId,
@@ -35,29 +36,70 @@ Future<Result<ApplyPromotionFailure?, SqlxError>> applyPromotion(
 }) async {
   final loaded = await loadCart(reads, cartId);
   if (loaded case Err(:final error)) return Err(error);
-  final cart = (loaded as Ok<Cart?, SqlxError>).value;
-  if (cart == null) return const Ok(ApplyPromotionFailure.noCart);
+  final cartOption = (loaded as Ok<Option<CartResponse>, SqlxError>).value;
+  if (cartOption case None()) {
+    return const Ok(Some(ApplyPromotionFailure.noCart));
+  }
+  final cart = (cartOption as Some<CartResponse>).value;
 
   final found = await reads.promotionByCode(code);
   if (found case Err(:final error)) return Err(error);
-  final row = (found as Ok<PromotionRow?, SqlxError>).value;
-  if (row == null) return const Ok(ApplyPromotionFailure.noPromotion);
-
-  final promotion = promotionOf(row);
+  final promotionOption = optionOf(
+    (found as Ok<PromotionPolicy?, SqlxError>).value,
+  );
+  if (promotionOption case None()) {
+    return const Ok(Some(ApplyPromotionFailure.noPromotion));
+  }
+  final promotion = (promotionOption as Some<PromotionPolicy>).value;
   if (!promotion.isUsableAt(now)) {
-    return const Ok(ApplyPromotionFailure.notUsable);
+    return const Ok(Some(ApplyPromotionFailure.notUsable));
   }
   if (promotion.type == PromotionType.fixed &&
       promotion.currencyCode != cart.region.currencyCode) {
-    return const Ok(ApplyPromotionFailure.wrongCurrency);
+    return const Ok(Some(ApplyPromotionFailure.wrongCurrency));
   }
 
   final off = promotion.discountOn(cart.subtotal);
   final written = await writes.setPromotion(
-      cartId, promotion.id, promotion.code, off.amount);
+    cartId,
+    promotion.id,
+    promotion.code,
+    promotion.type.name,
+    promotion.promotionValue,
+    promotion.currencyCode,
+    off.amount,
+  );
   if (written case Err(:final error)) return Err(error);
 
-  return const Ok(null);
+  return const Ok(None<ApplyPromotionFailure>());
+}
+
+/// Recalculates the applied snapshot after a line mutation.
+Future<Result<Unit, SqlxError>> refreshPromotionAmount(
+  CartReadRepository reads,
+  CartUpdateRepository writes,
+  String cartId,
+) async {
+  final found = await reads.promotionOn(cartId);
+  if (found case Err(:final error)) return Err(error);
+  final promotion = optionOf(
+    (found as Ok<AppliedPromotionResponse?, SqlxError>).value,
+  );
+  if (promotion case None()) return const Ok(unit);
+
+  final loaded = await reads.findCart(cartId);
+  if (loaded case Err(:final error)) return Err(error);
+  final cart = optionOf((loaded as Ok<CartResponse?, SqlxError>).value);
+  if (cart case None()) return const Ok(unit);
+
+  final applied = (promotion as Some<AppliedPromotionResponse>).value;
+  final subtotal = (cart as Some<CartResponse>).value.subtotal;
+  final updated = await writes.updatePromotionAmount(
+    cartId,
+    applied.discountOn(subtotal).amount,
+  );
+  if (updated case Err(:final error)) return Err(error);
+  return const Ok(unit);
 }
 
 /// Removes whatever promotion the cart had.
@@ -71,7 +113,10 @@ Future<Result<bool, SqlxError>> removePromotion(
 ) async {
   final found = await reads.findCart(cartId);
   if (found case Err(:final error)) return Err(error);
-  if ((found as Ok<CartRow?, SqlxError>).value == null) return const Ok(false);
+  final cart = optionOf((found as Ok<CartResponse?, SqlxError>).value);
+  if (cart case None()) {
+    return const Ok(false);
+  }
 
   final cleared = await writes.clearPromotion(cartId);
   if (cleared case Err(:final error)) return Err(error);

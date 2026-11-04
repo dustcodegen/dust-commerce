@@ -15,6 +15,47 @@ enum PromotionType {
   fixed,
 }
 
+/// One promotion already applied to a cart.
+///
+/// This is deliberately narrower than [Promotion]: a storefront may see the
+/// code and customer-facing value, but never redemption limits or validity
+/// policy. [amount] is the server's current discount snapshot.
+@Derive([ToString(), Eq(), Serialize(), Deserialize()])
+@SerDe(renameAll: SerDeRename.snakeCase)
+final class CartPromotion with _$CartPromotion {
+  /// Creates one explicit public cart-promotion snapshot.
+  const CartPromotion({
+    required this.id,
+    required this.code,
+    required this.type,
+    required this.value,
+    required this.amount,
+    this.currencyCode,
+  });
+
+  /// Current amount this promotion removes from the cart.
+  final Money amount;
+
+  /// Customer-entered promotion code.
+  final String code;
+
+  /// Currency of [value] for a fixed promotion.
+  final String? currencyCode;
+
+  /// Stable promotion identifier.
+  final String id;
+
+  /// How [value] is interpreted.
+  final PromotionType type;
+
+  /// Basis points for percentages, or minor units for fixed promotions.
+  final int value;
+
+  /// Creates a [CartPromotion] from JSON.
+  factory CartPromotion.fromJson(Map<String, Object?> json) =>
+      _$CartPromotionFromJson(json);
+}
+
 /// A code a customer types to pay less.
 @Derive([ToString(), Eq(), CopyWith(), Serialize(), Deserialize()])
 @SerDe(renameAll: SerDeRename.snakeCase)
@@ -169,8 +210,9 @@ Map<String, Money> allocateDiscount(Money discount, List<LineItem> lines) {
     0,
     (running, line) => running + line.subtotal.amount,
   );
-  if (total == 0)
+  if (total == 0) {
     return {for (final line in lines) line.id: Money.zero(currency)};
+  }
 
   final allocated = <String, int>{};
   var handed = 0;

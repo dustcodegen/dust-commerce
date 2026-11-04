@@ -19,6 +19,7 @@ class AddressInput with _$AddressInput {
     required this.city,
     required this.postalCode,
     required this.countryCode,
+    this.company,
     this.line2,
     this.province,
     this.phone,
@@ -26,11 +27,14 @@ class AddressInput with _$AddressInput {
 
   /// Creates an [AddressInput] from JSON.
   factory AddressInput.fromJson(Map<String, Object?> json) =>
-      _$AddressInputFromJson(json);
+      _$AddressInputFromJson(_normalizedAddressInput(json));
 
   /// Town or city.
   @Validate(length: Length(min: 1), message: 'Enter a city')
   final String city;
+
+  /// Optional company or organization.
+  final String? company;
 
   /// ISO 3166-1 alpha-2 country code.
   @Validate(
@@ -69,15 +73,16 @@ class AddressInput with _$AddressInput {
   /// Call [validate] first. This still rejects a malformed country code,
   /// because [Address] will not hold one either.
   Address toAddress() => Address.of(
-        firstName: firstName,
-        lastName: lastName,
-        line1: line1,
-        line2: line2,
-        city: city,
-        province: province,
-        postalCode: postalCode,
-        countryCode: countryCode,
-        phone: phone,
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        company: _optional(company),
+        line1: line1.trim(),
+        line2: _optional(line2),
+        city: city.trim(),
+        province: _optional(province),
+        postalCode: postalCode.trim(),
+        countryCode: countryCode.trim(),
+        phone: _optional(phone),
       );
 }
 
@@ -95,7 +100,7 @@ class CheckoutRequest with _$CheckoutRequest {
 
   /// Creates a [CheckoutRequest] from JSON.
   factory CheckoutRequest.fromJson(Map<String, Object?> json) =>
-      _$CheckoutRequestFromJson(json);
+      _$CheckoutRequestFromJson(_normalizedCheckout(json));
 
   /// Where the invoice goes, when it differs from the shipping address.
   @Validate(nested: true)
@@ -113,4 +118,25 @@ class CheckoutRequest with _$CheckoutRequest {
   /// Where the goods go.
   @Validate(nested: true)
   final AddressInput shippingAddress;
+}
+
+Map<String, Object?> _normalizedCheckout(Map<String, Object?> json) => {
+      ...json,
+      if (json['email'] case final String value) 'email': value.trim(),
+      if (json['shipping_address'] case final Map<Object?, Object?> address)
+        'shipping_address': _normalizedAddressInput(address.cast()),
+      if (json['billing_address'] case final Map<Object?, Object?> address)
+        'billing_address': _normalizedAddressInput(address.cast()),
+    };
+
+Map<String, Object?> _normalizedAddressInput(Map<String, Object?> json) => {
+      for (final entry in json.entries)
+        entry.key: entry.value is String
+            ? (entry.value! as String).trim()
+            : entry.value,
+    };
+
+String? _optional(String? value) {
+  final normalized = value?.trim();
+  return normalized == null || normalized.isEmpty ? null : normalized;
 }

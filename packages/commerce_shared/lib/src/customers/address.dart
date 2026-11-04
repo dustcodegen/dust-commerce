@@ -18,6 +18,7 @@ class Address with _$Address {
     required this.city,
     required this.postalCode,
     required this.countryCode,
+    this.company,
     this.line2,
     this.province,
     this.phone,
@@ -31,6 +32,7 @@ class Address with _$Address {
     required String city,
     required String postalCode,
     required String countryCode,
+    String? company,
     String? line2,
     String? province,
     String? phone,
@@ -45,6 +47,7 @@ class Address with _$Address {
     return Address(
       firstName: firstName,
       lastName: lastName,
+      company: company,
       line1: line1,
       line2: line2,
       city: city,
@@ -61,6 +64,9 @@ class Address with _$Address {
 
   /// Town or city.
   final String city;
+
+  /// Optional company or organization captured with the destination.
+  final String? company;
 
   /// ISO 3166-1 alpha-2 country code, lower case.
   final String countryCode;

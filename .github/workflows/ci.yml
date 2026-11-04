@@ -2,66 +2,107 @@ name: CI
 
 on:
   push:
-    branches: [main]
   pull_request:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
-  DUST_VERSION: v0.1.4
+  DUST_VERSION: v0.3.1
+  DUST_LINUX_X64_SHA256: e4626dfdf42682055aeb1d891db8138a8e9c242d5b5a77e5ec0322c84a950591
+  FLUTTER_VERSION: 3.44.1
+  DUST_DATABASE_URL: postgres://dust:dust@127.0.0.1:5432/dust_commerce?sslmode=disable
 
 jobs:
   verify:
     name: Verify
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: dust
+          POSTGRES_PASSWORD: dust
+          POSTGRES_DB: dust_commerce
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U dust -d dust_commerce"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2
         with:
-          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
 
-      - name: Install the Dust CLI
+      - name: Install verification tools
         run: |
           set -euo pipefail
-          cargo install --locked \
-            --git https://github.com/y3l1n4ung/dust \
-            --tag "$DUST_VERSION" \
-            dust_cli
-          dust --version
+          sudo apt-get update
+          sudo apt-get install --yes postgresql-client ripgrep
+          rg --version
 
-      - name: Resolve dependencies
-        run: flutter pub get
+      - name: Download the verified Dust CLI
+        run: ./scripts/install_dust_cli.sh
 
-      # A generated-code repository whose CI does not check the generated code
-      # is theatre. `dust check` fails when a committed .g.dart no longer
-      # matches its source, so a contributor who edits a model and forgets to
-      # rebuild is caught here rather than by a reviewer.
-      - name: Generated output is current
+      - name: Install the SQLx CLI
         run: |
           set -euo pipefail
-          dust check --root packages/commerce_shared
-          dust check --root packages/commerce_server
-          dust check --root apps/commerce_app
+          cargo install sqlx-cli --locked --version 0.8.6 \
+            --no-default-features --features postgres
+          sqlx --version
 
-      # SQL is validated against the real schema. A column that does not exist
-      # fails this step with `no such column` and a non-zero exit.
-      - name: SQL matches the schema
-        run: dust check --db --root packages/commerce_server
+      - name: Resolve Dart and Dust package dependencies
+        run: flutter pub get --enforce-lockfile
 
-      - name: Translations are current
-        run: dust i18n check --root apps/commerce_app
+      - name: Validate Dust CLI and package compatibility
+        run: dust doctor
+
+      # A clean checkout intentionally contains no .g.dart. Build every output
+      # before analysis and tests, then prove the files remain generator-owned.
+      - name: Regenerate Dust output
+        run: ./scripts/generate.sh
+
+      - name: Generated output policy is enforced
+        run: ./scripts/check_generated_output.sh
+
+      # Dust embeds ups for application startup. SQLx remains the operator tool
+      # and must also prove that every reversible pair runs in both directions.
+      - name: SQLx migrations run up and down
+        run: |
+          set -euo pipefail
+          export DATABASE_URL="$DUST_DATABASE_URL"
+          sqlx migrate run --source packages/commerce_server/migrations
+          for _migration in packages/commerce_server/migrations/*.down.sql; do
+            sqlx migrate revert --source packages/commerce_server/migrations
+          done
+          remaining="$(psql "$DATABASE_URL" --tuples-only --no-align \
+            --command="SELECT count(*) FROM pg_tables WHERE schemaname = 'public' \
+             AND tablename != '_sqlx_migrations';")"
+          test "$remaining" = "0"
+          sqlx migrate run --source packages/commerce_server/migrations
 
       - name: Analyze
         run: |
           set -euo pipefail
+          dart analyze packages/commerce_admin_shared
           dart analyze packages/commerce_shared
           dart analyze packages/commerce_server
           (cd apps/commerce_app && flutter analyze --no-pub)
+          (cd apps/admin_app && flutter analyze --no-pub)
 
       # Handwritten Dart only. Formatting generated files rewrites them into
       # something the generator would not emit, and `dust check` above would
@@ -72,9 +113,11 @@ jobs:
       - name: Test
         run: |
           set -euo pipefail
+          (cd packages/commerce_admin_shared && dart test)
           (cd packages/commerce_shared && dart test)
           (cd packages/commerce_server && dart test)
-          (cd apps/commerce_app && flutter test)
+          (cd apps/commerce_app && flutter test --no-pub)
+          (cd apps/admin_app && flutter test --no-pub)
 
       # The 180-line rule from CONTRIBUTING.md, enforced rather than trusted.
       # Generated files are exempt: they are output, not source.

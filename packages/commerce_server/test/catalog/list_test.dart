@@ -3,31 +3,22 @@ import 'dart:io';
 import 'package:commerce_server/commerce_server.dart';
 import 'package:test/test.dart';
 
-/// The value of a successful query, or a failure naming the error.
-///
-/// `Result` is sealed and carries no bare `unwrap`, which is the right default
-/// for production code and too ceremonious for a test that wants the value or
-/// wants to stop.
-T ok<T>(Result<T, SqlxError> result) => switch (result) {
-      Ok(:final value) => value,
-      Err(:final error) => throw StateError('query failed: $error'),
-    };
+import 'list_support.dart';
 
 void main() {
   late Directory directory;
   late CommerceDatabase database;
+  late CatalogCountRepository counts;
   late CatalogListRepository lists;
-  late CatalogReadRepository reads;
-
   setUp(() async {
     directory = await Directory.systemTemp.createTemp('commerce_repo');
-    database = CommerceDatabase.open(
+    database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );
+    counts = CatalogCountRepository(database.executor);
     lists = CatalogListRepository(database.executor);
-    reads = CatalogReadRepository(database.executor);
-    await _seed(database);
+    await seedCatalogList(database);
   });
 
   tearDown(() async {
@@ -36,102 +27,166 @@ void main() {
   });
 
   group('listPublished', () {
+    Future<Result<List<ProductResponse>, SqlxError>> list({
+      String currency = 'usd',
+      int limit = 10,
+      int offset = 0,
+      String? collection,
+      String categories = '[]',
+      String labels = '[]',
+      int? minPrice,
+      int? maxPrice,
+      int onSale = 0,
+      String options = '[]',
+      String sortBy = 'created_at',
+    }) =>
+        lists.listPublished(
+          currency,
+          limit,
+          offset,
+          null,
+          collection,
+          categories,
+          labels,
+          sortBy,
+          minPrice,
+          maxPrice,
+          onSale,
+          options,
+        );
+
+    Future<Result<int, SqlxError>> count({
+      String currency = 'usd',
+      String categories = '[]',
+      String labels = '[]',
+      int? minPrice,
+      int? maxPrice,
+      int onSale = 0,
+      String options = '[]',
+    }) =>
+        counts.countPublished(
+          currency,
+          null,
+          null,
+          categories,
+          labels,
+          minPrice,
+          maxPrice,
+          onSale,
+          options,
+        );
+
     test('returns only published products', () async {
-      final result = await lists.listPublished(10, 0);
+      final result = await list();
       final handles = ok(result).map((row) => row.handle);
 
       expect(handles, ['mug', 't-shirt']);
       expect(handles, isNot(contains('secret-hoodie')));
     });
 
+    test('lists only products sold through the storefront channel', () async {
+      await _run(
+        database,
+        "INSERT INTO sales_channels (id, name) VALUES "
+        "('sc_web', 'Online Store'), ('sc_wholesale', 'Wholesale')",
+      );
+      await _run(
+        database,
+        "INSERT INTO product_sales_channels "
+        "(id, product_id, sales_channel_id) VALUES "
+        "('psc_shirt', 'prod_shirt', 'sc_web'), "
+        "('psc_mug', 'prod_mug', 'sc_wholesale')",
+      );
+
+      expect(ok(await list()).map((row) => row.handle), ['t-shirt']);
+      expect(ok(await count()), 1);
+    });
+
     test('pages, so a large catalogue does not arrive at once', () async {
-      final first = await lists.listPublished(1, 0);
-      final second = await lists.listPublished(1, 1);
+      final first = await list(limit: 1);
+      final second = await list(limit: 1, offset: 1);
 
       expect(ok(first).single.handle, 'mug');
       expect(ok(second).single.handle, 't-shirt');
     });
 
+    test('sorts before paging through the Store API order values', () async {
+      expect(
+          ok(await list(limit: 1, sortBy: 'relevance')).single.handle, 'mug');
+      expect(ok(await list(limit: 1, sortBy: 'title_desc')).single.handle,
+          't-shirt');
+      expect(
+          ok(await list(limit: 1, sortBy: 'price_asc')).single.handle, 'mug');
+      expect(ok(await list(limit: 1, sortBy: 'price_desc')).single.handle,
+          't-shirt');
+    });
+
     test('counts what it would page through', () async {
-      expect(ok(await lists.countPublished()), 2);
-    });
-  });
-
-  group('findByHandle', () {
-    test('finds a published product', () async {
-      final row = ok(await reads.findByHandle('t-shirt'));
-
-      expect(row?.title, 'T-Shirt');
-      expect(row?.status, 'published');
+      expect(ok(await count()), 2);
     });
 
-    test('does not leak a draft, even to a caller who knows the handle',
+    test('filters products with active sale prices', () async {
+      expect(ok(await list(onSale: 1)).map((row) => row.handle), ['t-shirt']);
+      expect(ok(await count(onSale: 1)), 1);
+    });
+
+    test('filters by collection, category and tag', () async {
+      final byCollection = await list(collection: 'summer');
+      final byCategory = await list(categories: '["shirts"]');
+      final byTag = await list(labels: '["Cotton"]');
+      final byEitherCategory = await list(categories: '["shirts","missing"]');
+
+      expect(ok(byCollection).map((row) => row.handle), ['t-shirt']);
+      expect(ok(byCategory).map((row) => row.handle), ['t-shirt']);
+      expect(ok(byTag).map((row) => row.handle), ['t-shirt']);
+      expect(ok(byEitherCategory).map((row) => row.handle), ['t-shirt']);
+    });
+
+    test('filters by stable option value id', () async {
+      final matching = await list(options: '["optval_large"]');
+      final impossible = await list(options: '["optval_large","missing"]');
+      final missing = await list(options: '["not-a-value"]');
+
+      expect(ok(matching).map((row) => row.handle), ['t-shirt']);
+      expect(ok(impossible), isEmpty);
+      expect(ok(missing), isEmpty);
+      expect(
+        ok(await count(options: '["optval_large"]')),
+        1,
+      );
+      expect(ok(await count(options: '["optval_large","missing"]')), 0);
+    });
+
+    test('excludes products and option choices unavailable in the currency',
         () async {
-      expect(ok(await reads.findByHandle('secret-hoodie')), isNull);
+      final eur = await list(currency: 'eur');
+      final unavailableChoice =
+          await list(currency: 'eur', options: '["optval_large"]');
+
+      expect(ok(eur).map((row) => row.handle), ['t-shirt']);
+      expect(ok(eur).single.variants.map((variant) => variant.id), [
+        'var_small',
+      ]);
+      expect(ok(unavailableChoice), isEmpty);
+      expect(
+        ok(await count(currency: 'eur')),
+        1,
+      );
     });
 
-    test('returns null for a handle nobody has', () async {
-      expect(ok(await reads.findByHandle('nothing')), isNull);
-    });
-  });
+    test('filters by cheapest price in the requested currency', () async {
+      final fromTen = await list(minPrice: 1000);
+      final upToTen = await list(maxPrice: 1000);
 
-  group('variantsOf', () {
-    test('returns the variants priced in the asked-for currency', () async {
-      final rows = ok(await lists.variantsOf('prod_shirt', 'usd'));
-
-      expect(rows, hasLength(2));
-      expect(rows.map((row) => row.id), ['var_large', 'var_small']);
-      expect(rows.map((row) => row.amount), [2199, 1999]);
-      expect(rows.every((row) => row.currencyCode == 'usd'), isTrue);
-    });
-
-    test('drops a variant with no price in that currency', () async {
-      final rows = ok(await lists.variantsOf('prod_shirt', 'eur'));
-
-      expect(rows, hasLength(1));
-      expect(rows.single.id, 'var_small');
-    });
-
-    test('returns nothing for a currency nobody is priced in', () async {
-      expect(ok(await lists.variantsOf('prod_shirt', 'gbp')), isEmpty);
-    });
-  });
-
-  group('findVariant', () {
-    test('finds one variant with its price', () async {
-      final row = ok(await reads.findVariant('var_small', 'usd'));
-
-      expect(row?.amount, 1999);
-      expect(row?.inventoryQuantity, 5);
-    });
-
-    test('returns null when the variant is not sold in that currency',
-        () async {
-      expect(ok(await reads.findVariant('var_large', 'eur')), isNull);
+      expect(ok(fromTen).map((row) => row.handle), ['t-shirt']);
+      expect(ok(upToTen).map((row) => row.handle), ['mug']);
+      expect(
+        ok(await count(minPrice: 1000)),
+        1,
+      );
     });
   });
 }
 
-Future<void> _seed(CommerceDatabase database) async {
-  Future<void> run(String sql) =>
-      queryExecute(sql, []).execute(database.executor);
-
-  await run(
-    r"INSERT INTO products (id, title, handle, status) VALUES "
-    r"('prod_shirt', 'T-Shirt', 't-shirt', 'published'), "
-    r"('prod_mug', 'Mug', 'mug', 'published'), "
-    r"('prod_secret', 'Hoodie', 'secret-hoodie', 'draft')",
-  );
-  await run(
-    r"INSERT INTO product_variants "
-    r"(id, product_id, title, inventory_quantity) VALUES "
-    r"('var_small', 'prod_shirt', 'Small', 5), "
-    r"('var_large', 'prod_shirt', 'Large', 2)",
-  );
-  await run(
-    r"INSERT INTO variant_prices (variant_id, currency_code, amount) VALUES "
-    r"('var_small', 'usd', 1999), "
-    r"('var_large', 'usd', 2199), "
-    r"('var_small', 'eur', 1799)",
-  );
-}
+Future<void> _run(CommerceDatabase database, String sql) =>
+    queryExecute(sql, const []).execute(database.executor);

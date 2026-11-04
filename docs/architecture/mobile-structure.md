@@ -50,6 +50,12 @@ features/<feature>/
 The dependency direction is `view → view_model → core/api`. A view never calls
 the API, and a view model never imports Flutter widgets.
 
+Widget composition is structural code. A private function or method returning
+`Widget` hides that structure from Flutter's element model and from reviewers.
+Extract a focused `StatelessWidget` or `StatefulWidget`; keep ordinary callbacks
+as methods. Existing violations are frozen by `scripts/check_structure.sh` and
+must only decrease.
+
 ## MVVM contract
 
 - A view model is annotated `@ViewModel` and extends its generated base.

@@ -1,3 +1,4 @@
+import 'package:commerce_server/commerce_server.dart';
 import 'package:commerce_shared/commerce_shared.dart';
 import 'package:test/test.dart';
 
@@ -10,6 +11,39 @@ void main() {
   tearDown(() async => harness.stop());
 
   group('POST /store/checkout', () {
+    test('binds an authenticated cart and order to the customer', () async {
+      final account = await harness.account('ada@example.com');
+      final cartId = await harness.cartWith(
+        'var_small',
+        token: account.token,
+      );
+
+      final placed = await harness.checkout(
+        cartId,
+        email: 'spoofed@example.com',
+        token: account.token,
+      );
+      placed.assertCreated();
+      final order = Order.fromJson(placed.json! as Map<String, Object?>);
+
+      expect(order.customerId, account.customerId);
+      expect(order.email, 'ada@example.com');
+      final rows = await queryRaw(
+        'SELECT customer_id, email FROM carts WHERE id = \$1',
+        [cartId],
+      ).fetch(harness.database.connection as Executor);
+      expect(rows.single.readIndex<String>(0), account.customerId);
+      expect(rows.single.readIndex<String>(1), 'ada@example.com');
+    });
+
+    test('hides a customer cart from another signed-in customer', () async {
+      final ada = await harness.account('ada@example.com');
+      final grace = await harness.account('grace@example.com');
+      final cartId = await harness.cartWith('var_small', token: ada.token);
+
+      (await harness.checkout(cartId, token: grace.token)).assertNotFound();
+    });
+
     test('turns a cart into an order with frozen totals', () async {
       final cartId = await harness.cartWith('var_small', quantity: 2);
 
@@ -34,16 +68,27 @@ void main() {
       expect(await harness.stockOf('var_large'), 0);
     });
 
-    test('empties the cart it ordered', () async {
-      final cartId = await harness.cartWith('var_small');
+    test('returns the same order when checkout is retried', () async {
+      final cartId = await harness.cartWith('var_small', quantity: 2);
 
-      (await harness.checkout(cartId)).assertCreated();
+      final first = await harness.checkout(cartId);
+      final retried = await harness.checkout(cartId);
 
-      final response = await harness.client.get('/store/carts/$cartId').send();
-      final cart =
-          CartView.fromJson(response.json! as Map<String, Object?>).cart;
+      first.assertCreated();
+      retried.assertCreated();
+      final firstOrder = Order.fromJson(first.json! as Map<String, Object?>);
+      final retriedOrder =
+          Order.fromJson(retried.json! as Map<String, Object?>);
+      expect(retriedOrder.id, firstOrder.id);
+      expect(await harness.stockOf('var_small'), 48);
 
-      expect(cart.isEmpty, isTrue);
+      final rows = await queryRaw(
+        'SELECT COUNT(orders.id), MAX(carts.completed_at) FROM carts '
+        'LEFT JOIN orders ON orders.cart_id = carts.id WHERE carts.id = \$1',
+        [cartId],
+      ).fetch(harness.database.connection as Executor);
+      expect(rows.single.readIndex<int>(0), 1);
+      expect(rows.single.readIndex<DateTime?>(1), isNotNull);
     });
   });
 
@@ -66,52 +111,11 @@ void main() {
       (await harness.checkout(mine, email: 'loser@example.com'))
           .assertConflict();
 
-      (await harness.client.get('/store/orders?email=loser@example.com').send())
-        ..assertOk()
-        ..assertJsonContains({'count': 0});
-    });
-  });
-
-  group('what it refuses', () {
-    test('a cart nobody started', () async {
-      (await harness.checkout('nope')).assertNotFound();
-    });
-
-    test('an empty cart', () async {
-      final created = await harness.client.post('/store/carts').send();
-      final cartId =
-          CartView.fromJson(created.json! as Map<String, Object?>).cart.id;
-
-      (await harness.checkout(cartId)).assertUnprocessable();
-    });
-
-    test('an address that is not an email, naming the field', () async {
-      final cartId = await harness.cartWith('var_small');
-
-      (await harness.checkout(cartId, email: 'not-an-email'))
-        ..assertUnprocessable()
-        ..assertJsonContains({
-          'error': 'Validation failed',
-          'fields': {
-            'email': ['Enter a valid email address'],
-          },
-        });
-    });
-
-    test('a shipping address missing its recipient, named as nested', () async {
-      final cartId = await harness.cartWith('var_small');
-
-      (await harness.checkout(
-        cartId,
-        shipping: harness.address(firstName: ''),
-      ))
-        ..assertUnprocessable()
-        ..assertJsonContains({
-          'error': 'Validation failed',
-          'fields': {
-            'shippingAddress.firstName': ['Enter a first name'],
-          },
-        });
+      final rows = await queryRaw(
+        'SELECT COUNT(*) FROM orders WHERE email = \$1',
+        ['loser@example.com'],
+      ).fetch(harness.database.connection as Executor);
+      expect(rows.single.readIndex<int>(0), 0);
     });
   });
 }

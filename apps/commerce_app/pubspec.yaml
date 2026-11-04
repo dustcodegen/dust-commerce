@@ -10,16 +10,26 @@ resolution: workspace
 
 dependencies:
   commerce_shared: ^0.1.0
-  dust_dart: ^0.1.4
-  dust_flutter: ^0.1.4
+  country_flags: ^4.1.2
+  cupertino_icons: ^1.0.8
+  dio: ^5.11.1
+  dust_dart: ^0.3.1
+  dust_flutter: ^0.3.1
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_secure_storage: ^11.0.0
+  flutter_svg: ^2.3.0
+  flutter_web_plugins:
+    sdk: flutter
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   # Test-only: the round-trip test runs the real API and points the generated
   # client at it. The dependency goes this way and never the other.
   commerce_server: ^0.1.0
-  dust_server: ^0.1.0-beta.3
+  dust_server: ^0.3.1
   flutter_test:
     sdk: flutter
   very_good_analysis: ^10.3.0
@@ -27,5 +37,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/images/
     - assets/i18n/en/
     - assets/i18n/my/

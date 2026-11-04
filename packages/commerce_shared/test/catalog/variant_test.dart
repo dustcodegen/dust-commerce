@@ -12,6 +12,7 @@ void main() {
         title: 'Small / Black',
         sku: 'TSHIRT-S-BLK',
         prices: [Money.of(1999, 'usd'), Money.of(1799, 'eur')],
+        originalPrices: [Money.of(2499, 'usd')],
         inventoryQuantity: inventoryQuantity,
         manageInventory: manageInventory,
         allowBackorder: allowBackorder,
@@ -25,6 +26,18 @@ void main() {
           id: 'v',
           title: 't',
           prices: [Money.of(1, 'usd'), Money.of(2, 'usd')],
+        ),
+        throwsArgumentError,
+      );
+    });
+
+    test('rejects two original prices in the same currency', () {
+      expect(
+        () => ProductVariant.of(
+          id: 'v',
+          title: 't',
+          prices: [Money.of(1, 'usd')],
+          originalPrices: [Money.of(2, 'usd'), Money.of(3, 'usd')],
         ),
         throwsArgumentError,
       );
@@ -50,6 +63,17 @@ void main() {
 
     test('returns null for a currency it is not sold in', () {
       expect(variant().priceIn('gbp'), isNull);
+    });
+
+    test('reports sale state only when original exceeds active price', () {
+      expect(variant().originalPriceIn('usd'), Money.of(2499, 'usd'));
+      expect(variant().isOnSaleIn('usd'), isTrue);
+      expect(variant().isOnSaleIn('eur'), isFalse);
+    });
+
+    test('reports the rounded sale percentage used by the storefront', () {
+      expect(variant().salePercentageDiffIn('usd'), 20);
+      expect(variant().salePercentageDiffIn('eur'), isNull);
     });
   });
 

@@ -7,11 +7,15 @@ void main() {
     String line1 = '12 Analytical Way',
     String postalCode = '10115',
     String countryCode = 'de',
+    String? company,
+    String? line2,
   }) =>
       AddressInput(
         firstName: firstName,
         lastName: 'Lovelace',
+        company: company,
         line1: line1,
+        line2: line2,
         city: 'Berlin',
         postalCode: postalCode,
         countryCode: countryCode,
@@ -77,10 +81,16 @@ void main() {
 
   group('conversion', () {
     test('becomes an Address once valid', () {
-      final address = addressInput(countryCode: 'DE').toAddress();
+      final address = addressInput(
+        countryCode: 'DE',
+        company: 'Analytical Engines',
+        line2: 'Suite 2',
+      ).toAddress();
 
       expect(address.countryCode, 'de');
       expect(address.fullName, 'Ada Lovelace');
+      expect(address.company, 'Analytical Engines');
+      expect(address.line2, 'Suite 2');
     });
   });
 
@@ -92,6 +102,25 @@ void main() {
     test('carries snake_case keys, as the API speaks', () {
       expect(request().toJson().containsKey('cart_id'), isTrue);
       expect(request().toJson().containsKey('shipping_address'), isTrue);
+    });
+
+    test('normalizes transport whitespace before validation and conversion',
+        () {
+      final decoded = CheckoutRequest.fromJson({
+        'cart_id': 'cart_1',
+        'email': '  ada@example.com  ',
+        'shipping_address': {
+          ...addressInput(countryCode: ' US ').toJson(),
+          'company': '   ',
+          'line2': '  Suite 2  ',
+        },
+      });
+
+      expect(decoded.validate().isValid, isTrue);
+      expect(decoded.email, 'ada@example.com');
+      expect(decoded.shippingAddress.toAddress().countryCode, 'us');
+      expect(decoded.shippingAddress.toAddress().company, isNull);
+      expect(decoded.shippingAddress.toAddress().line2, 'Suite 2');
     });
   });
 }

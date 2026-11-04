@@ -1,5 +1,7 @@
 import 'package:dust_dart/serde.dart';
 
+import '../ordering/checkout_request.dart';
+
 part 'cart_request.g.dart';
 
 /// The body of `POST /carts`.
@@ -29,6 +31,79 @@ class CreateCartBody with _$CreateCartBody {
   final String? regionId;
 }
 
+/// The body of `PATCH /carts/{id}` when the selling region changes.
+@Derive([ToString(), Eq(), Validate(), Serialize(), Deserialize()])
+@SerDe(renameAll: SerDeRename.snakeCase)
+final class UpdateCartRegionBody with _$UpdateCartRegionBody {
+  /// Creates an explicit region replacement.
+  const UpdateCartRegionBody({required this.regionId});
+
+  /// Creates an [UpdateCartRegionBody] from JSON.
+  factory UpdateCartRegionBody.fromJson(Map<String, Object?> json) =>
+      _$UpdateCartRegionBodyFromJson(json);
+
+  /// Region whose currency and selling rules should govern the cart.
+  @Validate(length: Length(min: 1), message: 'region_id is required')
+  final String regionId;
+}
+
+/// The atomic cart payload used by a checkout permalink.
+@Derive([ToString(), Eq(), Validate(), Serialize(), Deserialize()])
+@SerDe(renameAll: SerDeRename.snakeCase)
+final class BuyCartBody with _$BuyCartBody {
+  /// Creates a cart containing every requested line.
+  const BuyCartBody({required this.items, this.regionId});
+
+  /// Decodes a checkout-permalink request.
+  factory BuyCartBody.fromJson(Map<String, Object?> json) =>
+      _$BuyCartBodyFromJson(json);
+
+  /// Every line is validated before the server writes the cart.
+  @Validate(length: Length(min: 1), message: 'Add at least one item')
+  final List<AddLineBody> items;
+
+  /// Optional selling region selected by the storefront.
+  final String? regionId;
+}
+
+/// The contact and destinations retained while checkout is in progress.
+@Derive([ToString(), Eq(), Validate(), Serialize(), Deserialize()])
+@SerDe(renameAll: SerDeRename.snakeCase)
+final class UpdateCartAddressesBody with _$UpdateCartAddressesBody {
+  /// Creates a complete replacement for the cart checkout addresses.
+  const UpdateCartAddressesBody({
+    required this.email,
+    required this.shippingAddress,
+    this.billingAddress,
+  });
+
+  /// Decodes the validated cart-address request.
+  factory UpdateCartAddressesBody.fromJson(Map<String, Object?> json) =>
+      _$UpdateCartAddressesBodyFromJson(_normalizedCartAddresses(json));
+
+  /// Separate invoice destination, or absent when shipping is reused.
+  @Validate(nested: true)
+  final AddressInput? billingAddress;
+
+  /// Receipt and delivery-contact email.
+  @Validate(length: Length(min: 1), message: 'Enter an email address')
+  @Validate(email: true, message: 'Enter a valid email address')
+  final String email;
+
+  /// Destination selected before delivery options are shown.
+  @Validate(nested: true)
+  final AddressInput shippingAddress;
+}
+
+Map<String, Object?> _normalizedCartAddresses(Map<String, Object?> json) => {
+      ...json,
+      if (json['email'] case final String value) 'email': value.trim(),
+      if (json['shipping_address'] case final Map<Object?, Object?> address)
+        'shipping_address': AddressInput.fromJson(address.cast()).toJson(),
+      if (json['billing_address'] case final Map<Object?, Object?> address)
+        'billing_address': AddressInput.fromJson(address.cast()).toJson(),
+    };
+
 /// The body of `POST /carts/{id}/line-items`.
 @Derive([ToString(), Eq(), Validate(), Serialize(), Deserialize()])
 @SerDe(renameAll: SerDeRename.snakeCase)
@@ -46,12 +121,28 @@ class AddLineBody with _$AddLineBody {
   /// generated deserialiser requires every non-nullable key unless a
   /// `defaultValue` says what a missing one means.
   @SerDe(defaultValue: 1)
-  @Validate(range: Range(min: 1), message: 'Order at least one')
+  @Validate(range: Range(min: 1, max: 100), message: 'Order 1 to 100')
   final int quantity;
 
   /// The variant being added.
   @Validate(length: Length(min: 1), message: 'variant_id is required')
   final String variantId;
+}
+
+/// The body of `PATCH /carts/{id}/line-items/{lineId}`.
+@Derive([ToString(), Eq(), Validate(), Serialize(), Deserialize()])
+@SerDe(renameAll: SerDeRename.snakeCase)
+class UpdateLineBody with _$UpdateLineBody {
+  /// Creates an [UpdateLineBody].
+  const UpdateLineBody({required this.quantity});
+
+  /// Creates an [UpdateLineBody] from JSON.
+  factory UpdateLineBody.fromJson(Map<String, Object?> json) =>
+      _$UpdateLineBodyFromJson(json);
+
+  /// The complete replacement quantity, rather than an increment.
+  @Validate(range: Range(min: 1), message: 'Order at least one')
+  final int quantity;
 }
 
 /// The body of `POST /carts/{id}/shipping-method`.
@@ -68,6 +159,22 @@ class ChooseShippingBody with _$ChooseShippingBody {
   /// The option being chosen.
   @Validate(length: Length(min: 1), message: 'option_id is required')
   final String optionId;
+}
+
+/// The body of `POST /carts/{id}/payment-sessions`.
+@Derive([ToString(), Eq(), Validate(), Serialize(), Deserialize()])
+@SerDe(renameAll: SerDeRename.snakeCase)
+final class ChoosePaymentBody with _$ChoosePaymentBody {
+  /// Creates an explicit payment-provider choice.
+  const ChoosePaymentBody({required this.providerId});
+
+  /// Creates a [ChoosePaymentBody] from JSON.
+  factory ChoosePaymentBody.fromJson(Map<String, Object?> json) =>
+      _$ChoosePaymentBodyFromJson(json);
+
+  /// Public provider identifier offered by this checkout.
+  @Validate(length: Length(min: 1), message: 'provider_id is required')
+  final String providerId;
 }
 
 /// The body of `POST /carts/{id}/promotions`.

@@ -1,7 +1,3 @@
-// Row types are imported from the library that declares them rather than
-// through model/model.dart. Dust resolves a DAO's row type by looking in
-// the libraries a file imports and does not follow an export barrel, so a
-// barrel import fails the build with 'unsupported DAO result type'.
 import 'package:commerce_server/src/features/cart/model/shipping.dart';
 import 'package:dust_dart/db.dart';
 
@@ -11,7 +7,7 @@ part 'list.g.dart';
 @SqlxDao()
 abstract final class CartListRepository {
   /// Binds the queries to [db].
-  const factory CartListRepository(DatabaseExecutor db) = _$CartListRepository;
+  const factory CartListRepository(Executor db) = _$CartListRepository;
 
   /// The delivery options [regionId] offers, cheapest first.
   ///
@@ -19,22 +15,59 @@ abstract final class CartListRepository {
   /// be offered, and therefore cannot be chosen, without the handler having to
   /// remember to check.
   @Query(r'''
-SELECT id, region_id, name, amount, currency_code
-FROM shipping_options
-WHERE region_id = $1
-ORDER BY amount, id
+SELECT option.id AS option_id, option.name,
+       json_build_object(
+         'amount', option.amount,
+         'currency_code', option.currency_code
+       )::text AS amount,
+       coalesce((
+         SELECT json_agg(dust_json_value(ordered.rule_json))
+         FROM (
+           SELECT json_build_object(
+             'attribute', rule.attribute,
+             'operator', rule.operator,
+             'value', rule.value
+           ) AS rule_json
+           FROM shipping_option_price_rules rule
+           WHERE rule.shipping_option_id = option.id
+             AND rule.deleted_at IS NULL
+           ORDER BY rule.id
+         ) ordered
+       ), '[]')::text AS price_rules
+FROM shipping_options option
+WHERE option.region_id = $1 AND option.deleted_at IS NULL
+ORDER BY option.amount, option.id
 ''')
-  Future<Result<List<ShippingOptionRow>, SqlxError>> shippingOptionsOf(
+  Future<Result<List<ShippingOptionResponse>, SqlxError>> shippingOptionsOf(
     String regionId,
   );
 
   /// One option, checked against the region that is allowed to use it.
   @Query(r'''
-SELECT id, region_id, name, amount, currency_code
-FROM shipping_options
-WHERE id = $1 AND region_id = $2
+SELECT option.id AS option_id, option.name,
+       json_build_object(
+         'amount', option.amount,
+         'currency_code', option.currency_code
+       )::text AS amount,
+       coalesce((
+         SELECT json_agg(dust_json_value(ordered.rule_json))
+         FROM (
+           SELECT json_build_object(
+             'attribute', rule.attribute,
+             'operator', rule.operator,
+             'value', rule.value
+           ) AS rule_json
+           FROM shipping_option_price_rules rule
+           WHERE rule.shipping_option_id = option.id
+             AND rule.deleted_at IS NULL
+           ORDER BY rule.id
+         ) ordered
+       ), '[]')::text AS price_rules
+FROM shipping_options option
+WHERE option.id = $1 AND option.region_id = $2
+  AND option.deleted_at IS NULL
 ''')
-  Future<Result<ShippingOptionRow?, SqlxError>> shippingOptionFor(
+  Future<Result<ShippingOptionResponse?, SqlxError>> shippingOptionFor(
     String optionId,
     String regionId,
   );

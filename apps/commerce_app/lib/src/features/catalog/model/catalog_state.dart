@@ -1,5 +1,6 @@
-import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_dart/serde.dart';
+
+import 'featured_product_rail.dart';
 
 part 'catalog_state.g.dart';
 
@@ -23,33 +24,27 @@ enum CatalogStatus {
 /// The screen holds no state of its own. A widget that keeps something across
 /// a frame is a second source of truth, and the two drift.
 @Derive([ToString(), Eq(), CopyWith()])
-class CatalogState with _$CatalogState {
+final class CatalogState with _$CatalogState {
   /// Creates a [CatalogState].
   const CatalogState({
     this.status = CatalogStatus.idle,
-    this.products = const [],
-    this.total = 0,
+    this.rails = const [],
     this.currencyCode = 'usd',
-    this.message,
   });
 
   /// The currency prices are shown in.
   final String currencyCode;
 
-  /// Why the last request failed, when it did.
-  final String? message;
-
-  /// The products on the current page.
-  final List<Product> products;
+  /// Source-ordered collection rails shown below the hero.
+  final List<FeaturedProductRail> rails;
 
   /// Where the screen is in its lifecycle.
   final CatalogStatus status;
 
-  /// How many published products exist.
-  final int total;
-
   /// Whether the screen has nothing to show and is not waiting.
-  bool get isEmpty => products.isEmpty && status == CatalogStatus.ready;
+  bool get isEmpty =>
+      status == CatalogStatus.ready &&
+      rails.every((rail) => rail.products.isEmpty);
 
   /// Whether a spinner belongs on screen.
   bool get isLoading => status == CatalogStatus.loading;

@@ -5,6 +5,8 @@ import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_server/testing.dart';
 import 'package:test/test.dart';
 
+import 'read_support.dart';
+
 void main() {
   late Directory directory;
   late CommerceDatabase database;
@@ -12,11 +14,11 @@ void main() {
 
   setUp(() async {
     directory = await Directory.systemTemp.createTemp('commerce_http');
-    database = CommerceDatabase.open(
+    database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );
-    await _seed(database);
+    await seedCatalogRead(database);
     client = TestClient(buildApp(database));
   });
 
@@ -24,14 +26,6 @@ void main() {
     await client.close();
     await database.close();
     await directory.delete(recursive: true);
-  });
-
-  group('GET /health', () {
-    test('answers ok', () async {
-      (await client.get('/health').send())
-        ..assertOk()
-        ..assertJson({'status': 'ok'});
-    });
   });
 
   group('GET /store/products', () {
@@ -56,10 +50,7 @@ void main() {
     });
 
     test('pages when asked', () async {
-      final response =
-          await client.get('/store/products?limit=1&offset=1').send();
-
-      response
+      (await client.get('/store/products?limit=1&offset=1').send())
         ..assertOk()
         ..assertJsonContains({'count': 1, 'limit': 1, 'offset': 1, 'total': 2});
     });
@@ -101,9 +92,17 @@ void main() {
       final product = Product.fromJson(response.json! as Map<String, Object?>);
 
       expect(product.title, 'T-Shirt');
-      expect(product.variants, hasLength(2));
       expect(product.cheapestIn('usd'), Money.of(1999, 'usd'));
-      expect(product.isPurchasable, isTrue);
+      final urls = product.images.map((image) => image.url);
+      expect(urls, [
+        'https://example.test/shirt-front.png',
+        'https://example.test/shirt-back.png',
+      ]);
+      expect(product.collection?.handle, 'summer');
+      expect(product.details.productType, 'Shirt');
+      expect(product.categories.single.handle, 'clothing/shirts');
+      expect(product.categories.single.parentId, 'cat_clothing');
+      expect(product.tags.single.value, 'Cotton');
     });
 
     test('answers 404 for a draft, not 403, so nothing leaks', () async {
@@ -142,6 +141,44 @@ void main() {
       );
     });
 
+    test('serializes only the explicit storefront allowlist', () async {
+      final response = await client.get('/store/products/t-shirt').send();
+      final product = response.json! as Map<String, Object?>;
+      final option = (product['options']! as List<Object?>).single!
+          as Map<String, Object?>;
+      final variant = (product['variants']! as List<Object?>).first!
+          as Map<String, Object?>;
+
+      expect(product.keys.toSet(), {
+        'categories',
+        'collection',
+        'description',
+        'details',
+        'handle',
+        'id',
+        'images',
+        'options',
+        'status',
+        'tags',
+        'thumbnail',
+        'title',
+        'variants',
+      });
+      expect(option.keys.toSet(), {'id', 'title', 'values'});
+      expect(variant.keys.toSet(), {
+        'allow_backorder',
+        'id',
+        'inventory_quantity',
+        'images',
+        'manage_inventory',
+        'option_values',
+        'original_prices',
+        'prices',
+        'sku',
+        'title',
+      });
+    });
+
     test('a size selector can find its variant, which is the point', () async {
       final response = await client.get('/store/products/t-shirt').send();
       final product = Product.fromJson(response.json! as Map<String, Object?>);
@@ -173,37 +210,4 @@ void main() {
         ..assertHeader('content-type', 'application/json');
     });
   });
-}
-
-Future<void> _seed(CommerceDatabase database) async {
-  Future<void> run(String sql) =>
-      queryExecute(sql, []).execute(database.executor);
-
-  await run(
-    r"INSERT INTO products (id, title, handle, status) VALUES "
-    r"('prod_shirt', 'T-Shirt', 't-shirt', 'published'), "
-    r"('prod_mug', 'Mug', 'mug', 'published'), "
-    r"('prod_secret', 'Hoodie', 'secret-hoodie', 'draft')",
-  );
-  await run(
-    r"INSERT INTO product_variants "
-    r"(id, product_id, title, inventory_quantity) VALUES "
-    r"('var_small', 'prod_shirt', 'Small', 5), "
-    r"('var_large', 'prod_shirt', 'Large', 2)",
-  );
-  await run(
-    r"INSERT INTO product_options (id, product_id, title, values_csv) VALUES "
-    r"('opt_size', 'prod_shirt', 'Size', 'Small,Large')",
-  );
-  await run(
-    r"INSERT INTO variant_option_values (variant_id, option_id, value) VALUES "
-    r"('var_small', 'opt_size', 'Small'), "
-    r"('var_large', 'opt_size', 'Large')",
-  );
-  await run(
-    r"INSERT INTO variant_prices (variant_id, currency_code, amount) VALUES "
-    r"('var_small', 'usd', 1999), "
-    r"('var_large', 'usd', 2199), "
-    r"('var_small', 'eur', 1799)",
-  );
 }

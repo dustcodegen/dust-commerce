@@ -1,5 +1,7 @@
 import 'package:commerce_server/src/features/cart/deps.dart';
+import 'package:commerce_server/src/features/cart/extractor.dart';
 import 'package:commerce_server/src/features/cart/handler/read.dart';
+import 'package:commerce_server/src/features/cart/model/model.dart';
 import 'package:commerce_server/src/features/cart/service/service.dart';
 import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_server/server.dart';
@@ -13,12 +15,11 @@ const ValidatedExtractable<ApplyPromotionBody> _body = ValidatedExtractable(
 /// An unknown code and an expired one answer differently. Telling a customer
 /// "that code does not exist" when it has merely finished is how a support
 /// queue fills with people who typed it correctly.
-Future<Result<CartView, Rejection>> applyPromotionHandler(
+Future<Result<CartViewResponse, Rejection>> applyPromotionHandler(
   Request request,
 ) async {
-  final id = cartIdOf(request);
-  if (id case Err(:final error)) return Err(error);
-  final cartId = (id as Ok<String, Rejection>).value;
+  final access = await request.extract(const Extension<CartAccess>());
+  final cartId = access.cart.id;
 
   final decoded = await _body.extract(request);
   if (decoded case Err(:final error)) return Err(error);
@@ -37,18 +38,18 @@ Future<Result<CartView, Rejection>> applyPromotionHandler(
   );
 
   return switch (result) {
-    Ok(value: null) => await cartViewOf(deps.reads, cartId),
-    Ok(value: ApplyPromotionFailure.noCart) =>
+    Ok(value: None()) => await cartViewOf(deps.reads, cartId),
+    Ok(value: Some(value: ApplyPromotionFailure.noCart)) =>
       Err(Rejection.notFound('Cart "$cartId"')),
-    Ok(value: ApplyPromotionFailure.noPromotion) => Err(
+    Ok(value: Some(value: ApplyPromotionFailure.noPromotion)) => Err(
         Rejection.status(
           422,
           'There is no promotion with the code "${body.code}"',
         ),
       ),
-    Ok(value: ApplyPromotionFailure.notUsable) =>
+    Ok(value: Some(value: ApplyPromotionFailure.notUsable)) =>
       Err(Rejection.status(422, 'The code "${body.code}" is not available')),
-    Ok(value: ApplyPromotionFailure.wrongCurrency) => Err(
+    Ok(value: Some(value: ApplyPromotionFailure.wrongCurrency)) => Err(
         Rejection.status(
           422,
           'The code "${body.code}" cannot be used in this currency',
@@ -59,12 +60,11 @@ Future<Result<CartView, Rejection>> applyPromotionHandler(
 }
 
 /// `DELETE /carts/{id}/promotions` — take the code off again.
-Future<Result<CartView, Rejection>> removePromotionHandler(
+Future<Result<CartViewResponse, Rejection>> removePromotionHandler(
   Request request,
 ) async {
-  final id = cartIdOf(request);
-  if (id case Err(:final error)) return Err(error);
-  final cartId = (id as Ok<String, Rejection>).value;
+  final access = await request.extract(const Extension<CartAccess>());
+  final cartId = access.cart.id;
 
   final state = await cartDeps(request);
   if (state case Err(:final error)) return Err(error);

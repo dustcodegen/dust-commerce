@@ -5,6 +5,8 @@ import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_server/testing.dart';
 import 'package:test/test.dart';
 
+import 'promotion_test_support.dart';
+
 void main() {
   late Directory directory;
   late CommerceDatabase database;
@@ -14,11 +16,11 @@ void main() {
   setUp(() async {
     counter = 0;
     directory = await Directory.systemTemp.createTemp('commerce_promo');
-    database = CommerceDatabase.open(
+    database = await openTestDatabase(
       '${directory.path}/commerce.db',
       options: commerceOptions,
     );
-    await _seed(database);
+    await seedPromotionFixture(database);
     client = TestClient(
       buildApp(
         database,
@@ -63,6 +65,15 @@ void main() {
           'tax': {'amount': 180, 'currency_code': 'usd'},
           'total': {'amount': 1980, 'currency_code': 'usd'},
         });
+      final applied = CartView.fromJson(
+        response.json! as Map<String, Object?>,
+      ).cart.promotions.single;
+      expect(applied.id, 'p1');
+      expect(applied.code, 'SAVE10');
+      expect(applied.type, PromotionType.percentage);
+      expect(applied.value, 1000);
+      expect(applied.currencyCode, isNull);
+      expect(applied.amount, Money.of(200, 'usd'));
     });
 
     test('a fixed amount comes off', () async {
@@ -78,6 +89,31 @@ void main() {
       final cartId = await cartWorth(2000);
 
       (await apply(cartId, 'save10')).assertOk();
+    });
+
+    test('recalculates its snapshot when line quantity changes', () async {
+      final cartId = await cartWorth(2000);
+      await apply(cartId, 'SAVE10');
+      final current = await client.get('/store/carts/$cartId').send();
+      final lineId = CartView.fromJson(
+        current.json! as Map<String, Object?>,
+      ).cart.items.single.id;
+
+      final changed = await (client.patch(
+        '/store/carts/$cartId/line-items/$lineId',
+      )..json({'quantity': 2}))
+          .send();
+
+      changed
+        ..assertOk()
+        ..assertJsonContains({
+          'discount_total': {'amount': 400, 'currency_code': 'usd'},
+        });
+      final applied = CartView.fromJson(
+        changed.json! as Map<String, Object?>,
+      ).cart.promotions.single;
+      expect(applied.code, 'SAVE10');
+      expect(applied.amount, Money.of(400, 'usd'));
     });
 
     test('applying a second code replaces the first', () async {
@@ -159,38 +195,4 @@ void main() {
           .assertOk();
     });
   });
-}
-
-Future<void> _seed(CommerceDatabase database) async {
-  Future<void> run(String sql) =>
-      queryExecute(sql, []).execute(database.executor);
-
-  await run(
-    r"INSERT INTO regions (id, name, currency_code, tax_rate, countries) "
-    r"VALUES ('reg_us', 'United States', 'usd', 1000, 'us')",
-  );
-  await run(
-    r"INSERT INTO products (id, title, handle, status) VALUES "
-    r"('prod_shirt', 'T-Shirt', 't-shirt', 'published')",
-  );
-  await run(
-    r"INSERT INTO product_variants "
-    r"(id, product_id, title, inventory_quantity) VALUES "
-    r"('var_small', 'prod_shirt', 'Small', 50)",
-  );
-  await run(
-    r"INSERT INTO variant_prices (variant_id, currency_code, amount) VALUES "
-    r"('var_small', 'usd', 2000)",
-  );
-  await run(
-    r"INSERT INTO promotions (id, code, type, value, currency_code, ends_at, "
-    r"usage_limit, usage_count) VALUES "
-    r"('p1', 'SAVE10', 'percentage', 1000, NULL, NULL, NULL, 0), "
-    r"('p2', 'TENOFF', 'fixed', 1000, 'usd', NULL, NULL, 0), "
-    r"('p3', 'HUGE', 'fixed', 999999, 'usd', NULL, NULL, 0), "
-    r"('p4', 'LASTYEAR', 'percentage', 5000, NULL, '2025-01-01T00:00:00.000Z',"
-    r" NULL, 0), "
-    r"('p5', 'SPENT', 'percentage', 5000, NULL, NULL, 1, 1), "
-    r"('p6', 'EUROOFF', 'fixed', 500, 'eur', NULL, NULL, 0)",
-  );
 }

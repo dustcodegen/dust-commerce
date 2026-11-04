@@ -8,5 +8,6 @@ import 'package:dust_server/server.dart';
 Router catalogRoutes() {
   return Router()
     ..route('/products', get(listProductsHandler))
+    ..route('/product-options', get(listProductOptionsHandler))
     ..route('/products/{handle}', get(readProductHandler));
 }
