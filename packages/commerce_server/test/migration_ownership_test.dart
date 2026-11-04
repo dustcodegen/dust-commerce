@@ -51,7 +51,8 @@ void main() {
       commerceTestDatabaseUrl(),
       '${directory.path}/missing.db',
     );
-    final database = CommerceDatabase.connect(url, options: commerceSqlxOptions);
+    final database =
+        CommerceDatabase.connect(url, options: commerceSqlxOptions);
     addTearDown(database.close);
 
     final result = await database.unsafe.fetch('SELECT 1', const []);

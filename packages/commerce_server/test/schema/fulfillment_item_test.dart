@@ -57,22 +57,22 @@ SELECT created_at, quantity FROM fulfillment_items WHERE id = 'fulitem_one'
       () => _insertItem(database, id: 'fulitem_duplicate', quantity: 1),
     );
     await expectDbFailure(() => _insertItem(
-        database,
-        id: 'fulitem_excess',
-        quantity: 2,
-        fulfillmentId: 'ful_two',
-      ));
+          database,
+          id: 'fulitem_excess',
+          quantity: 2,
+          fulfillmentId: 'ful_two',
+        ));
     await expectDbFailure(() => _insertItem(
-        database,
-        id: 'fulitem_foreign',
-        quantity: 1,
-        fulfillmentId: 'ful_two',
-        lineItemId: 'item_two',
-      ));
+          database,
+          id: 'fulitem_foreign',
+          quantity: 1,
+          fulfillmentId: 'ful_two',
+          lineItemId: 'item_two',
+        ));
     await expectDbFailure(() => queryExecute(
-        "UPDATE fulfillments SET order_id = 'ord_two' WHERE id = 'ful_one'",
-        [],
-      ).execute(database.executor));
+          "UPDATE fulfillments SET order_id = 'ord_two' WHERE id = 'ful_one'",
+          [],
+        ).execute(database.executor));
 
     await queryExecute(
       "UPDATE fulfillments SET canceled_at = "

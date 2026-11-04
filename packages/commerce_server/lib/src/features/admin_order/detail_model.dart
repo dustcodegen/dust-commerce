@@ -178,8 +178,7 @@ final class AdminOrderDetailResponse with _$AdminOrderDetailResponse {
   final DateTime updatedAt;
 }
 
-final class _AdminOrderDateTime
-    implements SqlxTryFrom<DateTime, DateTime> {
+final class _AdminOrderDateTime implements SqlxTryFrom<DateTime, DateTime> {
   const _AdminOrderDateTime();
 
   @override

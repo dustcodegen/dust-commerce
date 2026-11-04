@@ -47,13 +47,13 @@ SELECT status, canceled_at, canceled_by FROM orders WHERE id = 'ord_one'
 
   test('orders reject British spelling and unaudited cancellation', () async {
     await expectDbFailure(() => queryExecute(
-        "UPDATE orders SET status = 'cancelled' WHERE id = 'ord_one'",
-        [],
-      ).execute(database.executor));
+          "UPDATE orders SET status = 'cancelled' WHERE id = 'ord_one'",
+          [],
+        ).execute(database.executor));
     await expectDbFailure(() => queryExecute(
-        "UPDATE orders SET status = 'canceled' WHERE id = 'ord_one'",
-        [],
-      ).execute(database.executor));
+          "UPDATE orders SET status = 'canceled' WHERE id = 'ord_one'",
+          [],
+        ).execute(database.executor));
   });
 
   test('payment cancellation and refunds retain separate money facts',
