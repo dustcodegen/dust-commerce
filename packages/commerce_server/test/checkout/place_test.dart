@@ -68,16 +68,20 @@ void main() {
       expect(await harness.stockOf('var_large'), 0);
     });
 
-    test('empties the cart it ordered', () async {
+    test('empties and closes the cart it ordered', () async {
       final cartId = await harness.cartWith('var_small');
 
       (await harness.checkout(cartId)).assertCreated();
 
-      final response = await harness.client.get('/store/carts/$cartId').send();
-      final cart =
-          CartView.fromJson(response.json! as Map<String, Object?>).cart;
-
-      expect(cart.isEmpty, isTrue);
+      final rows = await queryRaw(
+        r'SELECT (SELECT COUNT(*) FROM line_items WHERE cart_id = $1), '
+        r'completed_at FROM carts WHERE id = $1',
+        [cartId],
+      ).fetch(harness.database.connection as Executor);
+      expect(rows.single.readIndex<int>(0), 0);
+      expect(rows.single.readIndex<DateTime?>(1), isNotNull);
+      (await harness.client.get('/store/carts/$cartId').send())
+          .assertNotFound();
     });
 
     test('returns the same order when checkout is retried', () async {

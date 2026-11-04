@@ -82,6 +82,7 @@ void main() {
       'currency_code': 'usd',
       'id': 'reg_us',
       'name': 'United States',
+      'policy': null,
       'tax_inclusive': false,
       'tax_rate': 0,
     });
