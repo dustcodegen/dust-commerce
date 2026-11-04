@@ -32,7 +32,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   Widget build(BuildContext context) {
     final cart = context.watchCartViewModel().value;
-    if (cart.status == CartStatus.idle || cart.status == CartStatus.loading) {
+    // Keep an active checkout mounted while a cart mutation is in flight.
+    // Replacing it with a spinner disposes the address section before its
+    // successful save can advance to Delivery.
+    if (cart.status == CartStatus.idle || cart.cart == null) {
       return const CheckoutScaffold(
         body: Center(child: CircularProgressIndicator()),
       );
