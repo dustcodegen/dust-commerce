@@ -55,6 +55,8 @@ The opt-in development seed now supplies the same seven default region-policy
 values as the current Medusa seed for both local regions. Existing custom
 metadata is preserved; only a missing region value is filled, so local policy
 pages render useful defaults without overwriting merchant settings.
+The Store-region endpoint test also injects a merchant-only metadata key and
+asserts that it never crosses the public response allowlist.
 
 Release-browser smoke on 2026-11-03 used a fresh PostgreSQL database and the
 current Dust API: `/dk/shipping` normalized to `/shipping` and rendered `EUR 10`,
