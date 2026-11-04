@@ -275,6 +275,12 @@ and confirmation capture cannot be judged from this run. The pinned source
 code and local checkout behavior remain the comparison baseline until the
 preview cart endpoint accepts a guest add.
 
+A follow-up check on the same date used the live `iPhone 16 Bundle` product.
+Its source `Add to cart` button again stayed `Loading…` after the request, and
+the header remained `Cart (0)`. Repeating the failure with a second product
+confirms that the missing comparison state is a preview-runtime problem, not
+an item-specific fixture failure.
+
 ## Open findings
 
 - P2 — Repeat the verification success/failure capture against the live Medusa
