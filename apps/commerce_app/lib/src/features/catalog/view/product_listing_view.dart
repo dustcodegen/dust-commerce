@@ -3,7 +3,6 @@ import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
 import 'listing_products.dart';
-import 'listing_header.dart';
 import 'listing_loading_products.dart';
 import 'listing_refinements.dart';
 
@@ -93,11 +92,6 @@ class ProductListingView extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    if (storeSearch)
-                      ListingHeader(
-                        state: state,
-                        onCategorySelected: onCategorySelected,
-                      ),
                     LayoutBuilder(
                       builder: (context, constraints) {
                         final desktop = constraints.maxWidth >= 976;
@@ -134,7 +128,6 @@ class ProductListingView extends StatelessWidget {
                                 onSearchChanged: onSearchChanged,
                                 onPageChanged: onPageChanged,
                                 onCategorySelected: onCategorySelected,
-                                showHeader: !storeSearch,
                               );
                         return desktop
                             ? Row(
