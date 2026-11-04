@@ -2166,6 +2166,42 @@ Store order confirmation help links result: passed for current source-code
 composition, compact browser behavior, contact prefill and browser-log
 cleanliness; same-state live Medusa confirmation remains unavailable
 
+## Store authenticated order history and detail
+
+This slice closes the browser-evidence gap for the authenticated order list and
+order detail routes. It uses a fresh PostgreSQL database, the current SQLx
+migrations and the opt-in development seed; the Store ran on `13001` against
+the local API on `3880`.
+
+**Browser evidence**
+
+- A synthetic QA customer signed in through `/account` and the account
+  overview showed the server-owned customer identity.
+- `/account/orders` rendered the source-shaped order history with order `#1`,
+  the `Wed Nov 4 2026` date, `USD 25.58` total, one item and the transfer
+  request surface.
+- `See details` opened the opaque-id route
+  `/account/orders/details/:id`. The detail page rendered the receipt email,
+  order date/number, `Not fulfilled` status, `Captured` payment, line item,
+  Delivery, Shipping Address, Contact, Method, Order Summary and both `Contact`
+  and `Returns & Exchanges` actions.
+- The order was created through the real Store checkout API, manually
+  authorized and captured, so the page was not backed by a static fixture.
+
+**Evidence limits**
+
+- This proves local authenticated route composition and ownership-backed data.
+  A same-state authenticated Medusa raster remains unavailable, so pixel parity
+  is still pending.
+
+**Validation**
+
+- `flutter test apps/commerce_app/test/account/account_orders_view_model_test.dart apps/commerce_app/test/account/account_order_detail_view_model_test.dart apps/commerce_app/test/account/account_route_guard_test.dart` passed: 12 tests.
+- No widget test was added.
+
+Store authenticated order history/detail result: functional route and local
+browser composition passed; authenticated Medusa visual comparison remains open
+
 ## Store authenticated profile password editor
 
 This slice closes the functional gap where the existing password-rotation
