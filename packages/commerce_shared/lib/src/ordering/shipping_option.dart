@@ -1,4 +1,5 @@
 import 'package:commerce_shared/src/money.dart';
+import 'package:commerce_shared/src/ordering/shipping_fulfillment_type.dart';
 import 'package:commerce_shared/src/ordering/shipping_price_rule.dart';
 import 'package:dust_dart/serde.dart';
 
@@ -13,6 +14,9 @@ class ShippingOption with _$ShippingOption {
     required this.optionId,
     required this.name,
     required this.amount,
+    this.fulfillmentType = ShippingFulfillmentType.shipping,
+    this.pickupAddress,
+    this.pickupName,
     this.priceRules = const [],
   });
 
@@ -23,11 +27,20 @@ class ShippingOption with _$ShippingOption {
   /// Price charged when the option is available and selected.
   final Money amount;
 
+  /// Whether the customer receives or collects the order.
+  final ShippingFulfillmentType fulfillmentType;
+
   /// Customer-facing service name.
   final String name;
 
   /// Stable option identifier.
   final String optionId;
+
+  /// Human-readable pickup address, present only for pickup options.
+  final String? pickupAddress;
+
+  /// Store name shown above [pickupAddress], present only for pickup options.
+  final String? pickupName;
 
   /// Conditions that all have to match the current cart.
   final List<ShippingPriceRule> priceRules;

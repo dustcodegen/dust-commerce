@@ -18,7 +18,7 @@ void main() {
     final downs =
         files.where((file) => file.path.endsWith('.down.sql')).toList();
 
-    expect(ups, hasLength(64));
+    expect(ups, hasLength(65));
     expect(downs, hasLength(ups.length));
     final versions =
         ups.map((file) => file.uri.pathSegments.last.split('_').first).toList();

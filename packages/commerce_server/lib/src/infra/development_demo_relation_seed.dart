@@ -117,6 +117,45 @@ ON CONFLICT DO NOTHING
 ];
 
 const _demoStatements = <_Statement>[
+  ..._demoPickupStatements,
   ..._demoProductStatements,
   ..._demoRelationStatements,
+];
+
+/// Adds pickup choices only to the opt-in demo layer, never to production.
+const _demoPickupStatements = <_Statement>[
+  _Statement(r'''
+INSERT INTO shipping_options (id, region_id, name, amount, currency_code)
+VALUES
+  ('ship_pickup', 'reg_us', 'Store pickup', 0, 'usd'),
+  ('ship_eu_pickup', 'reg_eu', 'Store pickup', 0, 'eur')
+ON CONFLICT DO NOTHING
+'''),
+  _Statement(r'''
+INSERT INTO shipping_option_fulfillments (
+  shipping_option_id, fulfillment_type, pickup_name, pickup_address
+)
+VALUES
+  ('ship_pickup', 'pickup', 'Morrow New York', '100 Broadway, New York, NY'),
+  ('ship_eu_pickup', 'pickup', 'Morrow Copenhagen', '1 Morrow Lane, Copenhagen')
+ON CONFLICT DO NOTHING
+'''),
+  _Statement(r'''
+INSERT INTO shipping_option_fulfillment_provider (
+  shipping_option_id, fulfillment_provider_id, data
+)
+VALUES
+  ('ship_pickup', 'manual', json_build_object('service_code', 'ship_pickup')),
+  ('ship_eu_pickup', 'manual', json_build_object('service_code', 'ship_eu_pickup'))
+ON CONFLICT DO NOTHING
+'''),
+  _Statement(r'''
+INSERT INTO shipping_option_shipping_profile (
+  shipping_option_id, shipping_profile_id
+)
+VALUES
+  ('ship_pickup', 'sp_default'),
+  ('ship_eu_pickup', 'sp_default')
+ON CONFLICT DO NOTHING
+'''),
 ];

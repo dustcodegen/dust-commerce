@@ -48,6 +48,9 @@ final class OrderResponse implements Serializable {
     this.paymentProvider,
     this.shippingOptionId,
     this.shippingName,
+    required this.shippingFulfillmentType,
+    this.shippingPickupAddress,
+    this.shippingPickupName,
   });
 
   /// Billing address encoded by SQLite's JSON functions.
@@ -146,9 +149,25 @@ final class OrderResponse implements Serializable {
   @Sqlx(rename: 'shipping_name')
   final String? shippingName;
 
+  /// Fulfillment kind captured from the selected shipping option.
+  @Sqlx(
+    rename: 'shipping_fulfillment_type',
+    tryFrom: ShippingFulfillmentTypeFromSql(),
+  )
+  @SerDe(using: ShippingFulfillmentTypeCodec())
+  final ShippingFulfillmentType shippingFulfillmentType;
+
   /// Delivery option captured at checkout.
   @Sqlx(rename: 'shipping_option_id')
   final String? shippingOptionId;
+
+  /// Pickup address captured from the selected option, when applicable.
+  @Sqlx(rename: 'shipping_pickup_address')
+  final String? shippingPickupAddress;
+
+  /// Pickup store captured from the selected option, when applicable.
+  @Sqlx(rename: 'shipping_pickup_name')
+  final String? shippingPickupName;
 
   /// Payment lifecycle value stored in SQLite.
   @Sqlx(rename: 'payment_status')

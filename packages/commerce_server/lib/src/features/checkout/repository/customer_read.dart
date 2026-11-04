@@ -51,6 +51,13 @@ SELECT o.id, o.display_id, o.email, o.customer_id, o.currency_code, o.subtotal,
        END AS fulfillment_status,
        o.placed_at, o.region_id,
        o.shipping_option_id, o.shipping_name,
+       coalesce((SELECT fulfillment_type FROM shipping_option_fulfillments
+                 WHERE shipping_option_id = o.shipping_option_id), 'shipping')
+         AS shipping_fulfillment_type,
+       (SELECT pickup_name FROM shipping_option_fulfillments
+        WHERE shipping_option_id = o.shipping_option_id) AS shipping_pickup_name,
+       (SELECT pickup_address FROM shipping_option_fulfillments
+        WHERE shipping_option_id = o.shipping_option_id) AS shipping_pickup_address,
        payment.provider AS payment_provider, payment.amount AS payment_amount,
        payment.created_at AS payment_created_at,
        r.name AS region_name, r.tax_rate,

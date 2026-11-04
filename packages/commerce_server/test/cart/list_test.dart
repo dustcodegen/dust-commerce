@@ -65,10 +65,7 @@ void main() {
       final body = response.json! as Map<String, Object?>;
       final freeJson = (body['shipping_options']! as List<Object?>).first!
           as Map<String, Object?>;
-      expect(
-        freeJson.keys.toSet(),
-        {'amount', 'name', 'option_id', 'price_rules'},
-      );
+      expect(freeJson['fulfillment_type'], 'shipping');
       expect(
         (freeJson['price_rules']! as List<Object?>).single,
         {'attribute': 'item_total', 'operator': 'gte', 'value': 3998},

@@ -15,6 +15,9 @@ final class ShippingOptionResponse with _$ShippingOptionResponse {
     required this.optionId,
     required this.name,
     required this.amount,
+    required this.fulfillmentType,
+    this.pickupAddress,
+    this.pickupName,
     required this.priceRules,
   });
 
@@ -22,12 +25,28 @@ final class ShippingOptionResponse with _$ShippingOptionResponse {
   @Sqlx(tryFrom: ShippingMoneyFromJson())
   final Money amount;
 
+  /// Whether this option delivers or offers store pickup.
+  @Sqlx(
+    rename: 'fulfillment_type',
+    tryFrom: ShippingFulfillmentTypeFromSql(),
+  )
+  @SerDe(using: ShippingFulfillmentTypeCodec())
+  final ShippingFulfillmentType fulfillmentType;
+
   /// Delivery service display name.
   final String name;
 
   /// Stable shipping-option identifier.
   @Sqlx(rename: 'option_id')
   final String optionId;
+
+  /// Human-readable pickup address, present only for pickup options.
+  @Sqlx(rename: 'pickup_address')
+  final String? pickupAddress;
+
+  /// Store name shown for pickup options.
+  @Sqlx(rename: 'pickup_name')
+  final String? pickupName;
 
   /// Explicit conditions the cart must satisfy.
   @Sqlx(
@@ -86,11 +105,22 @@ final class ShippingMethodResponse with _$ShippingMethodResponse {
     required this.optionId,
     required this.name,
     required this.amount,
+    required this.fulfillmentType,
+    this.pickupAddress,
+    this.pickupName,
   });
 
   /// Delivery price snapshot.
   @Sqlx(tryFrom: ShippingMoneyFromJson())
   final Money amount;
+
+  /// Whether this selected method delivers or offers store pickup.
+  @Sqlx(
+    rename: 'fulfillment_type',
+    tryFrom: ShippingFulfillmentTypeFromSql(),
+  )
+  @SerDe(using: ShippingFulfillmentTypeCodec())
+  final ShippingFulfillmentType fulfillmentType;
 
   /// Delivery service display name.
   final String name;
@@ -98,6 +128,29 @@ final class ShippingMethodResponse with _$ShippingMethodResponse {
   /// Stable shipping-option identifier.
   @Sqlx(rename: 'option_id')
   final String optionId;
+
+  /// Human-readable pickup address, present only for pickup methods.
+  @Sqlx(rename: 'pickup_address')
+  final String? pickupAddress;
+
+  /// Store name shown for pickup methods.
+  @Sqlx(rename: 'pickup_name')
+  final String? pickupName;
+}
+
+/// Converts the constrained SQL fulfillment type into the shared enum.
+final class ShippingFulfillmentTypeFromSql
+    implements SqlxTryFrom<ShippingFulfillmentType, Object?> {
+  /// Creates the stateless converter.
+  const ShippingFulfillmentTypeFromSql();
+
+  @override
+  ShippingFulfillmentType decode(Object? value) {
+    if (value is! String) {
+      throw FormatException('Expected a shipping fulfillment type string');
+    }
+    return ShippingFulfillmentType.values.byName(value);
+  }
 }
 
 /// Converts the shipping amount selected as a JSON object.

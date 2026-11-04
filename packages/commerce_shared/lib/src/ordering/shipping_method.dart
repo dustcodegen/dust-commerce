@@ -1,4 +1,5 @@
 import 'package:commerce_shared/src/money.dart';
+import 'package:commerce_shared/src/ordering/shipping_fulfillment_type.dart';
 import 'package:dust_dart/serde.dart';
 
 part 'shipping_method.g.dart';
@@ -17,6 +18,9 @@ class ShippingMethod with _$ShippingMethod {
     required this.optionId,
     required this.name,
     required this.amount,
+    this.fulfillmentType = ShippingFulfillmentType.shipping,
+    this.pickupAddress,
+    this.pickupName,
   });
 
   /// Creates a [ShippingMethod], rejecting an amount below zero.
@@ -27,6 +31,9 @@ class ShippingMethod with _$ShippingMethod {
     required String optionId,
     required String name,
     required Money amount,
+    ShippingFulfillmentType fulfillmentType = ShippingFulfillmentType.shipping,
+    String? pickupAddress,
+    String? pickupName,
   }) {
     if (amount.isNegative) {
       throw ArgumentError.value(
@@ -35,7 +42,14 @@ class ShippingMethod with _$ShippingMethod {
         'shipping cannot cost less than nothing',
       );
     }
-    return ShippingMethod(optionId: optionId, name: name, amount: amount);
+    return ShippingMethod(
+      optionId: optionId,
+      name: name,
+      amount: amount,
+      fulfillmentType: fulfillmentType,
+      pickupAddress: pickupAddress,
+      pickupName: pickupName,
+    );
   }
 
   /// Creates a [ShippingMethod] from JSON.
@@ -45,9 +59,18 @@ class ShippingMethod with _$ShippingMethod {
   /// What the customer is charged for delivery.
   final Money amount;
 
+  /// Whether the customer receives or collects the order.
+  final ShippingFulfillmentType fulfillmentType;
+
   /// The service name at the time of choosing.
   final String name;
 
   /// The option this was chosen from.
   final String optionId;
+
+  /// Human-readable pickup address, present only for pickup methods.
+  final String? pickupAddress;
+
+  /// Store name shown above [pickupAddress], present only for pickup methods.
+  final String? pickupName;
 }

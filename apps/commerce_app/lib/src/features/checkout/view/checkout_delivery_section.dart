@@ -4,6 +4,7 @@ import 'package:dust_flutter/i18n.dart';
 import 'package:flutter/material.dart';
 
 import 'checkout_delivery_content.dart';
+import 'checkout_delivery_summary.dart';
 import 'checkout_step_header.dart';
 
 /// Server-priced delivery choice translated from Medusa Shipping.

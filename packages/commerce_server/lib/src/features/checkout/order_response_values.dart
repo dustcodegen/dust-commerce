@@ -66,6 +66,9 @@ extension OrderResponseValues on OrderResponse {
           optionId: shippingOptionId!,
           name: shippingName ?? 'Delivery',
           amount: shippingTotal,
+          fulfillmentType: shippingFulfillmentType,
+          pickupAddress: shippingPickupAddress,
+          pickupName: shippingPickupName,
         );
 
   /// Frozen delivery amount.
@@ -111,6 +114,9 @@ extension OrderResponseValues on OrderResponse {
         paymentProvider: paymentProvider,
         shippingOptionId: shippingOptionId,
         shippingName: shippingName,
+        shippingFulfillmentType: shippingFulfillmentType,
+        shippingPickupAddress: shippingPickupAddress,
+        shippingPickupName: shippingPickupName,
       );
 }
 

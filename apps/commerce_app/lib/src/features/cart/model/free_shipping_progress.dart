@@ -26,7 +26,8 @@ Option<FreeShippingProgress> freeShippingProgressOf(
   List<ShippingOption> options,
 ) {
   for (final option in options) {
-    if (option.amount.amount != 0 ||
+    if (option.fulfillmentType != ShippingFulfillmentType.shipping ||
+        option.amount.amount != 0 ||
         option.amount.currencyCode != cart.subtotal.currencyCode) {
       continue;
     }

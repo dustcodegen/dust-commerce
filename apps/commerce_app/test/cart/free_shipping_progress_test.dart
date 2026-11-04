@@ -61,6 +61,27 @@ void main() {
     );
   });
 
+  test('does not treat free pickup as a free-shipping threshold', () {
+    const pickup = ShippingOption(
+      optionId: 'pickup',
+      name: 'Store pickup',
+      amount: Money(amount: 0, currencyCode: 'usd'),
+      fulfillmentType: ShippingFulfillmentType.pickup,
+      priceRules: [
+        ShippingPriceRule(
+          attribute: ShippingPriceRuleAttribute.itemTotal,
+          operator: ShippingPriceRuleOperator.gte,
+          value: 10000,
+        ),
+      ],
+    );
+
+    expect(
+      freeShippingProgressOf(_cart(2500), const [pickup]),
+      const None<FreeShippingProgress>(),
+    );
+  });
+
   test('supports every declared Medusa comparison operator', () {
     const lt = ShippingOption(
       optionId: 'lt',
