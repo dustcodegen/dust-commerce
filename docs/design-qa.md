@@ -109,6 +109,11 @@ subtotal, shipping, taxes, total, delivery, payment, Contact and Returns &
 Exchanges links, and `Powered by dust`. Browser logs contained no warnings or
 errors.
 
+Confirmation restoration now requires a completed, captured payment. A failed
+capture may retain an order in memory so checkout can retry, but its order id
+cannot render the confirmation route; the focused ViewModel regression asserts
+that boundary before the retry succeeds.
+
 The same pass exposed that the Address button persisted the address but could
 remain on `?step=address` before a refresh. The route now follows the source
 flow more directly: save the address, then move to Delivery; the Delivery page
