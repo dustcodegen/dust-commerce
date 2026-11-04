@@ -670,14 +670,15 @@ loading and successful Save states.
 
 **Findings**
 
-- [P1] Shipping-profile destination is not implemented
+- Shipping-profile destination is implemented and verified
   Location: Shipping configuration profile row.
-  Evidence: Medusa's `SidebarLink` navigates to the selected shipping profile's
-  settings detail. Morrow renders the source chevron but has no Shipping Profile
-  settings route to open.
-  Impact: the row visually promises navigation that is not yet available.
-  Fix: deliver the Shipping Profile settings list/detail slice, then make the
-  row a semantic link to the real profile route.
+  Evidence: after assigning the real `Default Shipping Profile` through the
+  drawer, the product row rendered the source chevron and opened the live
+  `Shipping Profiles › Default Shipping Profile` detail route. The destination
+  rendered the profile name, type, back link and actions without browser
+  warnings or errors.
+  Result: the row reaches the existing server-backed Shipping Profiles
+  settings list/detail slice; no new route work is required for this finding.
 
 - [P2] Drawer pixel comparison has no source visual
   Location: Shipping Configuration drawer.
@@ -737,12 +738,23 @@ findings.
 
 **Implementation checklist**
 
-- Add real Shipping Profile settings list/detail navigation.
+- Shipping Profile settings list/detail navigation is implemented and browser
+  verified. PostgreSQL retained `prod_shirt -> sp_default` after Save.
 - Capture the same drawer state from a runnable Medusa Admin.
 - Repeat the equal-viewport full and focused comparison before marking this
   slice passed.
 
-Admin product shipping-profile slice result: blocked
+**Authenticated browser route evidence**
+
+- Local Admin `13002` authenticated with a QA merchant against API `3878`.
+- `T-Shirt` opened its Shipping Configuration drawer, selected
+  `Default Shipping Profile`, saved successfully, and exposed the persisted
+  profile row.
+- Selecting that row opened the profile detail route. The settled Admin browser
+  pass reported no warning or error logs.
+
+Admin product shipping-profile slice result: functional route passed; drawer
+visual comparison remains open
 
 ## Admin Shipping Profiles settings list and detail
 
