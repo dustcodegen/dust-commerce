@@ -281,14 +281,24 @@ the header remained `Cart (0)`. Repeating the failure with a second product
 confirms that the missing comparison state is a preview-runtime problem, not
 an item-specific fixture failure.
 
+The pinned DTC source was also run locally from commit
+`913d4482641da21c9a219c92a5aa6b959af9bfd7` on 2026-11-04. Its backend ran on
+`19090` against a disposable PostgreSQL database and its storefront on
+`18000`; the repository seed rendered the four products. Selecting the
+source's default `M / White` T-shirt variant and pressing `Add to cart`
+completed successfully: the source header showed `Cart (1)` and the cart
+preview showed the variant, quantity `1`, `€10.00`, and subtotal `€10.00`.
+This is now the same-state source baseline for local pixel and flow
+comparison; the public preview remains a separate broken fixture.
+
 ## Open findings
 
+- P2 — Capture the Dust and pinned-source Review and confirmation states from
+  the local same-state stack, then judge visible differences before declaring
+  rendered parity; the public preview remains unavailable for this comparison.
 - P2 — Repeat the verification success/failure capture against the live Medusa
-  preview when its route is reachable, combine each same-state pair, and judge
-  visible differences before declaring rendered parity.
-- P2 — Capture a running Medusa checkout Review and confirmation state if exact
-  pixel parity is required; source comparison and local browser behavior now
-  pass for this slice.
+  preview when its route is reachable, because its current cart failure is a
+  separate runtime issue.
 - P1 — Add external payment-provider refund adapters before claiming a complete
   production refund lifecycle; labels and exchanges remain separate.
 
