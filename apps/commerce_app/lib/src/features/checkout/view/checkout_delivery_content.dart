@@ -35,12 +35,14 @@ final class CheckoutDeliveryChoices extends StatelessWidget {
     final pickupOptions = cart.shippingOptions.where(
       (option) => option.fulfillmentType == ShippingFulfillmentType.pickup,
     );
-    final firstAvailablePickup = pickupOptions.isEmpty
-        ? null
-        : pickupOptions.firstWhere(
-            (option) => option.isAvailableFor(cart.cart!.subtotal),
-            orElse: () => pickupOptions.first,
-          );
+    final subtotal = cart.cart?.subtotal;
+    final availablePickupOptions = subtotal == null
+        ? const <ShippingOption>[]
+        : pickupOptions
+            .where((option) => option.isAvailableFor(subtotal))
+            .toList(growable: false);
+    final firstAvailablePickup =
+        availablePickupOptions.isEmpty ? null : availablePickupOptions.first;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
