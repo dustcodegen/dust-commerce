@@ -112,6 +112,50 @@ void main() {
         cart.shippingMethod?.fulfillmentType, ShippingFulfillmentType.pickup);
     expect(cart.shippingMethod?.pickupName, 'Morrow New York');
   });
+
+  test('keeps pickup store details on the placed order', () async {
+    final created = await (client.post('/store/carts')
+          ..json({'region_id': 'reg_us'}))
+        .send();
+    final cartId =
+        CartView.fromJson(created.json! as Map<String, Object?>).cart.id;
+
+    (await (client.post('/store/carts/$cartId/line-items')
+              ..json({'variant_id': 'var_small', 'quantity': 1}))
+            .send())
+        .assertOk();
+    (await (client.post('/store/carts/$cartId/shipping-method')
+              ..json({'option_id': 'so_pickup'}))
+            .send())
+        .assertOk();
+    (await (client.post('/store/carts/$cartId/payment-sessions')
+              ..json({'provider_id': 'manual'}))
+            .send())
+        .assertOk();
+
+    final placed = await (client.post('/store/checkout')
+          ..json({
+            'cart_id': cartId,
+            'email': 'ada@example.com',
+            'shipping_address': {
+              'first_name': 'Ada',
+              'last_name': 'Lovelace',
+              'line1': '12 Analytical Way',
+              'city': 'London',
+              'postal_code': 'EC1A',
+              'country_code': 'us',
+            },
+          }))
+        .send();
+
+    placed.assertCreated();
+    final order = Order.fromJson(placed.json! as Map<String, Object?>);
+    expect(order.shippingTotal, Money.zero('usd'));
+    expect(
+        order.shippingMethod?.fulfillmentType, ShippingFulfillmentType.pickup);
+    expect(order.shippingMethod?.pickupName, 'Morrow New York');
+    expect(order.shippingMethod?.pickupAddress, '100 Broadway, New York, NY');
+  });
 }
 
 Future<void> _seed(CommerceDatabase database) async {

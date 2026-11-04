@@ -33,11 +33,7 @@ final class CheckoutDeliveryChoice extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final price = option.fulfillmentType == ShippingFulfillmentType.pickup
-        ? '-'
-        : available
-            ? formatMoney(option.amount)
-            : '-';
+    final price = available ? formatMoney(option.amount) : '-';
     return Semantics(
       button: true,
       checked: selected,
