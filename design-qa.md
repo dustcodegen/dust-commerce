@@ -2318,4 +2318,37 @@ files. No widget test was added.
 Store checkout deep-link guard result: server-authoritative step gating passed;
 same-state Medusa visual comparison remains open
 
+## Store seeded catalogue, product and cart smoke
+
+This slice verifies the public Store's first customer path against a fresh
+PostgreSQL database, the complete SQLx migration set and the opt-in development
+seed. The API ran on `3878` and the Store ran on `13001`.
+
+**Browser evidence**
+
+- The home route rendered the Morrow shell, Featured rail and seeded product
+  cards after the browser's Flutter accessibility bridge was enabled.
+- `/collections/featured` rendered the source-shaped sort controls, 12 product
+  cards and the Morrow footer taxonomy.
+- `/products/classic-white-tee` rendered the image, title, description, price,
+  information accordions and Add to cart control.
+- Add to cart incremented the header badge to `Cart (1)`. `/cart` then rendered
+  the Classic White Tee line, quantity control, USD 18.25 price and checkout
+  summary. No account or payment mutation was submitted.
+
+**Validation**
+
+- The production-entrypoint test passed against isolated PostgreSQL: startup,
+  21-product seed, `/health`, and clean restart.
+- The full Store Flutter suite passed: 168 tests.
+- Flutter analysis passed with no issues; Dust checks reported 194 clean Store
+  outputs and 166 clean server outputs.
+- The browser harness's initial white canvas was its `Enable accessibility`
+  bridge state, not a Store/API failure; the enabled semantics tree and render
+  matched the expected routes above.
+- No widget test was added.
+
+Store seeded catalogue/product/cart result: local public vertical slice passed;
+same-state Medusa visual comparison remains open
+
 final result: blocked
