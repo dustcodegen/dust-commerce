@@ -15,9 +15,9 @@ dependencies:
   csv: ^6.0.0
   # Password hashing and token generation.
   cryptography: ^2.9.0
-  dust_dart: ^0.3.0
-  dust_db_postgres: ^0.3.0
-  dust_server: ^0.3.0
+  dust_dart: ^0.3.1
+  dust_db_postgres: ^0.3.1
+  dust_server: ^0.3.1
   intl: ^0.20.2
   mailer: ^7.2.0
 

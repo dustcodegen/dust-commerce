@@ -14,8 +14,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DUST_VERSION: v0.3.0
-  DUST_LINUX_X64_SHA256: dd9cc1bdd44a282a4f1eeea9ae5c6f60da61b5e3d543c66d093cce1b35eca115
+  DUST_VERSION: v0.3.1
+  DUST_LINUX_X64_SHA256: e4626dfdf42682055aeb1d891db8138a8e9c242d5b5a77e5ec0322c84a950591
   FLUTTER_VERSION: 3.44.1
   DUST_DATABASE_URL: postgres://dust:dust@127.0.0.1:5432/dust_commerce?sslmode=disable
 

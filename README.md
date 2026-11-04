@@ -83,7 +83,7 @@ to its Medusa source areas and GitHub delivery issues.
 
 ## Running it
 
-Requires the Dust CLI at 0.3.0 or newer:
+Requires the Dust CLI at 0.3.1 or newer:
 
 ```bash
 dust --version

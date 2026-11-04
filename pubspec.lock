@@ -181,34 +181,34 @@ packages:
     dependency: transitive
     description:
       name: dust_dart
-      sha256: adfacbb3230f9f73469c0bcacf7a260fc524321a97866abfee87a5773810be66
+      sha256: "69d670e991bf73ddc8a31455854a95454421b5db83f4eeaf71bdc4d6adcd83d9"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.0"
+    version: "0.3.1"
   dust_db_postgres:
     dependency: transitive
     description:
       name: dust_db_postgres
-      sha256: "87e9d4c96e64ec655db6f79c9de2ec8b0baa703019a24b959d91e1d8c36d4ef7"
+      sha256: "43a2f11cc041faf27e74788fa7f4818d30c27165154ed9253d0903343b4ddd38"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.0"
+    version: "0.3.1"
   dust_flutter:
     dependency: transitive
     description:
       name: dust_flutter
-      sha256: e9d99bcc5dc5286bd0abfad2e84b8659883619924d328077c84bedd8c6005827
+      sha256: "43a1a12fe9792d76d34f7e6cd91c0218ac71afe175d997b23a4aa9e7f163cb34"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.0"
+    version: "0.3.1"
   dust_server:
     dependency: transitive
     description:
       name: dust_server
-      sha256: "1730f50735efb1dc354332baa581399d399e7b4b763cefb23eea11c4e1bcbe1d"
+      sha256: "1d5d92814967aeabd18e2238cd3e47b4c177183a9c13c1ae9fc1590039a72318"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.0"
+    version: "0.3.1"
   fake_async:
     dependency: transitive
     description:
