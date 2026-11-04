@@ -38,7 +38,11 @@ final class OrderReceiptItems extends StatelessWidget {
                         ),
                         if (item.variantTitle case final title?)
                           Text(
-                            title,
+                            context.tr(
+                              'shop_cart_variant',
+                              defaultText: 'Variant: {name}',
+                              args: {'name': title},
+                            ),
                             style: const TextStyle(
                               color: StoreColors.foregroundSubtle,
                             ),
