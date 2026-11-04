@@ -67,7 +67,15 @@ void main() {
           as Map<String, Object?>;
       expect(
         freeJson.keys.toSet(),
-        {'amount', 'name', 'option_id', 'price_rules'},
+        {
+          'amount',
+          'fulfillment_type',
+          'name',
+          'option_id',
+          'pickup_address',
+          'pickup_name',
+          'price_rules',
+        },
       );
       expect(
         (freeJson['price_rules']! as List<Object?>).single,
