@@ -58,6 +58,8 @@ void main() {
     final placedId = model.state.order!.id;
     expect(model.state.status, CheckoutStatus.failed);
     expect(model.state.shipping.line1, '12 Analytical Way');
+    expect(await model.loadReceipt(placedId), isFalse);
+    expect(model.state.message, 'Order confirmation not found.');
 
     expect(await model.placeOrder(), isTrue);
     expect(model.state.order!.id, placedId);
