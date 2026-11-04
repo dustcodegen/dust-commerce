@@ -9,5 +9,6 @@ Router catalogRoutes() {
   return Router()
     ..route('/products', get(listProductsHandler))
     ..route('/product-options', get(listProductOptionsHandler))
+    ..route('/products/{handle}/markdown', get(readProductMarkdownHandler))
     ..route('/products/{handle}', get(readProductHandler));
 }
