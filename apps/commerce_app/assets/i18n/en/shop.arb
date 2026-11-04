@@ -913,6 +913,14 @@
   "@checkout_pickup_store": {
     "description": "Translation for `shop_checkout_pickup_store`."
   },
+  "checkout_pickup_order": "Pick up your order",
+  "@checkout_pickup_order": {
+    "description": "Translation for `shop_checkout_pickup_order`."
+  },
+  "checkout_pickup_price": "-",
+  "@checkout_pickup_price": {
+    "description": "Translation for `shop_checkout_pickup_price`."
+  },
   "checkout_discount": "Discount",
   "@checkout_discount": {
     "description": "Translation for `shop_checkout_discount`."

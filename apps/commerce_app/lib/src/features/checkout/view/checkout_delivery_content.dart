@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import 'checkout_delivery_choice.dart';
 import 'checkout_primary_action.dart';
+import 'checkout_pickup_toggle.dart';
 
 /// Expanded server-priced delivery choices and progression action.
 final class CheckoutDeliveryChoices extends StatelessWidget {
@@ -34,6 +35,12 @@ final class CheckoutDeliveryChoices extends StatelessWidget {
     final pickupOptions = cart.shippingOptions.where(
       (option) => option.fulfillmentType == ShippingFulfillmentType.pickup,
     );
+    final firstAvailablePickup = pickupOptions.isEmpty
+        ? null
+        : pickupOptions.firstWhere(
+            (option) => option.isAvailableFor(cart.cart!.subtotal),
+            orElse: () => pickupOptions.first,
+          );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -59,6 +66,17 @@ final class CheckoutDeliveryChoices extends StatelessWidget {
         if (cart.shippingOptions.isEmpty && state.isBusy)
           const Center(child: CircularProgressIndicator())
         else ...[
+          if (pickupOptions.isNotEmpty) ...[
+            CheckoutPickupToggle(
+              selected:
+                  selected?.fulfillmentType == ShippingFulfillmentType.pickup,
+              enabled: !state.isBusy && firstAvailablePickup != null,
+              onTap: () => context
+                  .readCheckoutViewModel()
+                  .chooseDelivery(firstAvailablePickup!.optionId),
+            ),
+            const SizedBox(height: 8),
+          ],
           for (final option in shippingOptions) ...[
             CheckoutDeliveryChoice(
               option: option,
@@ -71,7 +89,7 @@ final class CheckoutDeliveryChoices extends StatelessWidget {
             ),
             const SizedBox(height: 8),
           ],
-          if (pickupOptions.isNotEmpty) ...[
+          if (selected?.fulfillmentType == ShippingFulfillmentType.pickup) ...[
             const SizedBox(height: 16),
             const TranslatedText(
               'shop_checkout_pickup_store',
