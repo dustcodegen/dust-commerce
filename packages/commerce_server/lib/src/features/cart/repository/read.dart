@@ -1,7 +1,6 @@
 import 'package:commerce_server/src/features/cart/model/cart.dart';
 import 'package:commerce_server/src/features/cart/model/line_item.dart';
 import 'package:commerce_server/src/features/cart/model/promotion.dart';
-import 'package:commerce_server/src/features/cart/model/shipping.dart';
 import 'package:dust_dart/db.dart';
 
 part 'read.g.dart';
@@ -155,27 +154,6 @@ WHERE cart_id = $1
 ORDER BY id
 ''')
   Future<Result<List<LineItemResponse>, SqlxError>> linesOf(String cartId);
-
-  /// The method [cartId] chose, if it has chosen one.
-  @Query(r'''
-SELECT method.option_id, method.name,
-       json_build_object(
-         'amount', method.amount,
-         'currency_code', region.currency_code
-       )::text AS amount,
-       coalesce(fulfillment.fulfillment_type, 'shipping') AS fulfillment_type,
-       fulfillment.pickup_name,
-       fulfillment.pickup_address
-FROM cart_shipping_methods method
-JOIN carts cart ON cart.id = method.cart_id
-JOIN regions region ON region.id = cart.region_id
-LEFT JOIN shipping_option_fulfillments fulfillment
-  ON fulfillment.shipping_option_id = method.option_id
-WHERE method.cart_id = $1
-''')
-  Future<Result<ShippingMethodResponse?, SqlxError>> shippingMethodOf(
-    String cartId,
-  );
 
   /// The promotion [cartId] has applied, if it has one.
   @Query(r'''
