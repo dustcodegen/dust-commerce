@@ -263,6 +263,18 @@ Search hits use the same subtle hover surface as the source
 The first non-empty debounced query enters the source `Searching…` state
 immediately instead of leaving the start message visible until the timer fires.
 
+## Live Medusa checkout comparison attempt
+
+On 2026-11-04 the current Medusa preview rendered its live `/dk/store` with
+eight products, and `/dk/products/espresso-cup` rendered the product detail.
+Its `Add to cart` action stayed in `Loading…`; opening `/dk/cart` afterwards
+still showed `Cart (0)`. The same disposable local stack added the seeded
+T-shirt successfully and exposed `Cart (1)`. This is a source-runtime/API
+availability failure, not a local storefront failure, so a same-state Review
+and confirmation capture cannot be judged from this run. The pinned source
+code and local checkout behavior remain the comparison baseline until the
+preview cart endpoint accepts a guest add.
+
 ## Open findings
 
 - P2 — Repeat the verification success/failure capture against the live Medusa
