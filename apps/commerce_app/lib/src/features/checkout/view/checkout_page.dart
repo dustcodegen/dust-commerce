@@ -55,7 +55,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
       );
     }
     final requested = context.checkoutStep;
-    final step = _availableStep(requested, checkout, cart);
+    final step = _availableStep(requested, cart);
     if (step != requested) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) context.replaceCheckoutStep(step);
@@ -120,15 +120,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
 
   static String _availableStep(
     String requested,
-    CheckoutState checkout,
     CartState cart,
   ) {
-    if (checkout.shipping.firstName.isEmpty) return 'address';
+    // Deep links must follow server state, not a stale local draft.
+    final serverCart = cart.cart?.cart;
+    if (serverCart?.shippingAddress == null) return 'address';
     if ((requested == 'payment' || requested == 'review') &&
-        cart.cart?.cart.shippingMethod == null) {
+        serverCart?.shippingMethod == null) {
       return 'delivery';
     }
-    if (requested == 'review' && !checkout.hasPaymentMethod) {
+    if (requested == 'review' && serverCart?.paymentSession == null) {
       return 'payment';
     }
     return requested;
