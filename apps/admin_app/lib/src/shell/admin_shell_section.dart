@@ -12,6 +12,9 @@ enum AdminShellSection {
   /// Merchant order-list routes.
   orders,
 
+  /// Inventory and stock-location routes.
+  inventory,
+
   /// Product list and product detail routes.
   products,
 

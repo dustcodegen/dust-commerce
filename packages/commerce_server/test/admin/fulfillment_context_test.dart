@@ -27,7 +27,15 @@ void main() {
     response.assertOk();
     expect(response.json, {
       'stock_locations': [
-        {'id': 'sloc_main', 'name': 'Morrow Warehouse'},
+        {
+          'id': 'sloc_main',
+          'name': 'Morrow Warehouse',
+          'address_1': '1 Morrow Lane',
+          'city': 'Copenhagen',
+          'province': null,
+          'postal_code': '1050',
+          'country_code': 'dk',
+        },
       ],
       'count': 1,
       'limit': 20,

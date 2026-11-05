@@ -15,6 +15,7 @@ final class AdminShell extends StatelessWidget {
     required this.onCustomerGroupsRequested,
     required this.onCustomerServiceRequested,
     required this.onOrdersRequested,
+    required this.onStockLocationsRequested,
     required this.onProductsRequested,
     required this.onProductOptionsRequested,
     required this.onPromotionsRequested,
@@ -47,6 +48,9 @@ final class AdminShell extends StatelessWidget {
 
   /// Returns to the product catalogue route.
   final VoidCallback onProductsRequested;
+
+  /// Opens the Inventory/Locations route.
+  final VoidCallback onStockLocationsRequested;
 
   /// Opens the global product-options table.
   final VoidCallback onProductOptionsRequested;
@@ -87,6 +91,7 @@ final class AdminShell extends StatelessWidget {
             onCustomerGroupsRequested: onCustomerGroupsRequested,
             onCustomerServiceRequested: onCustomerServiceRequested,
             onOrdersRequested: onOrdersRequested,
+            onStockLocationsRequested: onStockLocationsRequested,
             onProductsRequested: onProductsRequested,
             onProductOptionsRequested: onProductOptionsRequested,
             onPromotionsRequested: onPromotionsRequested,

@@ -18,6 +18,7 @@ final class AdminSidebar extends StatelessWidget {
     required this.onCustomerGroupsRequested,
     required this.onCustomerServiceRequested,
     required this.onOrdersRequested,
+    required this.onStockLocationsRequested,
     required this.onProductsRequested,
     required this.onProductOptionsRequested,
     required this.onPromotionsRequested,
@@ -45,6 +46,9 @@ final class AdminSidebar extends StatelessWidget {
 
   /// Returns to the product catalogue route.
   final VoidCallback onProductsRequested;
+
+  /// Opens the Inventory/Locations route.
+  final VoidCallback onStockLocationsRequested;
 
   /// Opens the global product-options route.
   final VoidCallback onProductOptionsRequested;
@@ -111,8 +115,12 @@ final class AdminSidebar extends StatelessWidget {
                   selected: selectedSection == AdminShellSection.productOptions,
                   onTap: onProductOptionsRequested,
                 ),
-                const _NavRow(
-                    icon: Icons.warehouse_outlined, label: 'Inventory'),
+                _NavRow(
+                  icon: Icons.warehouse_outlined,
+                  label: 'Inventory',
+                  selected: selectedSection == AdminShellSection.inventory,
+                  onTap: onStockLocationsRequested,
+                ),
                 const _SubNav(label: 'Reservations'),
                 _NavRow(
                   icon: Icons.people_outline,

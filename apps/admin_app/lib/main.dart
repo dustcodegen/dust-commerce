@@ -1,6 +1,7 @@
 import 'package:admin_app/src/admin_app.dart';
 import 'package:admin_app/src/bootstrap/admin_dependencies.dart';
 import 'package:admin_app/src/bootstrap/admin_view_model_scope.dart';
+import 'package:admin_app/src/inventory/admin_stock_location_view_model.dart';
 import 'package:admin_app/src/theme/admin_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
@@ -13,8 +14,12 @@ void main() {
     'API_BASE_URL',
     defaultValue: 'http://localhost:3878',
   );
-  runApp(AdminViewModelScope(
-    dependencies: AdminDependencies(baseUrl),
-    child: MorrowAdminApp(themes: AdminThemeController()),
+  final dependencies = AdminDependencies(baseUrl);
+  runApp(AdminStockLocationViewModelScope.value(
+    value: dependencies.stockLocations,
+    child: AdminViewModelScope(
+      dependencies: dependencies,
+      child: MorrowAdminApp(themes: AdminThemeController()),
+    ),
   ));
 }

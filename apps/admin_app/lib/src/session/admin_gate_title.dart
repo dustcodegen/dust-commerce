@@ -28,6 +28,7 @@ String _adminShellTitle({
           None() => 'Customers',
         },
       _AdminRoute.orders => 'Orders',
+      _AdminRoute.stockLocations => 'Inventory  ›  Locations',
       _AdminRoute.order => switch (orderDetail) {
           Some(value: final order) => 'Orders  ›  #${order.displayId}',
           None() => 'Orders',
