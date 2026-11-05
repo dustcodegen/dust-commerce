@@ -66,14 +66,27 @@ Future<Result<AdminProductTypeResponse, Rejection>>
     (decoded as Ok<AdminUpdateProductType, Rejection>).value,
   );
   return switch (result) {
-    Ok(value: Ok(value: final productType)) => Ok(productType),
-    Ok(value: Err(error: AdminUpdateProductTypeFailure.invalid)) =>
+    Ok(value: final productType) => Ok(productType),
+    Err(
+      error: AdminUpdateProductTypeRejected(
+        failure: AdminUpdateProductTypeFailure.invalid,
+      )
+    ) =>
       const Err(Rejection.status(422, 'Enter a product type')),
-    Ok(value: Err(error: AdminUpdateProductTypeFailure.notFound)) =>
+    Err(
+      error: AdminUpdateProductTypeRejected(
+        failure: AdminUpdateProductTypeFailure.notFound,
+      )
+    ) =>
       Err(Rejection.notFound('Product type "$id"')),
-    Ok(value: Err(error: AdminUpdateProductTypeFailure.valueConflict)) =>
+    Err(
+      error: AdminUpdateProductTypeRejected(
+        failure: AdminUpdateProductTypeFailure.valueConflict,
+      )
+    ) =>
       const Err(Rejection.conflict('Another product type uses this value')),
-    Err() => const Err(Rejection.internal()),
+    Err(error: AdminUpdateProductTypeStorage()) =>
+      const Err(Rejection.internal()),
   };
 }
 
