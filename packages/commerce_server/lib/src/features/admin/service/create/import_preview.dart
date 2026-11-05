@@ -14,10 +14,35 @@ enum AdminProductImportPreviewFailure {
   invalidCsv,
 }
 
+/// Error crossing the Admin product-import preview boundary.
+sealed class AdminProductImportPreviewError {
+  /// Creates one product-import preview error.
+  const AdminProductImportPreviewError();
+}
+
+/// A business rejection that is safe to expose to the handler.
+final class AdminProductImportPreviewRejected
+    extends AdminProductImportPreviewError {
+  /// Creates one business rejection.
+  const AdminProductImportPreviewRejected(this.failure);
+
+  /// The stable business reason.
+  final AdminProductImportPreviewFailure failure;
+}
+
+/// A storage failure retained for logging without exposing SQL details.
+final class AdminProductImportPreviewStorage
+    extends AdminProductImportPreviewError {
+  /// Creates one storage failure.
+  const AdminProductImportPreviewStorage(this.cause);
+
+  /// The original SQLx failure.
+  final SqlxError cause;
+}
+
 /// Validates and stages a CSV without mutating any catalogue table.
-Future<
-    Result<Result<AdminProductImportPreview, AdminProductImportPreviewFailure>,
-        SqlxError>> previewAdminProductImport(
+Future<Result<AdminProductImportPreview, AdminProductImportPreviewError>>
+    previewAdminProductImport(
   AdminProductImportRepository imports, {
   required List<int> bytes,
   required String filename,
@@ -31,27 +56,39 @@ Future<
   if (safeFilename == null ||
       !safeFilename.toLowerCase().endsWith('.csv') ||
       !const {'text/csv', 'application/vnd.ms-excel'}.contains(mime)) {
-    return const Ok(Err(AdminProductImportPreviewFailure.invalidFile));
+    return const Err(AdminProductImportPreviewRejected(
+      AdminProductImportPreviewFailure.invalidFile,
+    ));
   }
   String source;
   try {
     source = utf8.decode(bytes);
   } on FormatException {
-    return const Ok(Err(AdminProductImportPreviewFailure.invalidCsv));
+    return const Err(AdminProductImportPreviewRejected(
+      AdminProductImportPreviewFailure.invalidCsv,
+    ));
   }
   final parsed = parseAdminProductImport(source);
   if (parsed case Err()) {
-    return const Ok(Err(AdminProductImportPreviewFailure.invalidCsv));
+    return const Err(AdminProductImportPreviewRejected(
+      AdminProductImportPreviewFailure.invalidCsv,
+    ));
   }
   final document = (parsed as Ok<AdminProductImportDocument, String>).value;
   final encodedIdentities = jsonEncode(document.identities);
   final ambiguous = await imports.countAmbiguous(encodedIdentities);
-  if (ambiguous case Err(:final error)) return Err(error);
+  if (ambiguous case Err(:final error)) {
+    return Err(AdminProductImportPreviewStorage(error));
+  }
   if ((ambiguous as Ok<int, SqlxError>).value > 0) {
-    return const Ok(Err(AdminProductImportPreviewFailure.invalidCsv));
+    return const Err(AdminProductImportPreviewRejected(
+      AdminProductImportPreviewFailure.invalidCsv,
+    ));
   }
   final identities = await imports.countExisting(encodedIdentities);
-  if (identities case Err(:final error)) return Err(error);
+  if (identities case Err(:final error)) {
+    return Err(AdminProductImportPreviewStorage(error));
+  }
   final toUpdate = (identities as Ok<int, SqlxError>).value;
   final toCreate = document.productCount - toUpdate;
   final transactionId = nextId();
@@ -64,14 +101,16 @@ Future<
     toUpdate,
     now.toUtc().add(const Duration(hours: 24)).toIso8601String(),
   );
-  if (inserted case Err(:final error)) return Err(error);
-  return Ok(Ok(AdminProductImportPreview(
+  if (inserted case Err(:final error)) {
+    return Err(AdminProductImportPreviewStorage(error));
+  }
+  return Ok(AdminProductImportPreview(
     transactionId: transactionId,
     summary: AdminProductImportSummary(
       toCreate: toCreate,
       toUpdate: toUpdate,
     ),
-  )));
+  ));
 }
 
 String? _safeFilename(String value) {
