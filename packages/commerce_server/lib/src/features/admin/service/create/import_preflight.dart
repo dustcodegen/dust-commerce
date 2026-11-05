@@ -5,17 +5,43 @@ import 'package:commerce_server/src/features/admin/service/create/import_prepare
 import 'package:commerce_server/src/features/admin/service/create/import_variant_preflight.dart';
 import 'package:dust_dart/db.dart';
 
+/// Error crossing the Admin product-import preflight boundary.
+sealed class AdminProductImportPreflightError {
+  /// Creates one product-import preflight error.
+  const AdminProductImportPreflightError();
+}
+
+/// A business rejection that is safe to expose to confirmation.
+final class AdminProductImportPreflightRejected
+    extends AdminProductImportPreflightError {
+  /// Creates one business rejection.
+  const AdminProductImportPreflightRejected(this.failure);
+
+  /// The stable business reason.
+  final AdminProductImportConfirmFailure failure;
+}
+
+/// A storage failure retained for logging without exposing SQL details.
+final class AdminProductImportPreflightStorage
+    extends AdminProductImportPreflightError {
+  /// Creates one storage failure.
+  const AdminProductImportPreflightStorage(this.cause);
+
+  /// The original SQLx failure.
+  final SqlxError cause;
+}
+
 /// Re-checks every identity and reference before the first catalogue write.
-Future<
-    Result<
-        Result<List<PreparedImportedProduct>, AdminProductImportConfirmFailure>,
-        SqlxError>> preflightAdminProductImport(
+Future<Result<List<PreparedImportedProduct>, AdminProductImportPreflightError>>
+    preflightAdminProductImport(
   AdminProductImportConfirmRepository reads,
   List<AdminImportedProduct> products, {
   required String Function() nextId,
 }) async {
   final currenciesResult = await reads.activeCurrencies();
-  if (currenciesResult case Err(:final error)) return Err(error);
+  if (currenciesResult case Err(:final error)) {
+    return Err(AdminProductImportPreflightStorage(error));
+  }
   final currencies =
       (currenciesResult as Ok<List<AdminProductImportCurrencyRow>, SqlxError>)
           .value
@@ -30,7 +56,9 @@ Future<
     final incomingId = row['Product Id']!;
     final matchesResult =
         await reads.findProducts(incomingId, row['Product Handle']!);
-    if (matchesResult case Err(:final error)) return Err(error);
+    if (matchesResult case Err(:final error)) {
+      return Err(AdminProductImportPreflightStorage(error));
+    }
     final matches =
         (matchesResult as Ok<List<AdminProductImportIdentityRow>, SqlxError>)
             .value;
@@ -40,16 +68,24 @@ Future<
             (matches.length != 1 ||
                 matches.single.id != incomingId ||
                 matches.single.handle != row['Product Handle']))) {
-      return const Ok(Err(AdminProductImportConfirmFailure.conflict));
+      return const Err(AdminProductImportPreflightRejected(
+        AdminProductImportConfirmFailure.conflict,
+      ));
     }
     final productId = incomingId.isEmpty ? nextId() : incomingId;
     if (!productIds.add(productId)) {
-      return const Ok(Err(AdminProductImportConfirmFailure.invalid));
+      return const Err(AdminProductImportPreflightRejected(
+        AdminProductImportConfirmFailure.invalid,
+      ));
     }
     final references = await _validReferences(reads, row);
-    if (references case Err(:final error)) return Err(error);
+    if (references case Err(:final error)) {
+      return Err(AdminProductImportPreflightStorage(error));
+    }
     if (!(references as Ok<bool, SqlxError>).value) {
-      return const Ok(Err(AdminProductImportConfirmFailure.invalid));
+      return const Err(AdminProductImportPreflightRejected(
+        AdminProductImportConfirmFailure.invalid,
+      ));
     }
     final variants = <PreparedImportedVariant>[];
     for (final variantRow in product.variantRows) {
@@ -60,18 +96,22 @@ Future<
         currencies,
         nextId,
       );
-      if (resolved case Err(:final error)) return Err(error);
-      final outcome = (resolved as Ok<
-              Result<PreparedImportedVariant, AdminProductImportConfirmFailure>,
-              SqlxError>)
-          .value;
-      if (outcome case Err(:final error)) return Ok(Err(error));
-      final variant = (outcome
-              as Ok<PreparedImportedVariant, AdminProductImportConfirmFailure>)
+      if (resolved case Err(:final error)) {
+        return switch (error) {
+          AdminProductImportVariantPreflightStorage(:final cause) =>
+            Err(AdminProductImportPreflightStorage(cause)),
+          AdminProductImportVariantPreflightRejected(:final failure) =>
+            Err(AdminProductImportPreflightRejected(failure)),
+        };
+      }
+      final variant = (resolved as Ok<PreparedImportedVariant,
+              AdminProductImportVariantPreflightError>)
           .value;
       final sku = variant.row.optional('Variant SKU');
       if (!variantIds.add(variant.id) || (sku != null && !skus.add(sku))) {
-        return const Ok(Err(AdminProductImportConfirmFailure.invalid));
+        return const Err(AdminProductImportPreflightRejected(
+          AdminProductImportConfirmFailure.invalid,
+        ));
       }
       variants.add(variant);
     }
@@ -79,7 +119,9 @@ Future<
         (matches.isEmpty &&
             variants.any(
                 (variant) => !currencies.every(variant.prices.containsKey)))) {
-      return const Ok(Err(AdminProductImportConfirmFailure.invalid));
+      return const Err(AdminProductImportPreflightRejected(
+        AdminProductImportConfirmFailure.invalid,
+      ));
     }
     prepared.add(PreparedImportedProduct(
       id: productId,
@@ -88,7 +130,7 @@ Future<
       variants: variants,
     ));
   }
-  return Ok(Ok(prepared));
+  return Ok(prepared);
 }
 
 Future<Result<bool, SqlxError>> _validReferences(
