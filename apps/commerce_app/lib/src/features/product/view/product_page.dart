@@ -57,15 +57,21 @@ class _ProductPageState extends State<ProductPage> {
   @override
   Widget build(BuildContext context) {
     final state = context.watchProductViewModel().value;
+    final content = switch (state.status) {
+      ProductDetailStatus.idle ||
+      ProductDetailStatus.loading =>
+        const Center(child: CircularProgressIndicator()),
+      ProductDetailStatus.missing => const StoreMainNotFound(),
+      ProductDetailStatus.failed => _Failure(message: state.message!),
+      ProductDetailStatus.ready => ProductLayout(state: state),
+    };
     return StoreScaffold(
-      body: switch (state.status) {
-        ProductDetailStatus.idle ||
-        ProductDetailStatus.loading =>
-          const Center(child: CircularProgressIndicator()),
-        ProductDetailStatus.missing => const StoreMainNotFound(),
-        ProductDetailStatus.failed => _Failure(message: state.message!),
-        ProductDetailStatus.ready => ProductLayout(state: state),
-      },
+      body: Stack(
+        children: [
+          ProductDocumentMetadata(product: state.product),
+          content,
+        ],
+      ),
     );
   }
 }

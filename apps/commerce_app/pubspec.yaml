@@ -24,6 +24,7 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   url_launcher: ^6.3.2
+  web: ^1.1.1
 
 dev_dependencies:
   # Test-only: the round-trip test runs the real API and points the generated

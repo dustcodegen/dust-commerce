@@ -7,6 +7,7 @@ export 'src/core/money.dart';
 export 'src/core/product_image.dart';
 export 'src/core/store_scaffold.dart';
 export 'src/core/store_date.dart';
+export 'src/core/store_document_metadata.dart';
 export 'src/core/store_error_message.dart';
 export 'src/core/store_interactive_link.dart';
 export 'src/core/store_theme.dart';
