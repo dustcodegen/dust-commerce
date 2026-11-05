@@ -35,18 +35,34 @@ Future<Result<AdminProductDetailResponse, Rejection>>
     (decoded as Ok<AdminUpdateProductVariant, Rejection>).value,
   );
   return switch (result) {
-    Ok(value: Ok(value: final product)) => Ok(product),
-    Ok(value: Err(error: AdminUpdateVariantFailure.notFound)) =>
+    Ok(:final value) => Ok(value),
+    Err(
+      error: AdminUpdateVariantRejected(
+        failure: AdminUpdateVariantFailure.notFound,
+      )
+    ) =>
       Err(Rejection.notFound('Product variant "$variantId"')),
-    Ok(value: Err(error: AdminUpdateVariantFailure.invalidOptions)) =>
+    Err(
+      error: AdminUpdateVariantRejected(
+        failure: AdminUpdateVariantFailure.invalidOptions,
+      )
+    ) =>
       const Err(Rejection.status(
         422,
         'Select one unique value for every active product option',
       )),
-    Ok(value: Err(error: AdminUpdateVariantFailure.skuConflict)) =>
+    Err(
+      error: AdminUpdateVariantRejected(
+        failure: AdminUpdateVariantFailure.skuConflict,
+      )
+    ) =>
       const Err(Rejection.conflict('Another variant already uses this SKU')),
-    Ok(value: Err(error: AdminUpdateVariantFailure.unavailable)) =>
+    Err(
+      error: AdminUpdateVariantRejected(
+        failure: AdminUpdateVariantFailure.unavailable,
+      )
+    ) =>
       const Err(Rejection.internal()),
-    Err() => const Err(Rejection.internal()),
+    Err(error: AdminUpdateVariantStorage()) => const Err(Rejection.internal()),
   };
 }

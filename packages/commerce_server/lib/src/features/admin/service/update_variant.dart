@@ -20,33 +20,66 @@ enum AdminUpdateVariantFailure {
   unavailable,
 }
 
+/// Error crossing the Admin variant-update boundary.
+sealed class AdminUpdateVariantError {
+  /// Creates one variant-update error.
+  const AdminUpdateVariantError();
+}
+
+/// A business rejection that is safe to expose to the handler.
+final class AdminUpdateVariantRejected extends AdminUpdateVariantError {
+  /// Creates one business rejection.
+  const AdminUpdateVariantRejected(this.failure);
+
+  /// The stable business reason.
+  final AdminUpdateVariantFailure failure;
+}
+
+/// A storage failure retained for logging without exposing SQL details.
+final class AdminUpdateVariantStorage extends AdminUpdateVariantError {
+  /// Creates one storage failure.
+  const AdminUpdateVariantStorage(this.cause);
+
+  /// The original SQLx failure.
+  final SqlxError cause;
+}
+
 /// Atomically replaces Medusa's variant-detail fields and returns fresh detail.
-Future<
-    Result<Result<AdminProductDetailResponse, AdminUpdateVariantFailure>,
-        SqlxError>> updateAdminProductVariant(
+Future<Result<AdminProductDetailResponse, AdminUpdateVariantError>>
+    updateAdminProductVariant(
   CommerceDatabase database,
   String productId,
   String variantId,
   AdminUpdateProductVariant input,
-) =>
-    database.transaction((tx) async {
+) async {
+  return transactionResult<AdminProductDetailResponse, AdminUpdateVariantError>(
+    database,
+    (tx) async {
       final reads = AdminProductReadRepository(tx);
       final found = await reads.findById(productId);
-      if (found case Err(:final error)) return Err(error);
+      if (found case Err(:final error)) {
+        return Err(AdminUpdateVariantStorage(error));
+      }
       final product = optionOf(
         (found as Ok<AdminProductDetailResponse?, SqlxError>).value,
       );
       if (product case None()) {
-        return const Ok(Err(AdminUpdateVariantFailure.notFound));
+        return const Err(
+          AdminUpdateVariantRejected(AdminUpdateVariantFailure.notFound),
+        );
       }
       final detail = (product as Some<AdminProductDetailResponse>).value;
       final variant = _variant(detail.variants, variantId);
       if (variant case None()) {
-        return const Ok(Err(AdminUpdateVariantFailure.notFound));
+        return const Err(
+          AdminUpdateVariantRejected(AdminUpdateVariantFailure.notFound),
+        );
       }
       final selections = _prepareSelections(detail, variantId, input);
       if (selections case None()) {
-        return const Ok(Err(AdminUpdateVariantFailure.invalidOptions));
+        return const Err(
+          AdminUpdateVariantRejected(AdminUpdateVariantFailure.invalidOptions),
+        );
       }
 
       final writes = AdminVariantUpdateRepository(tx);
@@ -58,10 +91,16 @@ Future<
           selection.key,
           selection.value,
         );
-        if (result case Err(:final error)) return Err(error);
+        if (result case Err(:final error)) {
+          return Err(AdminUpdateVariantStorage(error));
+        }
         final id = optionOf((result as Ok<String?, SqlxError>).value);
         if (id case None()) {
-          return const Ok(Err(AdminUpdateVariantFailure.invalidOptions));
+          return const Err(
+            AdminUpdateVariantRejected(
+              AdminUpdateVariantFailure.invalidOptions,
+            ),
+          );
         }
         valueIds[selection.key] = (id as Some<String>).value;
       }
@@ -85,9 +124,13 @@ Future<
         input.manageInventory ? 1 : 0,
         input.allowBackorder ? 1 : 0,
       );
-      if (updated case Err(:final error)) return Err(error);
+      if (updated case Err(:final error)) {
+        return Err(AdminUpdateVariantStorage(error));
+      }
       if ((updated as Ok<ExecResult, SqlxError>).value.rowsAffected == 0) {
-        return const Ok(Err(AdminUpdateVariantFailure.skuConflict));
+        return const Err(
+          AdminUpdateVariantRejected(AdminUpdateVariantFailure.skuConflict),
+        );
       }
       for (final selection in valueIds.entries) {
         final linked = await writes.upsertOptionValue(
@@ -95,18 +138,26 @@ Future<
           selection.key,
           selection.value,
         );
-        if (linked case Err(:final error)) return Err(error);
+        if (linked case Err(:final error)) {
+          return Err(AdminUpdateVariantStorage(error));
+        }
       }
 
       final refreshed = await reads.findById(productId);
-      if (refreshed case Err(:final error)) return Err(error);
+      if (refreshed case Err(:final error)) {
+        return Err(AdminUpdateVariantStorage(error));
+      }
       return switch (optionOf(
         (refreshed as Ok<AdminProductDetailResponse?, SqlxError>).value,
       )) {
-        Some(:final value) => Ok(Ok(value)),
-        None() => const Ok(Err(AdminUpdateVariantFailure.unavailable)),
+        Some(:final value) => Ok(value),
+        None() => const Err(
+            AdminUpdateVariantRejected(AdminUpdateVariantFailure.unavailable)),
       };
-    });
+    },
+    storageError: AdminUpdateVariantStorage.new,
+  );
+}
 
 Option<AdminProductVariant> _variant(
   List<AdminProductVariant> variants,
