@@ -30,11 +30,20 @@ Future<Result<AdminProductImportPreview, Rejection>>
     now: deps.clock.now(),
   );
   return switch (result) {
-    Ok(value: Ok(:final value)) => Ok(value),
-    Ok(value: Err(error: AdminProductImportPreviewFailure.invalidFile)) =>
+    Ok(:final value) => Ok(value),
+    Err(
+      error: AdminProductImportPreviewRejected(
+        failure: AdminProductImportPreviewFailure.invalidFile,
+      )
+    ) =>
       const Err(Rejection.status(422, 'Upload one CSV file')),
-    Ok(value: Err(error: AdminProductImportPreviewFailure.invalidCsv)) =>
+    Err(
+      error: AdminProductImportPreviewRejected(
+        failure: AdminProductImportPreviewFailure.invalidCsv,
+      )
+    ) =>
       const Err(Rejection.status(422, 'Product CSV is invalid')),
-    Err() => const Err(Rejection.internal()),
+    Err(error: AdminProductImportPreviewStorage()) =>
+      const Err(Rejection.internal()),
   };
 }
