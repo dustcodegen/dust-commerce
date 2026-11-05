@@ -170,8 +170,9 @@ downloadable GitHub Actions artifacts. Set the repository variable
 `PRODUCTION_API_BASE_URL` to the deployed API origin before merging; release
 web builds reject the local development default. Artifact creation is
 continuous delivery only: deployment remains the hosting platform's job.
-The local release-artifact check and the current missing-origin boundary are
-recorded in [delivery-local-build-qa.md](docs/delivery-local-build-qa.md).
+The current local release-artifact check and the fail-closed missing-origin
+boundary are recorded in
+[delivery-local-build-qa.md](docs/delivery-local-build-qa.md).
 
 Then the same checks CI runs:
 
