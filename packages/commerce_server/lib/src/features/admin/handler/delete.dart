@@ -28,9 +28,14 @@ Future<Result<Response, Rejection>> deleteAdminProductTypeHandler(
   final deps = (state as Ok<AdminDeps, Rejection>).value;
   final result = await deleteAdminProductType(deps.database, id);
   return switch (result) {
-    Ok(value: Ok()) => Ok(noContent()),
-    Ok(value: Err(error: AdminDeleteProductTypeFailure.notFound)) =>
+    Ok() => Ok(noContent()),
+    Err(
+      error: AdminDeleteProductTypeRejected(
+        failure: AdminDeleteProductTypeFailure.notFound,
+      )
+    ) =>
       Err(Rejection.notFound('Product type "$id"')),
-    Err() => const Err(Rejection.internal()),
+    Err(error: AdminDeleteProductTypeStorage()) =>
+      const Err(Rejection.internal()),
   };
 }

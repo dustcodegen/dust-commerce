@@ -38,8 +38,7 @@ Future<Result<CustomerRegistrationResponse, Rejection>> registerAccountHandler(
     );
   }
 
-  late final Result<Result<RegisteredAccount, RegisterFailure>, SqlxError>
-      result;
+  late final Result<RegisteredAccount, RegisterAccountError> result;
   try {
     result = await registerAccount(
       deps.database,
@@ -55,11 +54,15 @@ Future<Result<CustomerRegistrationResponse, Rejection>> registerAccountHandler(
     );
   }
   return switch (result) {
-    Ok(value: Ok(value: final registration)) =>
+    Ok(value: final registration) =>
       await _completeRegistration(deps, registration),
-    Ok(value: Err(error: RegisterFailure.alreadyExists)) =>
+    Err(
+      error: RegisterAccountRejected(
+        failure: RegisterFailure.alreadyExists,
+      )
+    ) =>
       const Err(Rejection.conflict('A customer account already exists')),
-    Err() => const Err(Rejection.internal()),
+    Err(error: RegisterAccountStorage()) => const Err(Rejection.internal()),
   };
 }
 

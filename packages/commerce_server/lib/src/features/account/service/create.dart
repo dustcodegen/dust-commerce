@@ -5,20 +5,14 @@ import 'package:commerce_server/src/features/account/crypto.dart';
 import 'package:commerce_server/src/features/account/mail.dart';
 import 'package:commerce_server/src/features/account/model.dart';
 import 'package:commerce_server/src/features/account/repository/repository.dart';
+import 'package:commerce_server/src/features/account/register_error.dart';
 import 'package:commerce_server/src/infra/database.dart';
 import 'package:commerce_server/src/infra/option.dart';
 import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_dart/db.dart';
 
-/// Why a customer account was not created.
-enum RegisterFailure {
-  /// An active account already owns this email address.
-  alreadyExists,
-}
-
 /// Creates a customer, auth identity, and email provider atomically.
-Future<Result<Result<RegisteredAccount, RegisterFailure>, SqlxError>>
-    registerAccount(
+Future<Result<RegisteredAccount, RegisterAccountError>> registerAccount(
   CommerceDatabase database,
   RegisterAccountBody input, {
   required String Function() nextId,
@@ -38,62 +32,75 @@ Future<Result<Result<RegisteredAccount, RegisterFailure>, SqlxError>>
   final verificationToken =
       requireEmailVerification ? Some(Tokens.issue()) : const None<String>();
   final verificationExpiresAt = now.toUtc().add(verificationLifetime);
-  return database.transaction((tx) async {
-    final writes = AccountCreateRepository(tx);
-    final customer = await writes.insertCustomer(
-      customerId,
-      email,
-      input.firstName,
-      input.lastName,
-      input.phone,
-    );
-    if (customer case Err(:final error)) return Err(error);
-    if ((customer as Ok<ExecResult, SqlxError>).value.rowsAffected == 0) {
-      return const Ok(Err(RegisterFailure.alreadyExists));
-    }
-
-    final identity = await writes.insertAuthIdentity(
-      authIdentityId,
-      jsonEncode({'customer_id': customerId}),
-    );
-    if (identity case Err(:final error)) return Err(error);
-
-    final provider = await writes.insertProviderIdentity(
-      providerIdentityId,
-      email,
-      authIdentityId,
-      jsonEncode({'password': passwordHash}),
-    );
-    if (provider case Err(:final error)) return Err(error);
-
-    if (verificationToken case Some(value: final token)) {
-      final verification = await writes.insertEmailVerification(
-        authIdentityId,
-        await Tokens.fingerprint(token),
-        verificationExpiresAt.toIso8601String(),
+  return transactionResult<RegisteredAccount, RegisterAccountError>(
+    database,
+    (tx) async {
+      final writes = AccountCreateRepository(tx);
+      final customer = await writes.insertCustomer(
+        customerId,
+        email,
+        input.firstName,
+        input.lastName,
+        input.phone,
       );
-      if (verification case Err(:final error)) return Err(error);
-    }
+      if (customer case Err(:final error)) {
+        return Err(RegisterAccountStorage(error));
+      }
+      if ((customer as Ok<ExecResult, SqlxError>).value.rowsAffected == 0) {
+        return const Err(
+            RegisterAccountRejected(RegisterFailure.alreadyExists));
+      }
 
-    return Ok(Ok(
-      RegisteredAccount(
-        customer: CustomerResponse(
-          id: customerId,
-          email: email,
-          firstName: input.firstName,
-          lastName: input.lastName,
-          phone: input.phone,
-        ),
-        verification: verificationToken.map(
-          (token) => EmailVerificationMail(
-            recipient: email,
-            token: token,
-            expiresAt: verificationExpiresAt,
+      final identity = await writes.insertAuthIdentity(
+        authIdentityId,
+        jsonEncode({'customer_id': customerId}),
+      );
+      if (identity case Err(:final error)) {
+        return Err(RegisterAccountStorage(error));
+      }
+
+      final provider = await writes.insertProviderIdentity(
+        providerIdentityId,
+        email,
+        authIdentityId,
+        jsonEncode({'password': passwordHash}),
+      );
+      if (provider case Err(:final error)) {
+        return Err(RegisterAccountStorage(error));
+      }
+
+      if (verificationToken case Some(value: final token)) {
+        final verification = await writes.insertEmailVerification(
+          authIdentityId,
+          await Tokens.fingerprint(token),
+          verificationExpiresAt.toIso8601String(),
+        );
+        if (verification case Err(:final error)) {
+          return Err(RegisterAccountStorage(error));
+        }
+      }
+
+      return Ok(
+        RegisteredAccount(
+          customer: CustomerResponse(
+            id: customerId,
+            email: email,
+            firstName: input.firstName,
+            lastName: input.lastName,
+            phone: input.phone,
+          ),
+          verification: verificationToken.map(
+            (token) => EmailVerificationMail(
+              recipient: email,
+              token: token,
+              expiresAt: verificationExpiresAt,
+            ),
           ),
         ),
-      ),
-    ));
-  });
+      );
+    },
+    storageError: RegisterAccountStorage.new,
+  );
 }
 
 /// Exchanges valid credentials for a short-lived opaque token.

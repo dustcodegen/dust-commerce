@@ -5,6 +5,7 @@ import 'package:dust_dart/db.dart';
 import 'package:dust_db_postgres/dust_db_postgres.dart';
 
 export 'raw_query.dart';
+export 'transaction_result.dart';
 
 part 'database.g.dart';
 

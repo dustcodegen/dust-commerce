@@ -40,13 +40,25 @@ Future<Result<OrderResponse, Rejection>> authorizePaymentHandler(
   );
 
   return switch (result) {
-    Ok(value: Ok(value: final order)) => Ok(order),
-    Ok(value: Err(error: AuthorizeFailure.noOrder)) =>
+    Ok(value: final order) => Ok(order),
+    Err(
+      error: AuthorizePaymentRejected(
+        failure: AuthorizeFailure.noOrder,
+      )
+    ) =>
       Err(Rejection.notFound('Order "$orderId"')),
-    Ok(value: Err(error: AuthorizeFailure.canceled)) =>
+    Err(
+      error: AuthorizePaymentRejected(
+        failure: AuthorizeFailure.canceled,
+      )
+    ) =>
       const Err(Rejection.conflict('A canceled order cannot be paid for')),
-    Ok(value: Err(error: AuthorizeFailure.archived)) =>
+    Err(
+      error: AuthorizePaymentRejected(
+        failure: AuthorizeFailure.archived,
+      )
+    ) =>
       const Err(Rejection.conflict('An archived order cannot be paid for')),
-    Err() => const Err(Rejection.internal()),
+    Err(error: AuthorizePaymentStorage()) => const Err(Rejection.internal()),
   };
 }

@@ -38,15 +38,31 @@ Future<Result<OrderResponse, Rejection>> capturePaymentHandler(
   );
 
   return switch (result) {
-    Ok(value: Ok(value: final order)) => Ok(order),
-    Ok(value: Err(error: CaptureFailure.noOrder)) =>
+    Ok(value: final order) => Ok(order),
+    Err(
+      error: CapturePaymentRejected(
+        failure: CaptureFailure.noOrder,
+      )
+    ) =>
       Err(Rejection.notFound('Order "$orderId"')),
-    Ok(value: Err(error: CaptureFailure.noPayment)) =>
+    Err(
+      error: CapturePaymentRejected(
+        failure: CaptureFailure.noPayment,
+      )
+    ) =>
       const Err(Rejection.conflict('No payment has been started')),
-    Ok(value: Err(error: CaptureFailure.canceled)) =>
+    Err(
+      error: CapturePaymentRejected(
+        failure: CaptureFailure.canceled,
+      )
+    ) =>
       const Err(Rejection.conflict('A canceled order cannot be paid for')),
-    Ok(value: Err(error: CaptureFailure.archived)) =>
+    Err(
+      error: CapturePaymentRejected(
+        failure: CaptureFailure.archived,
+      )
+    ) =>
       const Err(Rejection.conflict('An archived order cannot be paid for')),
-    Err() => const Err(Rejection.internal()),
+    Err(error: CapturePaymentStorage()) => const Err(Rejection.internal()),
   };
 }
