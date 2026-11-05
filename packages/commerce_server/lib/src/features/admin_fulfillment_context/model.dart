@@ -7,14 +7,41 @@ part 'model.g.dart';
 @Derive([Serialize(), FromRow()])
 @SerDe(renameAll: SerDeRename.snakeCase)
 final class AdminStockLocationResponse with _$AdminStockLocationResponse {
-  /// Creates one explicit merchant location choice.
-  const AdminStockLocationResponse({required this.id, required this.name});
+  /// Creates one explicit merchant location projection.
+  const AdminStockLocationResponse({
+    required this.id,
+    required this.name,
+    this.address1,
+    this.city,
+    this.province,
+    this.postalCode,
+    this.countryCode,
+  });
 
   /// Stable identifier accepted by fulfillment creation.
   final String id;
 
   /// Merchant-facing warehouse name.
   final String name;
+
+  /// First address line, when the location has a physical address.
+  @Sqlx(rename: 'address_1')
+  @SerDe(rename: 'address_1')
+  final String? address1;
+
+  /// City shown in the location list when available.
+  final String? city;
+
+  /// Administrative area shown in the location list when available.
+  final String? province;
+
+  /// Postal code shown in the location list when available.
+  @Sqlx(rename: 'postal_code')
+  final String? postalCode;
+
+  /// Lowercase ISO country code shown in the location list when available.
+  @Sqlx(rename: 'country_code')
+  final String? countryCode;
 }
 
 /// One bounded page of direct stock-location projections.

@@ -36,6 +36,7 @@ mixin _AdminHomeNavigation on State<_AdminHome>, _AdminHomeActions {
       onCustomerGroupsRequested: _showCustomerGroups,
       onCustomerServiceRequested: _showCustomerService,
       onOrdersRequested: _showOrders,
+      onStockLocationsRequested: _showStockLocations,
       onProductsRequested: _showProducts,
       onProductOptionsRequested: _showProductOptions,
       onPromotionsRequested: _showPromotions,
@@ -51,6 +52,7 @@ mixin _AdminHomeNavigation on State<_AdminHome>, _AdminHomeActions {
           AdminShellSection.customerGroups,
         _AdminRoute.customerService => AdminShellSection.customerService,
         _AdminRoute.orders || _AdminRoute.order => AdminShellSection.orders,
+        _AdminRoute.stockLocations => AdminShellSection.inventory,
         _AdminRoute.products ||
         _AdminRoute.product =>
           AdminShellSection.products,
@@ -101,6 +103,9 @@ mixin _AdminHomeNavigation on State<_AdminHome>, _AdminHomeActions {
         _AdminRoute.orders => AdminOrderPage(
             searchFocus: _orderSearchFocus,
             onOpen: _showOrder,
+          ),
+        _AdminRoute.stockLocations => AdminStockLocationPage(
+            searchFocus: _stockLocationSearchFocus,
           ),
         _AdminRoute.order => AdminOrderDetailPage(
             orderId: selectedIdForNavigation,

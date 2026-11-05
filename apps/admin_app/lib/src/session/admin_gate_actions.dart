@@ -10,6 +10,18 @@ mixin _AdminHomeActions
   FocusNode get _typeSearchFocus;
   FocusNode get _profileSearchFocus;
   FocusNode get _promotionSearchFocus;
+  FocusNode get _stockLocationSearchFocus;
+
+  _AdminRoute get _route;
+  set _route(_AdminRoute value);
+  String get _selectedId;
+  set _selectedId(String value);
+
+  void _showStockLocations();
+  void _requestInventorySearch();
+  Future<void> _createProduct();
+  Future<void> _createCustomer();
+  Future<void> _createProductOption();
 
   String get selectedIdForNavigation => _selectedId;
   String get selectedCustomerIdForNavigation => _selectedCustomerId;
@@ -60,6 +72,10 @@ mixin _AdminHomeActions
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _promotionSearchFocus.requestFocus();
       });
+      return;
+    }
+    if (_route == _AdminRoute.stockLocations) {
+      _requestInventorySearch();
       return;
     }
     final options = _route == _AdminRoute.productOptions ||
@@ -170,26 +186,4 @@ mixin _AdminHomeActions
         _route = _AdminRoute.promotion;
         _selectedId = id;
       });
-
-  Future<void> _createProduct() async {
-    final created = await showAdminProductCreatePage(context);
-    if (!mounted) return;
-    if (created case Some(value: final product)) {
-      await context.readAdminProductViewModel().load(offset: 0);
-      if (mounted) _showProduct(product.id);
-    }
-  }
-
-  Future<void> _createCustomer() async {
-    final created = await showAdminCustomerCreatePage(context);
-    if (!mounted || created == null) return;
-    await context.readAdminCustomerViewModel().load(offset: 0);
-    if (mounted) _showCustomer(created.id);
-  }
-
-  Future<void> _createProductOption() async {
-    final created = await showAdminProductOptionCreatePage(context);
-    if (!mounted || created == null) return;
-    _showProductOption(created.id);
-  }
 }

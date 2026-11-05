@@ -5,6 +5,8 @@ import 'package:admin_app/src/bootstrap/admin_customer_dependencies.dart';
 import 'package:admin_app/src/bootstrap/admin_customer_group_dependencies.dart';
 import 'package:admin_app/src/customer_service/admin_customer_service_api.dart';
 import 'package:admin_app/src/customer_service/admin_customer_service_view_model.dart';
+import 'package:admin_app/src/inventory/admin_stock_location_api.dart';
+import 'package:admin_app/src/inventory/admin_stock_location_view_model.dart';
 import 'package:admin_app/src/order/admin_fulfillment_context_view_model.dart';
 import 'package:admin_app/src/order/admin_order_detail_api.dart';
 import 'package:admin_app/src/order/admin_order_detail_view_model.dart';
@@ -43,6 +45,7 @@ final class AdminDependencies {
     final orderDetailApi = AdminOrderDetailApi(dio, baseUrl: baseUrl);
     final shippingProfileApi = AdminShippingProfileApi(dio, baseUrl: baseUrl);
     final promotionApi = AdminPromotionApi(dio, baseUrl: baseUrl);
+    final stockLocationApi = AdminStockLocationApi(dio, baseUrl: baseUrl);
     return AdminDependencies._(
       session: AdminSessionViewModel(
         AdminSessionViewModelArgs(api: api, sessions: sessions),
@@ -109,6 +112,9 @@ final class AdminDependencies {
       promotionDetail: AdminPromotionDetailViewModel(
         AdminPromotionDetailViewModelArgs(api: promotionApi),
       ),
+      stockLocations: AdminStockLocationViewModel(
+        AdminStockLocationViewModelArgs(api: stockLocationApi),
+      ),
     );
   }
 
@@ -132,6 +138,7 @@ final class AdminDependencies {
     required this.shippingProfileDetail,
     required this.promotions,
     required this.promotionDetail,
+    required this.stockLocations,
   });
 
   /// Signed-in Admin session state.
@@ -190,4 +197,7 @@ final class AdminDependencies {
 
   /// Selected promotion detail state.
   final AdminPromotionDetailViewModel promotionDetail;
+
+  /// Inventory/Locations collection state.
+  final AdminStockLocationViewModel stockLocations;
 }

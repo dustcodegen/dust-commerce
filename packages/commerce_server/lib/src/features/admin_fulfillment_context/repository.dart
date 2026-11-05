@@ -20,10 +20,15 @@ WHERE deleted_at IS NULL
 
   /// Lists safe active stock locations in stable display order.
   @Query(r'''
-SELECT id, name FROM stock_locations
-WHERE deleted_at IS NULL
-  AND ($1 = '' OR lower(name) LIKE '%' || lower($1) || '%')
-ORDER BY lower(name), id
+SELECT location.id, location.name,
+       address.address_1, address.city, address.province,
+       address.postal_code, address.country_code
+FROM stock_locations location
+LEFT JOIN stock_location_addresses address
+  ON address.id = location.address_id AND address.deleted_at IS NULL
+WHERE location.deleted_at IS NULL
+  AND ($1 = '' OR lower(location.name) LIKE '%' || lower($1) || '%')
+ORDER BY lower(location.name), location.id
 LIMIT $2 OFFSET $3
 ''')
   Future<Result<List<AdminStockLocationResponse>, SqlxError>> listLocations(

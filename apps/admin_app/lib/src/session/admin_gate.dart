@@ -10,6 +10,8 @@ import 'package:admin_app/src/customer_group/admin_customer_group_page.dart';
 import 'package:admin_app/src/customer_group/admin_customer_group_view_model.dart';
 import 'package:admin_app/src/customer_service/admin_customer_service_page.dart';
 import 'package:admin_app/src/customer_service/admin_customer_service_view_model.dart';
+import 'package:admin_app/src/inventory/admin_stock_location_page.dart';
+import 'package:admin_app/src/inventory/admin_stock_location_view_model.dart';
 import 'package:admin_app/src/product/admin_product_page.dart';
 import 'package:admin_app/src/product/admin_product_detail_page.dart';
 import 'package:admin_app/src/product/admin_product_create_page.dart';
@@ -46,7 +48,9 @@ import 'package:dust_dart/fp.dart';
 import 'package:flutter/material.dart';
 
 part 'admin_gate_actions.dart';
+part 'admin_gate_creation_actions.dart';
 part 'admin_gate_customer_group_actions.dart';
+part 'admin_gate_inventory_actions.dart';
 part 'admin_gate_navigation.dart';
 part 'admin_gate_support_actions.dart';
 part 'admin_gate_title.dart';
@@ -93,6 +97,8 @@ final class _AdminHome extends StatefulWidget {
 final class _AdminHomeState extends State<_AdminHome>
     with
         _AdminCustomerGroupActions,
+        _AdminCreationActions,
+        _AdminInventoryActions,
         _AdminSupportActions,
         _AdminHomeActions,
         _AdminHomeNavigation {
@@ -114,6 +120,8 @@ final class _AdminHomeState extends State<_AdminHome>
   final _profileSearchFocus = FocusNode();
   @override
   final _promotionSearchFocus = FocusNode();
+  @override
+  final _stockLocationSearchFocus = FocusNode();
   @override
   _AdminRoute _route = _AdminRoute.products;
   @override
@@ -143,6 +151,7 @@ final class _AdminHomeState extends State<_AdminHome>
     _typeSearchFocus.dispose();
     _profileSearchFocus.dispose();
     _promotionSearchFocus.dispose();
+    _stockLocationSearchFocus.dispose();
     super.dispose();
   }
 
@@ -167,6 +176,7 @@ enum _AdminRoute {
   productType,
   promotions,
   promotion,
+  stockLocations,
   shippingProfiles,
   shippingProfile,
 }

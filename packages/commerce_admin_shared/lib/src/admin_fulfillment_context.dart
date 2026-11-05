@@ -6,8 +6,16 @@ part 'admin_fulfillment_context.g.dart';
 @Derive([ToString(), Eq(), Serialize(), Deserialize()])
 @SerDe(renameAll: SerDeRename.snakeCase)
 final class AdminStockLocation with _$AdminStockLocation {
-  /// Creates a location choice without exposing its private address.
-  const AdminStockLocation({required this.id, required this.name});
+  /// Creates a location choice with its safe merchant address projection.
+  const AdminStockLocation({
+    required this.id,
+    required this.name,
+    this.address1,
+    this.city,
+    this.province,
+    this.postalCode,
+    this.countryCode,
+  });
 
   /// Decodes one generated Admin API response.
   factory AdminStockLocation.fromJson(Map<String, Object?> json) =>
@@ -18,6 +26,22 @@ final class AdminStockLocation with _$AdminStockLocation {
 
   /// Merchant-facing warehouse name.
   final String name;
+
+  /// First address line, when a physical address is configured.
+  @SerDe(rename: 'address_1')
+  final String? address1;
+
+  /// City, when a physical address is configured.
+  final String? city;
+
+  /// Administrative area, when a physical address is configured.
+  final String? province;
+
+  /// Postal code, when a physical address is configured.
+  final String? postalCode;
+
+  /// Lowercase ISO country code, when a physical address is configured.
+  final String? countryCode;
 }
 
 /// One bounded page of fulfillment location choices.
