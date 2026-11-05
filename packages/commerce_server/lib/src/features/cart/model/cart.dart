@@ -96,7 +96,7 @@ final class CartPromotionsSqlxJson
       const AppliedPromotionsFromJson().decode(value);
 }
 
-/// Builds explicit line responses from a SQLite JSON aggregate.
+/// Builds explicit line responses from a PostgreSQL JSON aggregate.
 final class LineItemsFromJson
     implements SqlxTryFrom<List<LineItemResponse>, String> {
   /// Creates the stateless converter.
@@ -158,7 +158,7 @@ final class OptionalAddressFromJson implements SqlxTryFrom<Address?, String> {
       value == 'null' ? null : Address.fromJson(_object(value));
 }
 
-/// Builds an explicit region response from a JSON object selected by SQLite.
+/// Builds an explicit region response from a JSON object selected by PostgreSQL.
 final class RegionResponseFromJson
     implements SqlxTryFrom<RegionResponse, String> {
   /// Creates the stateless converter.

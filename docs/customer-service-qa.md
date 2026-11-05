@@ -47,7 +47,7 @@ proven live outside the local development environment.
   not inherit database or domain models.
 - Absence is surfaced as `Option`; status is a typed enum; audit values decode
   as UTC `DateTime`.
-- SQLite owns request creation, update and resolution timestamps. The final
+- PostgreSQL owns request creation, update and resolution timestamps. The final
   one-shot table has no appended `ALTER TABLE` migration.
 - ViewModels expose one success/failure boundary and never return nested
   `Result<Result<...>>` values.

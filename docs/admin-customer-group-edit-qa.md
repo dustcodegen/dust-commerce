@@ -41,7 +41,7 @@ drawer sends only the name; metadata remains a separate detail-section concern.
 
 `POST /admin/customer-groups/{id}` runs below the parent Admin route guard and
 also extracts `AuthenticatedAdmin`. Strict JSON extraction accepts only `name`.
-One transaction updates the active row, lets SQLite generate `updated_at`, then
+One transaction updates the active row, lets PostgreSQL generate `updated_at`, then
 uses the existing SQLx `FromRow` detail response directly. The service returns
 one flat `Result<Option<...>, SqlxError>`; missing and soft-deleted groups share
 `404`.
@@ -78,7 +78,7 @@ Authenticated browser QA verified:
 - saving `VIP Members` refreshes the breadcrumb and General title;
 - saving `  VIP Customers  ` restores the normalized canonical fixture;
 - the exact success message is visible after save;
-- SQLite retains `created_at` and advances its generated `updated_at`;
+- PostgreSQL retains `created_at` and advances its generated `updated_at`;
 - compact and `1440 x 1000` layouts keep the drawer usable; and
 - the final browser warning/error log is empty.
 

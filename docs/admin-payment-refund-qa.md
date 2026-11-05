@@ -27,7 +27,7 @@ Pinned source truth:
   feature and cannot form `Result<Result<...>>`.
 - Admin responses are direct SQLx `FromRow` allowlists. Provider metadata and
   other internal payment data never enter the contract.
-- SQLite generates UTC refund and reason audit timestamps. Integer minor units
+- PostgreSQL generates UTC refund and reason audit timestamps. Integer minor units
   remain the only money representation.
 - Manual payments are supported. Unknown or external payment providers return
   `503` before any refund row is written.
@@ -79,7 +79,7 @@ local merchant.
    usable without horizontal overflow. The drawer offered USD 15.58 remaining.
 5. Admin refunded the remainder. The refreshed order displayed Refunded, two
    audits and a disabled Refund action.
-6. SQLite contained exactly two refund rows totaling 2558 minor units. The
+6. PostgreSQL contained exactly two refund rows totaling 2558 minor units. The
    first retained its reason and note; the second correctly kept both absent.
 7. Browser warning and error logs were empty.
 

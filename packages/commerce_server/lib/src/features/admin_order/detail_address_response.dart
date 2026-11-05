@@ -20,7 +20,7 @@ final class AdminOrderAddressResponse with _$AdminOrderAddressResponse {
     required this.phone,
   });
 
-  /// Decodes the JSON object selected by SQLite.
+  /// Decodes the JSON object selected by PostgreSQL.
   factory AdminOrderAddressResponse.fromJson(Map<String, Object?> json) =>
       _$AdminOrderAddressResponseFromJson(json);
 

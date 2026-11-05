@@ -56,7 +56,7 @@ final class LineItemResponse with _$LineItemResponse {
   final String? variantTitle;
 }
 
-/// Builds [Money] from a JSON object selected by SQLite.
+/// Builds [Money] from a JSON object selected by PostgreSQL.
 final class MoneyFromJson implements SqlxTryFrom<Money, String> {
   /// Creates the stateless converter.
   const MoneyFromJson();

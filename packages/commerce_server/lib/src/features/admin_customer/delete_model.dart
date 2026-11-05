@@ -21,7 +21,7 @@ final class AdminCustomerDeleteContext {
   @Sqlx(rename: 'auth_identity_count')
   final int authIdentityCount;
 
-  /// Raw SQLite account flag.
+  /// Raw PostgreSQL account flag.
   @Sqlx(rename: 'has_account')
   final int hasAccountValue;
 

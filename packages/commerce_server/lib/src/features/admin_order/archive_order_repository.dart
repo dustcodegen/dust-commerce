@@ -16,7 +16,7 @@ SELECT status FROM orders WHERE id = $1 AND deleted_at IS NULL
 ''')
   Future<Result<AdminArchiveOrderTarget?, SqlxError>> target(String orderId);
 
-  /// Archives an eligible order; SQLite owns `updated_at`.
+  /// Archives an eligible order; PostgreSQL owns `updated_at`.
   @Query(r'''
 UPDATE orders SET status = 'archived'
 WHERE id = $1 AND status IN ('completed', 'canceled')

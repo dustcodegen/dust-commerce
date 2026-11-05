@@ -40,7 +40,7 @@ the address, applies default flags atomically and returns the refreshed direct
 SQLx customer allowlist through one flat `Result` boundary.
 
 The unreleased `customer_addresses` migration is its one-shot final table: no
-appended `ALTER TABLE` migration exists. SQLite owns ISO-8601 UTC `created_at`
+appended `ALTER TABLE` migration exists. PostgreSQL owns UTC `TIMESTAMPTZ` `created_at`
 and `updated_at`, nullable source fields remain nullable SQL data, and the
 reversible down file drops the table cleanly.
 

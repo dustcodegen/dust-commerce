@@ -63,7 +63,7 @@ void main() {
     expect(rows.single.readIndex<int>(0), 1);
   });
 
-  test('updates value and lets SQLite generate the mutation timestamp',
+  test('updates value and lets PostgreSQL generate the mutation timestamp',
       () async {
     await harness.raw(
       "UPDATE product_types SET updated_at = '2000-01-01T00:00:00.000Z' "

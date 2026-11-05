@@ -35,7 +35,7 @@ and detail refresh follow those source boundaries.
 route guard and also requires `AuthenticatedAdmin` in the handler. One direct
 SQLx statement soft-deletes only an active address owned by the active customer;
 a foreign customer/address pair, missing record, inactive parent or repeated
-request returns `404` without a write. SQLite owns `deleted_at` and the existing
+request returns `404` without a write. PostgreSQL owns `deleted_at` and the existing
 trigger owns `updated_at`.
 
 The exact Medusa-shaped acknowledgement contains `id`, `object`, `deleted` and

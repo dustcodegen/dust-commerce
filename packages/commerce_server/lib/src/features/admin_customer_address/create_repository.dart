@@ -9,7 +9,7 @@ abstract final class AdminCustomerAddressCreateRepository {
   const factory AdminCustomerAddressCreateRepository(Executor db) =
       _$AdminCustomerAddressCreateRepository;
 
-  /// Inserts beneath one active customer and lets SQLite own audit timestamps.
+  /// Inserts beneath one active customer and lets PostgreSQL own audit timestamps.
   @Query(r'''
 INSERT INTO customer_addresses (
   id, customer_id, address_name, first_name, last_name, company, phone,

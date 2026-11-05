@@ -42,7 +42,7 @@ ids; inactive groups, customers and memberships are excluded.
 The unreleased final schema uses one reversible migration for
 `customer_groups` and one for `customer_group_customers`, without an appended
 `ALTER TABLE`. Inline comments explain identity, ownership, metadata,
-membership history and timestamp behavior. SQLite generates sortable ISO-8601
+membership history and timestamp behavior. PostgreSQL generates UTC `TIMESTAMPTZ`
 UTC timestamps and maintains `updated_at`; active membership uniqueness still
 allows a customer to be re-added after a soft deletion.
 

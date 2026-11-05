@@ -33,7 +33,7 @@ not invent a completion button.
 - The serialized SQLx transaction updates only `orders.status`, then reads the
   refreshed direct SQLx response.
 - No migration or `completed_at` column was added because Medusa's order model
-  has neither. SQLite's existing trigger owns the UTC `updated_at` mutation.
+  has neither. PostgreSQL's existing trigger owns the UTC `updated_at` mutation.
 - Payment and fulfillment remain independent facts and are never fabricated by
   completion.
 

@@ -17,7 +17,7 @@ final class AdminFulfillmentLabelResponse with _$AdminFulfillmentLabelResponse {
     required this.updatedAt,
   });
 
-  /// Decodes one JSON object selected by SQLite.
+  /// Decodes one JSON object selected by PostgreSQL.
   factory AdminFulfillmentLabelResponse.fromJson(Map<String, Object?> json) =>
       _$AdminFulfillmentLabelResponseFromJson(json);
 

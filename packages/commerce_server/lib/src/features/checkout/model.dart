@@ -53,7 +53,7 @@ final class OrderResponse implements Serializable {
     this.shippingPickupName,
   });
 
-  /// Billing address encoded by SQLite's JSON functions.
+  /// Billing address encoded by PostgreSQL's JSON functions.
   @Sqlx(rename: 'billing_address_json')
   final String billingAddressJson;
 
@@ -141,7 +141,7 @@ final class OrderResponse implements Serializable {
   @Sqlx(rename: 'tax_rate')
   final int regionTaxRate;
 
-  /// Shipping address encoded by SQLite's JSON functions.
+  /// Shipping address encoded by PostgreSQL's JSON functions.
   @Sqlx(rename: 'shipping_address_json')
   final String shippingAddressJson;
 
@@ -169,7 +169,7 @@ final class OrderResponse implements Serializable {
   @Sqlx(rename: 'shipping_pickup_name')
   final String? shippingPickupName;
 
-  /// Payment lifecycle value stored in SQLite.
+  /// Payment lifecycle value stored in PostgreSQL.
   @Sqlx(rename: 'payment_status')
   final String storedPaymentStatus;
 
@@ -177,7 +177,7 @@ final class OrderResponse implements Serializable {
   @Sqlx(rename: 'fulfillment_status')
   final String storedFulfillmentStatus;
 
-  /// Order lifecycle value stored in SQLite.
+  /// Order lifecycle value stored in PostgreSQL.
   @Sqlx(rename: 'status')
   final String storedStatus;
 

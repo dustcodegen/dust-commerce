@@ -42,11 +42,11 @@ empty, incorrectly typed, and oversized requests are rejected before storage.
 
 The route sits below `AdminAuth` and explicitly extracts
 `AuthenticatedAdmin`. Its repository updates only an active address owned by
-the supplied active customer. SQLite JSON presence checks preserve the
+the supplied active customer. PostgreSQL JSON presence checks preserve the
 omitted-versus-null distinction without an ORM or a second model conversion.
 
 One SQLx transaction applies the patch and refetches the direct customer-detail
-allowlist. SQLite owns default-address uniqueness and automatic UTC
+allowlist. PostgreSQL owns default-address uniqueness and automatic UTC
 `updated_at`; the application passes no clock value. Missing, deleted,
 foreign-parent, and inactive-parent addresses return the same not-found
 boundary without disclosing ownership. Storage failure rolls back both field

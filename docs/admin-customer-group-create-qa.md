@@ -92,7 +92,7 @@ Authenticated browser QA verified:
 - submitting `  Regional Partners  ` stores and displays `Regional Partners`;
 - the refreshed newest-first list increases from 12 to 13 groups;
 - the new group reports zero customers and the exact success message;
-- SQLite stores non-null `created_by`, null metadata and matching generated
+- PostgreSQL stores non-null `created_by`, null metadata and matching generated
   `created_at`/`updated_at` instants;
 - the default compact layout remains usable;
 - `1440 x 1000` renders the 720 px source body and half-width Name field; and
