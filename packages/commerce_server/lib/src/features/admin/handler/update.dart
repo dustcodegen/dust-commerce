@@ -116,15 +116,20 @@ Future<Result<AdminProductDetailResponse, Rejection>>
     (decoded as Ok<AdminUpdateProductOrganization, Rejection>).value,
   );
   return switch (result) {
-    Ok(value: Ok(value: final product)) => Ok(product),
-    Ok(value: Err(error: AdminUpdateProductOrganizationFailure.notFound)) =>
+    Ok(:final value) => Ok(value),
+    Err(
+      error: AdminUpdateProductOrganizationRejected(
+        failure: AdminUpdateProductOrganizationFailure.notFound,
+      )
+    ) =>
       Err(Rejection.notFound('Product "$id"')),
-    Ok(
-      value: Err(
-        error: AdminUpdateProductOrganizationFailure.invalidProductType
+    Err(
+      error: AdminUpdateProductOrganizationRejected(
+        failure: AdminUpdateProductOrganizationFailure.invalidProductType,
       )
     ) =>
       const Err(Rejection.status(422, 'Choose an active product type')),
-    Err() => const Err(Rejection.internal()),
+    Err(error: AdminUpdateProductOrganizationStorage()) =>
+      const Err(Rejection.internal()),
   };
 }
