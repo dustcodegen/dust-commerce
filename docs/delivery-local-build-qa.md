@@ -34,22 +34,23 @@ intentional.
 
 ## Current merged revision
 
-On 2026-11-06, merged `main` revision `3eade5bbe425c572044808dc4f7e56cc01d9963e`
-also passed local release packaging with the repository API origin:
+On 2026-11-06, merged `main` revision `e201be23` passed local release
+packaging with the repository API origin:
 
 ```bash
 (cd apps/commerce_app && flutter build web --release \
   --dart-define=API_BASE_URL=http://127.0.0.1:3878 \
-  --output=/tmp/dust-commerce-store-build)
+  --output=/tmp/dust-commerce-store-build-e201be23)
 (cd apps/admin_app && flutter build web --release \
   --dart-define=API_BASE_URL=http://127.0.0.1:3878 \
-  --output=/tmp/dust-commerce-admin-build)
+  --output=/tmp/dust-commerce-admin-build-e201be23)
 dart compile exe packages/commerce_server/bin/server.dart \
-  -o /tmp/dust-commerce-server-3eade5bb
+  -o /tmp/dust-commerce-server-e201be23
 ```
 
 The Store and Admin builds completed with Flutter's WebAssembly dry run, and
-the API executable was produced. Post-merge CI `42112098620` passed all
-repository verification steps. Delivery `42114289109` still fails closed at
-the production-origin check with `PRODUCTION_API_BASE_URL` unset; it does not
-indicate an artifact compilation failure.
+the API executable was produced. Post-merge CI `42117128722` passed all
+repository verification steps for this revision. Delivery `42119251765`
+still fails closed at the production-origin check with
+`PRODUCTION_API_BASE_URL` unset; it does not indicate an artifact compilation
+failure.
