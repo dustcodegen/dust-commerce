@@ -35,16 +35,29 @@ Future<Result<AdminProductDetailResponse, Rejection>>
     (decoded as Ok<AdminUpdateVariantPrices, Rejection>).value,
   );
   return switch (result) {
-    Ok(value: Ok(value: final product)) => Ok(product),
-    Ok(value: Err(error: AdminUpdateVariantPricesFailure.notFound)) =>
+    Ok(:final value) => Ok(value),
+    Err(
+      error: AdminUpdateVariantPricesRejected(
+        failure: AdminUpdateVariantPricesFailure.notFound,
+      )
+    ) =>
       Err(Rejection.notFound('Product variant "$variantId"')),
-    Ok(value: Err(error: AdminUpdateVariantPricesFailure.invalidPrices)) =>
+    Err(
+      error: AdminUpdateVariantPricesRejected(
+        failure: AdminUpdateVariantPricesFailure.invalidPrices,
+      )
+    ) =>
       const Err(Rejection.status(
         422,
         'Set one non-negative price for every active currency',
       )),
-    Ok(value: Err(error: AdminUpdateVariantPricesFailure.unavailable)) =>
+    Err(
+      error: AdminUpdateVariantPricesRejected(
+        failure: AdminUpdateVariantPricesFailure.unavailable,
+      )
+    ) =>
       const Err(Rejection.internal()),
-    Err() => const Err(Rejection.internal()),
+    Err(error: AdminUpdateVariantPricesStorage()) =>
+      const Err(Rejection.internal()),
   };
 }
