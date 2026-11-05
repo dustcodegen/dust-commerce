@@ -1479,6 +1479,10 @@
   "@order_transfer_unavailable": {
     "description": "Indistinguishable invalid or expired capability feedback."
   },
+  "in_stock": "ပစ္စည်းလက်ကျန်ရှိပါသည်",
+  "@in_stock": {
+    "description": "Available selected variant label."
+  },
   "origin_country": "ထုတ်လုပ်သည့်နိုင်ငံ",
   "@origin_country": {
     "description": "Product origin fact label."

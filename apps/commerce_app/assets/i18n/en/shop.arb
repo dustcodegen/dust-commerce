@@ -1479,6 +1479,10 @@
   "@order_transfer_unavailable": {
     "description": "Indistinguishable invalid or expired capability feedback."
   },
+  "in_stock": "In stock",
+  "@in_stock": {
+    "description": "Available selected variant label."
+  },
   "origin_country": "Country of origin",
   "@origin_country": {
     "description": "Product origin fact label."
