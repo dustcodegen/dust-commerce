@@ -31,3 +31,25 @@ before building artifacts because the repository variable
 deployment origin is still required before a release artifact can be
 considered production-ready; the fail-closed workflow guard remains
 intentional.
+
+## Current merged revision
+
+On 2026-11-06, merged `main` revision `3eade5bbe425c572044808dc4f7e56cc01d9963e`
+also passed local release packaging with the repository API origin:
+
+```bash
+(cd apps/commerce_app && flutter build web --release \
+  --dart-define=API_BASE_URL=http://127.0.0.1:3878 \
+  --output=/tmp/dust-commerce-store-build)
+(cd apps/admin_app && flutter build web --release \
+  --dart-define=API_BASE_URL=http://127.0.0.1:3878 \
+  --output=/tmp/dust-commerce-admin-build)
+dart compile exe packages/commerce_server/bin/server.dart \
+  -o /tmp/dust-commerce-server-3eade5bb
+```
+
+The Store and Admin builds completed with Flutter's WebAssembly dry run, and
+the API executable was produced. Post-merge CI `42112098620` passed all
+repository verification steps. Delivery `42114289109` still fails closed at
+the production-origin check with `PRODUCTION_API_BASE_URL` unset; it does not
+indicate an artifact compilation failure.
