@@ -31,6 +31,27 @@ The functional Customer Service route is documented in
 [customer-service-qa.md](customer-service-qa.md) as a Morrow extension because
 the pinned DTC source has no equivalent route.
 
+## Order receipt line ordering slice
+
+The pinned Medusa DTC order-detail component renders order items newest first,
+using `created_at` as the primary sort and the item id as a stable tie-breaker.
+Dust now applies the same ordering in the Store order, customer-order and
+customer-order-list SQL projections instead of relying on PostgreSQL's
+unspecified aggregate order. The regression test in
+`packages/commerce_server/test/checkout/orders_test.dart` updates two fixture
+line timestamps and verifies the public response returns the newer line first.
+
+The focused gate passed on 2026-11-05 with the host PostgreSQL instance:
+
+```text
+DUST_DATABASE_URL=postgres://dust:dust@127.0.0.1:5432/dust_commerce?sslmode=disable
+dart test test/checkout/orders_test.dart
+6 tests passed
+```
+
+The dedicated local PostgreSQL container was still in recovery during the
+first attempt; no code failure was attributed to that infrastructure state.
+
 ## Source-to-Dust map
 
 | Medusa source | Flutter/Dust owner | Status |
