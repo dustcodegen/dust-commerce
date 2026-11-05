@@ -23,6 +23,9 @@ must be backed by the source, tests and browser evidence recorded below.
 
 The latest live local smoke is recorded in
 [storefront-local-smoke-qa.md](storefront-local-smoke-qa.md).
+The current package-level verification is recorded in
+[storefront-verification-qa.md](storefront-verification-qa.md); it is the
+authoritative non-widget Dust/analyzer/test gate for the storefront revision.
 
 The functional Customer Service route is documented in
 [customer-service-qa.md](customer-service-qa.md) as a Morrow extension because
