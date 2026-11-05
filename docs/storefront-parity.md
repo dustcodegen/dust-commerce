@@ -52,6 +52,24 @@ dart test test/checkout/orders_test.dart
 The dedicated local PostgreSQL container was still in recovery during the
 first attempt; no code failure was attributed to that infrastructure state.
 
+## Selected-variant availability slice
+
+Current Medusa DTC source renders an explicit `In stock` or `Out of stock`
+status below the selected variant price in
+`apps/storefront/src/modules/products/components/product-actions/index.tsx`.
+Dust now keeps that status in the standalone `ProductAvailability` component,
+uses the same `ProductVariant.isInStock` rule as the purchase button, and
+leaves the label hidden until a complete variant selection exists. The compact
+sticky action remains source-shaped: its button still carries the actionable
+state, while the inline product action owns the status label.
+
+The non-widget source-conversion gate passed on 2026-11-05:
+
+```text
+flutter test apps/commerce_app/test/storefront/source_conversion_test.dart
+10 tests passed
+```
+
 ## Source-to-Dust map
 
 | Medusa source | Flutter/Dust owner | Status |
