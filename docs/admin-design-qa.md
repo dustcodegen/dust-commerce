@@ -290,7 +290,7 @@ raster is available, so pixel parity is not claimed.
   four-column drag ordering, selection, deletion, thumbnail promotion, Cancel
   cleanup and Save are wired to one authenticated generated-client operation.
   A browser pass reordered two real images, changed the thumbnail, saved, and
-  confirmed compact ranks plus the new thumbnail in SQLite. Browser logs had no
+  confirmed compact ranks plus the new thumbnail in PostgreSQL. Browser logs had no
   errors.
 - Selecting one media item exposes Delete and Manage associated variants. The
   drawer persists add/remove deltas through the guarded generated client,
@@ -343,7 +343,7 @@ raster is available, so pixel parity is not claimed.
 - Product list rows and the detail General card now expose one shared
   source-shaped Edit/Delete action menu. Browser QA deleted a temporary
   published product through the confirmation, observed the row disappear and
-  independently received Store `404`. SQLite retained the product, variant and
+  independently received Store `404`. PostgreSQL retained the product, variant and
   two price rows with generated deletion timestamps. Global options remain
   active, while product-exclusive options are retired transactionally. Thirty
   non-widget Admin and 273 server tests pass; no widget tests were added.
@@ -529,7 +529,7 @@ raster is available, so pixel parity is not claimed.
   order #1 opened the `Are you sure?` prompt, rendered Medusa's irreversible
   warning, showed the unavailable notification switch disabled, and continued
   once. The order and fulfillment badges refreshed from Shipped to Delivered,
-  while SQLite retained `shipped_at`, `MORROW-TRACK-001` and generated UTC
+  while PostgreSQL retained `shipped_at`, `MORROW-TRACK-001` and generated UTC
   `delivered_at` value `2026-09-14T00:10:07.063Z`. The terminal card removed
   both lifecycle actions. All 100 non-widget Admin tests and all 429 server
   tests pass; analyzer, Dust checks and the Admin release web build are clean.
@@ -543,7 +543,7 @@ raster is available, so pixel parity is not claimed.
   exact `Are you sure?` warning and continued once. The refreshed order changed
   from Fulfilled to Not fulfilled, retained Fulfillment #1 as Canceled, disabled
   its Cancel action and exposed Create fulfillment again; reopening the form
-  offered the original `2 / 2` units. SQLite stored
+  offered the original `2 / 2` units. PostgreSQL stored
   `2026-09-14T00:34:07.240Z` and `owner@morrow.local` as the cancellation actor,
   with shipped and delivered timestamps absent. All 104 non-widget Admin, 435
   server and 11 Admin-contract tests pass; analyzers and all Dust checks are
@@ -570,7 +570,7 @@ raster is available, so pixel parity is not claimed.
 - Customer-group edit now follows the pinned General-card action and 560 px
   right-side drawer. Live QA opened Edit, validated empty input, renamed VIP
   Customers to VIP Members, restored the normalized canonical name, observed
-  the exact success message and confirmed SQLite advanced its database-owned
+  the exact success message and confirmed PostgreSQL advanced its database-owned
   timestamp. Compact and `1440 x 1000` layouts, Escape dismissal and final
   browser logs passed. All 146 non-widget Admin and 527 server tests pass; both
   Dust modes and analyzers are clean, and no widget test was added.

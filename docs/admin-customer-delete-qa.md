@@ -38,7 +38,7 @@ email is explicitly absent.
 extracts `AuthenticatedAdmin` in the handler. One SQLx transaction:
 
 - reads authentication ownership through a direct `FromRow` projection;
-- soft-deletes the customer and active reusable addresses with SQLite time;
+- soft-deletes the customer and active reusable addresses with PostgreSQL time;
 - preserves carts, orders and immutable order history;
 - deletes tokens and verification capabilities for an exclusive identity;
 - soft-deletes its provider and auth identities; or

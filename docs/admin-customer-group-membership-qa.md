@@ -47,7 +47,7 @@ returns the direct customer-group detail projection. Invalid customers cannot
 partially remove valid members, and an injected insert failure rolls the whole
 batch back.
 
-Existing adds and absent removals are idempotent. SQLite owns membership
+Existing adds and absent removals are idempotent. PostgreSQL owns membership
 creation, update, and deletion timestamps; the authenticated Admin id is stored
 as the creation actor. The service returns one flat
 `Result<Option<AdminCustomerGroupDetailResult>,

@@ -31,7 +31,7 @@ body scrolls. Success closes the focus route and opens the created customer.
 - Duplicate active guest email is a typed conflict. A registered customer may
   retain the same email because Admin creation must not claim or alter account
   ownership.
-- SQLite owns both UTC audit timestamps. The command accepts only an id source;
+- PostgreSQL owns both UTC audit timestamps. The command accepts only an id source;
   it has no application clock parameter.
 - The generated Admin client serializes the typed body and decodes the explicit
   detail response. Dio remains the only owner of Authorization.

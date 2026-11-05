@@ -44,7 +44,7 @@ checkout boundary was corrected before QA continued:
   of a nested result, while retaining the original SQLx cause internally.
 - Guest checkout atomically upserts one active `has_account = 0` profile per
   email from the shipping contact.
-- SQLite generates `created_at` and maintains `updated_at`; checkout supplies
+- PostgreSQL generates `created_at` and maintains `updated_at`; checkout supplies
   neither timestamp.
 - Guest orders intentionally retain `customer_id = NULL`, preserving the
   existing secure order-transfer flow until a registered customer claims them.

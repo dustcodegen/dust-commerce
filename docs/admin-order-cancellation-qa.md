@@ -24,7 +24,7 @@ Pinned source truth:
 - One serialized transaction cancels the order and payment collection, writes
   a refund audit for captured manual payments, restores managed inventory, and
   records the authenticated actor.
-- SQLite owns UTC audit timestamps. The Dart clock is not used for table audit
+- PostgreSQL owns UTC audit timestamps. The Dart clock is not used for table audit
   data.
 - Unknown payment providers, active fulfillments, completed orders, missing
   orders, and repeated cancellation are rejected before a partial write.
@@ -70,7 +70,7 @@ with API `3878`, Store `13001`, and Admin `13002`.
    Refunded and disabled Cancel.
 5. Database verification showed one USD 22.00 refund, payment collection
    Canceled, inventory restored exactly to 20, and `canceled_by` resolved to
-   `owner@example.com` with SQLite-generated UTC timestamps.
+   `owner@example.com` with PostgreSQL-generated UTC timestamps.
 6. A repeated request returned `422 Order is already canceled`; the refund
    count remained one and inventory remained 20.
 

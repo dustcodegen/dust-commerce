@@ -29,7 +29,7 @@ disabled or simulated action in this slice.
 - Guest email is required and conflicts only with another active guest.
   Registered-account email ownership is immutable; omitted email retains the
   stored value. Other nullable fields may be cleared.
-- SQLite owns `updated_at`; neither the contract nor service accepts a clock.
+- PostgreSQL owns `updated_at`; neither the contract nor service accepts a clock.
 - The generated Admin client accepts a typed body and no token. Dio remains the
   sole Authorization owner.
 - Dedicated Dust edit state retains an `Option<AdminCustomerDetail>` or one

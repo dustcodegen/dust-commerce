@@ -23,7 +23,7 @@ expose an archive control, so Morrow does not invent one.
 - The original one-shot `orders` migration includes `archived`; no appended
   `ALTER TABLE` migration and no invented `archived_at` column were added.
 - Archiving a canceled order preserves `canceled_at` and `canceled_by`.
-- SQLite's existing trigger owns the UTC `updated_at` value.
+- PostgreSQL's existing trigger owns the UTC `updated_at` value.
 - Store and Admin response contracts decode the typed archived status.
 - Archived orders cannot start or capture a payment.
 - `POST /admin/orders/:id/archive` is bodyless, protected by the parent Admin

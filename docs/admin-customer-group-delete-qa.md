@@ -38,7 +38,7 @@ rows, or deletion timestamps.
 
 `DELETE /admin/customer-groups/{id}` runs below the parent Admin route guard and
 also extracts `AuthenticatedAdmin`. One SQLx transaction soft-deletes the active
-group and all active membership rows. SQLite generates every `deleted_at` and
+group and all active membership rows. PostgreSQL generates every `deleted_at` and
 `updated_at`; no application clock, `ALTER TABLE`, or replacement migration is
 introduced. Missing, repeated, and retired targets return `404`, and an injected
 membership failure proves the group update rolls back.
