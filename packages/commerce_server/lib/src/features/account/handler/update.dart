@@ -58,8 +58,7 @@ Future<Result<PasswordChanged, Rejection>> updatePasswordHandler(
   if (decoded case Err(:final error)) return Err(error);
   final deps = await request.state<AccountDeps>();
 
-  late final Result<Result<PasswordChanged, ChangePasswordFailure>, SqlxError>
-      result;
+  late final Result<PasswordChanged, ChangePasswordError> result;
   try {
     result = await changeCustomerPassword(
       deps.database,
@@ -74,16 +73,24 @@ Future<Result<PasswordChanged, Rejection>> updatePasswordHandler(
     );
   }
   return switch (result) {
-    Ok(value: Ok(value: final changed)) => Ok(changed),
-    Ok(value: Err(error: ChangePasswordFailure.invalidCurrentPassword)) =>
+    Ok(value: final changed) => Ok(changed),
+    Err(
+      error: ChangePasswordRejected(
+        failure: ChangePasswordFailure.invalidCurrentPassword,
+      )
+    ) =>
       const Err(Rejection.unprocessable({
         'old_password': ['Current password is incorrect'],
       })),
-    Ok(value: Err(error: ChangePasswordFailure.unchanged)) =>
+    Err(
+      error: ChangePasswordRejected(
+        failure: ChangePasswordFailure.unchanged,
+      )
+    ) =>
       const Err(Rejection.unprocessable({
         'new_password': ['Use a different password'],
       })),
-    Err() => const Err(Rejection.internal()),
+    Err(error: ChangePasswordStorage()) => const Err(Rejection.internal()),
   };
 }
 

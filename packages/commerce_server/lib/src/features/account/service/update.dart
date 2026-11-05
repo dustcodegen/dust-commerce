@@ -15,6 +15,30 @@ enum ChangePasswordFailure {
   unchanged,
 }
 
+/// Error crossing the password-rotation service boundary.
+sealed class ChangePasswordError {
+  /// Creates one password error.
+  const ChangePasswordError();
+}
+
+/// A business rejection that is safe to expose to the handler.
+final class ChangePasswordRejected extends ChangePasswordError {
+  /// Creates one business rejection.
+  const ChangePasswordRejected(this.failure);
+
+  /// The stable business reason.
+  final ChangePasswordFailure failure;
+}
+
+/// A storage failure retained for logging without exposing SQL details.
+final class ChangePasswordStorage extends ChangePasswordError {
+  /// Creates one storage failure.
+  const ChangePasswordStorage(this.cause);
+
+  /// The original SQLx failure.
+  final SqlxError cause;
+}
+
 /// Consumes one live verification capability exactly once.
 Future<Result<bool, SqlxError>> confirmCustomerEmail(
   AccountUpdateRepository updates,
@@ -32,8 +56,7 @@ Future<Result<bool, SqlxError>> confirmCustomerEmail(
 }
 
 /// Verifies and rotates a credential, then atomically revokes every session.
-Future<Result<Result<PasswordChanged, ChangePasswordFailure>, SqlxError>>
-    changeCustomerPassword(
+Future<Result<PasswordChanged, ChangePasswordError>> changeCustomerPassword(
   CommerceDatabase database,
   AccountReadRepository reads,
   String customerId,
@@ -41,12 +64,16 @@ Future<Result<Result<PasswordChanged, ChangePasswordFailure>, SqlxError>>
   required PasswordWorkLimiter passwordWork,
 }) async {
   final found = await reads.credentialForCustomer(customerId);
-  if (found case Err(:final error)) return Err(error);
+  if (found case Err(:final error)) {
+    return Err(ChangePasswordStorage(error));
+  }
   final credential = optionOf(
     (found as Ok<PasswordCredential?, SqlxError>).value,
   );
   if (credential case None()) {
-    return const Ok(Err(ChangePasswordFailure.invalidCurrentPassword));
+    return const Err(
+      ChangePasswordRejected(ChangePasswordFailure.invalidCurrentPassword),
+    );
   }
   final current = (credential as Some<PasswordCredential>).value;
   final valid = await Passwords.verify(
@@ -55,32 +82,44 @@ Future<Result<Result<PasswordChanged, ChangePasswordFailure>, SqlxError>>
     limiter: passwordWork,
   );
   if (!valid) {
-    return const Ok(Err(ChangePasswordFailure.invalidCurrentPassword));
+    return const Err(
+      ChangePasswordRejected(ChangePasswordFailure.invalidCurrentPassword),
+    );
   }
   if (input.newPassword == input.oldPassword) {
-    return const Ok(Err(ChangePasswordFailure.unchanged));
+    return const Err(ChangePasswordRejected(ChangePasswordFailure.unchanged));
   }
   final newHash = await Passwords.hash(
     input.newPassword,
     limiter: passwordWork,
   );
 
-  return database.transaction((tx) async {
-    final updated = await AccountUpdateRepository(tx).updatePassword(
-      current.authIdentityId,
-      current.passwordHash,
-      newHash,
-    );
-    if (updated case Err(:final error)) return Err(error);
-    if ((updated as Ok<ExecResult, SqlxError>).value.rowsAffected != 1) {
-      return const Ok(Err(ChangePasswordFailure.invalidCurrentPassword));
-    }
-    final revoked = await AccountDeleteRepository(tx).revokeIdentityTokens(
-      current.authIdentityId,
-    );
-    if (revoked case Err(:final error)) return Err(error);
-    return const Ok(Ok(PasswordChanged(success: true)));
-  });
+  return transactionResult<PasswordChanged, ChangePasswordError>(
+    database,
+    (tx) async {
+      final updated = await AccountUpdateRepository(tx).updatePassword(
+        current.authIdentityId,
+        current.passwordHash,
+        newHash,
+      );
+      if (updated case Err(:final error)) {
+        return Err(ChangePasswordStorage(error));
+      }
+      if ((updated as Ok<ExecResult, SqlxError>).value.rowsAffected != 1) {
+        return const Err(
+          ChangePasswordRejected(ChangePasswordFailure.invalidCurrentPassword),
+        );
+      }
+      final revoked = await AccountDeleteRepository(tx).revokeIdentityTokens(
+        current.authIdentityId,
+      );
+      if (revoked case Err(:final error)) {
+        return Err(ChangePasswordStorage(error));
+      }
+      return const Ok(PasswordChanged(success: true));
+    },
+    storageError: ChangePasswordStorage.new,
+  );
 }
 
 /// Replaces the editable profile fields of one authenticated customer.
