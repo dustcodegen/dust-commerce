@@ -27,13 +27,27 @@ Future<Result<AdminProductDetailResponse, Rejection>>
     (decoded as Ok<AdminUpdateProductStock, Rejection>).value,
   );
   return switch (result) {
-    Ok(value: Ok(value: final product)) => Ok(product),
-    Ok(value: Err(error: AdminUpdateProductStockFailure.notFound)) =>
+    Ok(:final value) => Ok(value),
+    Err(
+      error: AdminUpdateProductStockRejected(
+        failure: AdminUpdateProductStockFailure.notFound,
+      )
+    ) =>
       Err(Rejection.notFound('A selected product variant')),
-    Ok(value: Err(error: AdminUpdateProductStockFailure.invalid)) => const Err(
-        Rejection.status(422, 'Choose unique variants and valid stock')),
-    Ok(value: Err(error: AdminUpdateProductStockFailure.unavailable)) =>
+    Err(
+      error: AdminUpdateProductStockRejected(
+        failure: AdminUpdateProductStockFailure.invalid,
+      )
+    ) =>
+      const Err(
+          Rejection.status(422, 'Choose unique variants and valid stock')),
+    Err(
+      error: AdminUpdateProductStockRejected(
+        failure: AdminUpdateProductStockFailure.unavailable,
+      )
+    ) =>
       const Err(Rejection.internal()),
-    Err() => const Err(Rejection.internal()),
+    Err(error: AdminUpdateProductStockStorage()) =>
+      const Err(Rejection.internal()),
   };
 }
