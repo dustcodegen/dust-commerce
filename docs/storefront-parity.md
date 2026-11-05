@@ -122,7 +122,7 @@ rows, and sort radio rows keep the source compact 12px/20px text rhythm; the
 category and label checkbox controls also keep the source top offset.
 
 Store search was browser-verified on 2026-09-26 against commit `d89bed8` using
-a fresh seeded SQLite database and the live Store on `127.0.0.1:13001`. The nav
+a fresh seeded PostgreSQL database and the live Store on `127.0.0.1:13001`. The nav
 search opens the right-side drawer with the source title, close action,
 placeholder, start state and clear control; `tee` returns Classic White Tee,
 Heavyweight Black Tee and Split Raglan Tee; `zzzz` renders the explicit empty

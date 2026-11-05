@@ -1,6 +1,6 @@
 # Architecture
 
-One request, from a Flutter widget to a SQLite row and back, and what is
+One request, from a Flutter widget to a PostgreSQL row and back, and what is
 generated along the way.
 
 - [Backend module structure](backend-structure.md) — where server code goes.
@@ -23,7 +23,7 @@ service/list.dart      the rules: what is published, what it costs
   ↓
 CatalogRepository      GENERATED from @Query, SQL checked against the schema
   ↓
-SQLite
+PostgreSQL
 ```
 
 Back up the same path, one thing matters: the server encodes with

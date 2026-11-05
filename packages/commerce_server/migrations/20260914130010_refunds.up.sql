@@ -22,7 +22,7 @@ CREATE TABLE refunds (
   created_by            TEXT REFERENCES admin_users (id) ON DELETE SET NULL,
   -- Provider-private response data remains valid JSON and outside Store DTOs.
   metadata              TEXT,
-  -- SQLite owns the actual refund event time for every writer.
+  -- PostgreSQL owns the actual refund event time for every writer.
   created_at TIMESTAMPTZ NOT NULL DEFAULT
                         (CURRENT_TIMESTAMP),
   -- Soft deletion retains reconciliation history without presenting it active.

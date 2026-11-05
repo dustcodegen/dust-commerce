@@ -23,7 +23,7 @@ CREATE TABLE fulfillment_labels (
       lower(label_url) LIKE 'https://%'
     )
   ),
-  -- SQLite owns creation time so every shipment writer records consistent UTC.
+  -- PostgreSQL owns creation time so every shipment writer records consistent UTC.
   created_at TIMESTAMPTZ NOT NULL DEFAULT
                   (CURRENT_TIMESTAMP),
   -- The trigger below owns mutation time; application code never supplies it.

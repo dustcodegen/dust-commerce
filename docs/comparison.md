@@ -18,7 +18,7 @@ payment, and a basic customer account.
 
 | | Medusa | dust-commerce |
 | :--- | :--- | :--- |
-| Schema | modular PostgreSQL schemas | 38 SQLite tables |
+| Schema | modular PostgreSQL schemas | one PostgreSQL schema with 59 reversible tables |
 | Admin API | broad modular API | isolated identity and product-management slices (22 protected generated-client operations plus public media reads) |
 | Generated client operations | broad Store API | 39 method/path operations |
 | Workflow engine and plugins | yes | none |
@@ -166,8 +166,8 @@ It uses its own contract package, provider name, secure-storage key, Axum-style
 route guard, generated client, and Flutter app. The bootstrap command is not an
 HTTP route. It accepts the initial password only through the process environment
 and stores an Argon2id PHC value. Admin token expiry is a Dart `DateTime`; Dust
-serializes it as ISO-8601 JSON, while persistence normalizes the instant to UTC
-text for SQLite.
+serializes it as ISO-8601 JSON, while persistence stores the instant in
+PostgreSQL `TIMESTAMPTZ` columns.
 
 The product-creation slice copies Medusa's full-screen Details, Organize and
 Variants progression while keeping a smaller domain. One guarded request writes
@@ -181,7 +181,7 @@ relationships. Those are not silently fabricated here.
 
 The post-create media slice copies Medusa's complete gallery replacement:
 retained image ids, new upload ids, display order and thumbnail travel in one
-admin-only request. SQLite shifts historical ranks before compacting active
+admin-only request. PostgreSQL shifts historical ranks before compacting active
 ones, then soft-deletes omitted links and updates the product thumbnail in the
 same transaction. The Flutter focus surface supports upload, grid drag-order,
 selection, deletion and thumbnail promotion. A second guarded batch operation
@@ -213,7 +213,7 @@ option memberships and product-exclusive option definitions remain as
 historical rows; reusable global options and immutable variant prices are not
 retired. Active handle and SKU indexes release identifiers immediately, and
 the separate Store query excludes the deleted graph. All timestamps come from
-SQLite defaults and update triggers rather than an application clock or an
+PostgreSQL defaults and update triggers rather than an application clock or an
 appended migration.
 
 Admin product queries use Medusa's `status`, `tag_id`, timestamp-comparison and
@@ -263,14 +263,13 @@ pinned DTC illustration, copy, 40% desktop column and action styling. It is a
 neutral page: accept and decline remain explicit POST actions, so mail-security
 link scanners cannot transfer an order merely by opening the message.
 
-### PostgreSQL timestamps become explicit SQLite UTC text
+### PostgreSQL timestamps stay native `TIMESTAMPTZ`
 
 Medusa's PostgreSQL migrations use `timestamptz not null default now()`.
-SQLite has no native `TIMESTAMPTZ`, so every automatic timestamp here is a
-stored ISO-8601 UTC `TEXT` value ending in `Z`, supplied by a database default;
-mutable root tables use triggers for `updated_at`. They are not generated
-columns. A PostgreSQL port should replace them with real `TIMESTAMPTZ` rather
-than copying this SQLite representation.
+This project uses the same native `TIMESTAMPTZ` boundary. PostgreSQL defaults
+create audit instants and triggers maintain `updated_at`; Dart contracts decode
+them as UTC `DateTime` values. They are not generated columns, and application
+clocks never write table audit timestamps.
 
 ## Not attempted
 
