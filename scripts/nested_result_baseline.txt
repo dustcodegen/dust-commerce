@@ -3,7 +3,6 @@ packages/commerce_server/lib/src/features/admin/service/create/import_confirm.da
 packages/commerce_server/lib/src/features/admin/service/create/import_preflight.dart:1
 packages/commerce_server/lib/src/features/admin/service/create/import_preview.dart:1
 packages/commerce_server/lib/src/features/admin/service/create/import_variant_preflight.dart:1
-packages/commerce_server/lib/src/features/admin/service/image_variants.dart:1
 packages/commerce_server/lib/src/features/admin/service/update.dart:1
 packages/commerce_server/lib/src/features/admin/service/update/organization.dart:1
 packages/commerce_server/lib/src/features/admin/service/update_media.dart:1

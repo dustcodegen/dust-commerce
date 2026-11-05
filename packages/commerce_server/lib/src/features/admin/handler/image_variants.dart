@@ -33,14 +33,23 @@ Future<Result<AdminBatchImageVariantsResult, Rejection>>
     (decoded as Ok<AdminBatchImageVariants, Rejection>).value,
   );
   return switch (result) {
-    Ok(value: Ok(value: final changed)) => Ok(changed),
-    Ok(value: Err(error: AdminBatchImageVariantsFailure.notFound)) =>
+    Ok(:final value) => Ok(value),
+    Err(
+      error: AdminBatchImageVariantsRejected(
+        failure: AdminBatchImageVariantsFailure.notFound,
+      )
+    ) =>
       Err(Rejection.notFound('Product image "$imageId"')),
-    Ok(value: Err(error: AdminBatchImageVariantsFailure.invalidVariants)) =>
+    Err(
+      error: AdminBatchImageVariantsRejected(
+        failure: AdminBatchImageVariantsFailure.invalidVariants,
+      )
+    ) =>
       const Err(Rejection.status(
         422,
         'Use unique active variants owned by this product',
       )),
-    Err() => const Err(Rejection.internal()),
+    Err(error: AdminBatchImageVariantsStorage()) =>
+      const Err(Rejection.internal()),
   };
 }
