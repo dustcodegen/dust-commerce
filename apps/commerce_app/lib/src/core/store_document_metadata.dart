@@ -80,3 +80,10 @@ void applyStoreDocumentMetadata(StoreDocumentMetadata metadata) =>
 
 /// Restores the shell metadata when leaving a product route.
 void resetStoreDocumentMetadata() => resetPlatformDocumentMetadata();
+
+/// Applies the home-route JSON-LD projection on document-capable platforms.
+void applyStoreHomeStructuredData(String structuredData) =>
+    applyPlatformHomeStructuredData(structuredData);
+
+/// Removes the home-route JSON-LD projection.
+void resetStoreHomeStructuredData() => resetPlatformHomeStructuredData();

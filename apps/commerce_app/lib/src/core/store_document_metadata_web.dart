@@ -20,7 +20,12 @@ void applyPlatformDocumentMetadata({
     _setMeta(document, property: 'og:image', content: imageUrl);
   }
   _setCanonical(document, canonicalUrl);
-  _setStructuredData(document, structuredData);
+  document.querySelector('script[data-dust-home-structured-data]')?.remove();
+  _setStructuredData(
+    document,
+    structuredData,
+    marker: 'data-dust-product-structured-data',
+  );
 }
 
 /// Restores the static shell metadata when the route is no longer a product.
@@ -38,6 +43,26 @@ void resetPlatformDocumentMetadata() {
   _removeMeta(document, property: 'og:image');
   document.querySelector('link[rel="canonical"]')?.remove();
   document.querySelector('script[data-dust-product-structured-data]')?.remove();
+  document.querySelector('script[data-dust-home-structured-data]')?.remove();
+}
+
+/// Applies home-route JSON-LD without replacing the product route script.
+void applyPlatformHomeStructuredData(String structuredData) {
+  web.document
+      .querySelector('script[data-dust-product-structured-data]')
+      ?.remove();
+  _setStructuredData(
+    web.document,
+    structuredData,
+    marker: 'data-dust-home-structured-data',
+  );
+}
+
+/// Removes home-route JSON-LD when leaving the catalogue route.
+void resetPlatformHomeStructuredData() {
+  web.document
+      .querySelector('script[data-dust-home-structured-data]')
+      ?.remove();
 }
 
 void _setCanonical(web.Document document, String href) {
@@ -71,14 +96,16 @@ void _removeMeta(web.Document document, {required String property}) {
   document.querySelector('meta[property="$property"]')?.remove();
 }
 
-void _setStructuredData(web.Document document, String content) {
-  final existing = document.querySelector(
-    'script[data-dust-product-structured-data]',
-  );
+void _setStructuredData(
+  web.Document document,
+  String content, {
+  required String marker,
+}) {
+  final existing = document.querySelector('script[$marker]');
   final script = existing == null
       ? (web.HTMLScriptElement()
         ..type = 'application/ld+json'
-        ..setAttribute('data-dust-product-structured-data', 'true'))
+        ..setAttribute(marker, 'true'))
       : existing as web.HTMLScriptElement;
   script.text = content;
   if (existing == null) document.head?.append(script);
