@@ -39,12 +39,20 @@ Future<Result<AdminProductDetailResponse, Rejection>> updateAdminProductHandler(
     (decoded as Ok<AdminUpdateProduct, Rejection>).value,
   );
   return switch (result) {
-    Ok(value: Ok(value: final product)) => Ok(product),
-    Ok(value: Err(error: AdminUpdateProductFailure.notFound)) =>
+    Ok(:final value) => Ok(value),
+    Err(
+      error: AdminUpdateProductRejected(
+        failure: AdminUpdateProductFailure.notFound,
+      )
+    ) =>
       Err(Rejection.notFound('Product "$id"')),
-    Ok(value: Err(error: AdminUpdateProductFailure.handleConflict)) =>
+    Err(
+      error: AdminUpdateProductRejected(
+        failure: AdminUpdateProductFailure.handleConflict,
+      )
+    ) =>
       const Err(Rejection.conflict('Another product already uses this handle')),
-    Err() => const Err(Rejection.internal()),
+    Err(error: AdminUpdateProductStorage()) => const Err(Rejection.internal()),
   };
 }
 
