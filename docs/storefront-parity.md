@@ -92,6 +92,28 @@ flutter test apps/commerce_app/test/storefront/product_document_metadata_test.da
 2 tests passed
 ```
 
+## Product structured-data slice
+
+The current Medusa product source publishes a schema.org Product or
+ProductGroup projection alongside the route metadata. Dust now builds the same
+customer-visible contract from the allowlisted `Product` model: currency-scoped
+prices, SKU, stock availability, product images, option properties and variant
+URLs. The browser implementation owns one marked `application/ld+json` script
+node and removes it when the product route is left; native Flutter targets use
+the no-op platform implementation.
+
+JSON-LD is serialized explicitly rather than by dumping the full response
+model. Merchant text escapes `<` before entering the script element, preventing
+a closing-script breakout while retaining the decoded product text for search
+consumers.
+
+The pure contract gate passed locally:
+
+```text
+flutter test apps/commerce_app/test/storefront/store_product_structured_data_test.dart
+3 tests passed
+```
+
 ## Source-to-Dust map
 
 | Medusa source | Flutter/Dust owner | Status |
