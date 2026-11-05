@@ -5,40 +5,11 @@ import 'package:commerce_server/src/features/account/crypto.dart';
 import 'package:commerce_server/src/features/account/mail.dart';
 import 'package:commerce_server/src/features/account/model.dart';
 import 'package:commerce_server/src/features/account/repository/repository.dart';
+import 'package:commerce_server/src/features/account/register_error.dart';
 import 'package:commerce_server/src/infra/database.dart';
 import 'package:commerce_server/src/infra/option.dart';
 import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_dart/db.dart';
-
-/// Why a customer account was not created.
-enum RegisterFailure {
-  /// An active account already owns this email address.
-  alreadyExists,
-}
-
-/// Error crossing the account-registration service boundary.
-sealed class RegisterAccountError {
-  /// Creates one registration error.
-  const RegisterAccountError();
-}
-
-/// A business rejection that is safe to expose to the handler.
-final class RegisterAccountRejected extends RegisterAccountError {
-  /// Creates one business rejection.
-  const RegisterAccountRejected(this.failure);
-
-  /// The stable business reason.
-  final RegisterFailure failure;
-}
-
-/// A storage failure retained for logging without exposing SQL details.
-final class RegisterAccountStorage extends RegisterAccountError {
-  /// Creates one storage failure.
-  const RegisterAccountStorage(this.cause);
-
-  /// The original SQLx failure.
-  final SqlxError cause;
-}
 
 /// Creates a customer, auth identity, and email provider atomically.
 Future<Result<RegisteredAccount, RegisterAccountError>> registerAccount(

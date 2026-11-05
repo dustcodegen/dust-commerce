@@ -4,7 +4,6 @@ import 'package:commerce_server/src/features/account/extractor.dart';
 import 'package:commerce_server/src/features/account/model.dart';
 import 'package:commerce_server/src/features/account/service/service.dart';
 import 'package:commerce_shared/commerce_shared.dart';
-import 'package:dust_dart/db.dart';
 import 'package:dust_server/server.dart';
 
 const ValidatedExtractable<UpdateCustomerProfileBody> _profileBody =
