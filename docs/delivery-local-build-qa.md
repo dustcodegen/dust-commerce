@@ -8,7 +8,7 @@ can accidentally point at a real service.
 
 ## Evidence
 
-On 2026-11-05, from `main` at `ac3ca26f`, these release commands completed
+On 2026-11-05, from `main` at `8f2ce096`, these release commands completed
 successfully:
 
 ```bash
@@ -21,10 +21,13 @@ dart compile exe packages/commerce_server/bin/server.dart \
 ```
 
 Both Flutter commands produced `build/web/index.html`; the Dart command
-produced an executable Linux API bundle. Flutter's release compiler also
+produced an executable Linux API bundle at
+`/tmp/dust-commerce-server-current`. Flutter's release compiler also
 completed its WebAssembly dry run for both applications.
 
-The post-merge Delivery run `42050466729` correctly stopped before building
-artifacts because the repository variable `PRODUCTION_API_BASE_URL` is not
-configured. A real absolute HTTP(S) deployment origin is still required
-before a release artifact can be considered production-ready.
+The latest observed post-merge Delivery run `42056675837` correctly stopped
+before building artifacts because the repository variable
+`PRODUCTION_API_BASE_URL` is not configured. A real absolute HTTP(S)
+deployment origin is still required before a release artifact can be
+considered production-ready; the fail-closed workflow guard remains
+intentional.
