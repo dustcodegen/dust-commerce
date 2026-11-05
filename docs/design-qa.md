@@ -318,13 +318,24 @@ run because its no-JavaScript `/dk/cart/add` route throws
 `cookies was called outside a request scope` under Next 16; its product/detail
 render remains the visual source baseline.
 
+On 2026-11-06, the pinned local source was re-run from Medusa DTC commit
+`4a1d53dc434ed124a78c4e2c9f312e1f47d4e9eb` with its backend on `19090`,
+storefront on `8000`, and a disposable PostgreSQL database on `55434`. The
+source API created a real cart for the Europe/DK region, added one seeded
+`Medusa T-Shirt` variant, saved the DK address, attached Standard Shipping,
+initialized `pp_system_default`, and completed the order. The resulting
+`/dk/order/{id}/confirmed` response returned `200` and contained the
+source-owned `Thank you!`, `Your order was placed successfully.`, `Summary`,
+`Medusa T-Shirt`, `Need help?`, `Contact`, and `qa-source@example.com` states.
+This closes the source-runtime checkout blocker for structural comparison; it
+is HTML/content evidence, not a raster claim.
+
 ## Open findings
 
-- P2 — Capture the pinned-source confirmation state from the local same-state
-  stack, then judge visible differences before declaring rendered parity; Dust
-  Review and order confirmation are already captured, while the pinned
-  source's cart route currently fails before checkout and the public preview
-  remains unavailable.
+- P2 — Capture a screenshot of the pinned-source confirmation state from the
+  local same-state stack, then judge visible differences before declaring
+  rendered parity; the source HTML/content state is now reachable, while the
+  public preview remains unavailable.
 - P2 — Repeat the verification success/failure capture against the live Medusa
   preview when its route is reachable, because its current cart failure is a
   separate runtime issue.
