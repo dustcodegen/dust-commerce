@@ -92,6 +92,20 @@ flutter test apps/commerce_app/test/storefront/product_document_metadata_test.da
 2 tests passed
 ```
 
+## Product Markdown policy formatting slice
+
+The pinned Medusa Markdown projection renders a zero conditional shipping
+price as `free`. Dust now keeps that source wording while retaining the
+validated policy boundary and existing paid-rate output. The catalog read test
+seeds a complete zero-rate policy and verifies the public Markdown response.
+
+The focused server gate passed locally:
+
+```text
+DUST_DATABASE_URL=postgres://dust:dust@127.0.0.1:5432/dust_commerce?sslmode=disable dart test packages/commerce_server/test/catalog/markdown_test.dart
+3 tests passed
+```
+
 ## Product structured-data slice
 
 The current Medusa product source publishes a schema.org Product or

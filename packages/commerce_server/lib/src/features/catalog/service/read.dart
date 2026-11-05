@@ -43,9 +43,14 @@ String renderProductMarkdown(
         '${variant.sku ?? ''} | $renderedPrice | $availability | '
         '`${variant.id}` |';
   }).join('\n');
+  final shipping = policy == null
+      ? null
+      : policy.shippingRate == '0'
+          ? 'free'
+          : '${policy.shippingRate} ${currencyCode.toUpperCase()}';
   final policyLines = policy == null
       ? ''
-      : '\n- Shipping: ${policy.shippingRate} ${currencyCode.toUpperCase()}, '
+      : '\n- Shipping: $shipping, '
           'ships in ${_dayRange(policy.handlingDaysMin, policy.handlingDaysMax)} '
           'business days, delivery '
           '${_dayRange(policy.transitDaysMin, policy.transitDaysMax)} '
