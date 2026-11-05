@@ -21,6 +21,9 @@ This document is the current storefront parity ledger. The public repository
 currently has no linked issue or milestone for this work, so status claims here
 must be backed by the source, tests and browser evidence recorded below.
 
+The latest live local smoke is recorded in
+[storefront-local-smoke-qa.md](storefront-local-smoke-qa.md).
+
 The functional Customer Service route is documented in
 [customer-service-qa.md](customer-service-qa.md) as a Morrow extension because
 the pinned DTC source has no equivalent route.
