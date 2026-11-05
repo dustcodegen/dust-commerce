@@ -3,6 +3,7 @@ void applyPlatformDocumentMetadata({
   required String title,
   required String description,
   required String canonicalUrl,
+  required String structuredData,
   String? imageUrl,
 }) {}
 

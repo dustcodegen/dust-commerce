@@ -68,7 +68,10 @@ class _ProductPageState extends State<ProductPage> {
     return StoreScaffold(
       body: Stack(
         children: [
-          ProductDocumentMetadata(product: state.product),
+          ProductDocumentMetadata(
+            product: state.product,
+            currencyCode: state.currencyCode,
+          ),
           content,
         ],
       ),

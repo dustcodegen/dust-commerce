@@ -5,6 +5,7 @@ void applyPlatformDocumentMetadata({
   required String title,
   required String description,
   required String canonicalUrl,
+  required String structuredData,
   String? imageUrl,
 }) {
   final document = web.document;
@@ -19,6 +20,7 @@ void applyPlatformDocumentMetadata({
     _setMeta(document, property: 'og:image', content: imageUrl);
   }
   _setCanonical(document, canonicalUrl);
+  _setStructuredData(document, structuredData);
 }
 
 /// Restores the static shell metadata when the route is no longer a product.
@@ -35,6 +37,7 @@ void resetPlatformDocumentMetadata() {
   }
   _removeMeta(document, property: 'og:image');
   document.querySelector('link[rel="canonical"]')?.remove();
+  document.querySelector('script[data-dust-product-structured-data]')?.remove();
 }
 
 void _setCanonical(web.Document document, String href) {
@@ -66,4 +69,17 @@ void _setMeta(
 
 void _removeMeta(web.Document document, {required String property}) {
   document.querySelector('meta[property="$property"]')?.remove();
+}
+
+void _setStructuredData(web.Document document, String content) {
+  final existing = document.querySelector(
+    'script[data-dust-product-structured-data]',
+  );
+  final script = existing == null
+      ? (web.HTMLScriptElement()
+        ..type = 'application/ld+json'
+        ..setAttribute('data-dust-product-structured-data', 'true'))
+      : existing as web.HTMLScriptElement;
+  script.text = content;
+  if (existing == null) document.head?.append(script);
 }

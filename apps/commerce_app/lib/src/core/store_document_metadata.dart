@@ -1,5 +1,6 @@
 import 'package:commerce_shared/commerce_shared.dart';
 
+import 'store_product_structured_data.dart';
 import 'store_document_metadata_platform.dart'
     if (dart.library.html) 'store_document_metadata_web.dart';
 
@@ -10,19 +11,30 @@ final class StoreDocumentMetadata {
     required this.title,
     required this.description,
     required this.canonicalUrl,
+    required this.structuredData,
     this.imageUrl,
   });
 
   /// Builds the source-shaped metadata for a product route.
-  factory StoreDocumentMetadata.forProduct(Product product, Uri currentUri) {
+  factory StoreDocumentMetadata.forProduct(
+    Product product,
+    Uri currentUri, {
+    String currencyCode = 'usd',
+  }) {
     final description = product.description?.trim();
+    final canonicalUrl = _canonicalUrl(currentUri);
     return StoreDocumentMetadata(
       title: '${product.title} | Morrow',
       description: description == null || description.isEmpty
           ? product.title
           : description,
-      canonicalUrl: _canonicalUrl(currentUri),
+      canonicalUrl: canonicalUrl,
       imageUrl: product.thumbnail,
+      structuredData: buildStoreProductStructuredData(
+        product: product,
+        currencyCode: currencyCode,
+        productUrl: canonicalUrl,
+      ),
     );
   }
 
@@ -37,6 +49,9 @@ final class StoreDocumentMetadata {
 
   /// Browser document title.
   final String title;
+
+  /// Safe JSON-LD for the browser document head.
+  final String structuredData;
 }
 
 String _canonicalUrl(Uri currentUri) {
@@ -56,6 +71,7 @@ void applyStoreDocumentMetadata(StoreDocumentMetadata metadata) =>
       description: metadata.description,
       canonicalUrl: metadata.canonicalUrl,
       imageUrl: metadata.imageUrl,
+      structuredData: metadata.structuredData,
     );
 
 /// Restores the shell metadata when leaving a product route.

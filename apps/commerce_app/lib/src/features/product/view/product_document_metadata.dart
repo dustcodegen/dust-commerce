@@ -5,10 +5,17 @@ import 'package:flutter/widgets.dart';
 /// Keeps browser metadata in sync with the product currently addressed.
 class ProductDocumentMetadata extends StatefulWidget {
   /// Creates the route metadata synchronizer.
-  const ProductDocumentMetadata({required this.product, super.key});
+  const ProductDocumentMetadata({
+    required this.product,
+    required this.currencyCode,
+    super.key,
+  });
 
   /// Loaded product, or null while the route is loading or missing.
   final Product? product;
+
+  /// Currency selected for the product route.
+  final String currencyCode;
 
   @override
   State<ProductDocumentMetadata> createState() =>
@@ -25,7 +32,10 @@ class _ProductDocumentMetadataState extends State<ProductDocumentMetadata> {
   @override
   void didUpdateWidget(ProductDocumentMetadata oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.product != widget.product) _sync();
+    if (oldWidget.product != widget.product ||
+        oldWidget.currencyCode != widget.currencyCode) {
+      _sync();
+    }
   }
 
   @override
@@ -45,7 +55,11 @@ class _ProductDocumentMetadataState extends State<ProductDocumentMetadata> {
         resetStoreDocumentMetadata();
       } else {
         applyStoreDocumentMetadata(
-          StoreDocumentMetadata.forProduct(product, Uri.base),
+          StoreDocumentMetadata.forProduct(
+            product,
+            Uri.base,
+            currencyCode: widget.currencyCode,
+          ),
         );
       }
     });
