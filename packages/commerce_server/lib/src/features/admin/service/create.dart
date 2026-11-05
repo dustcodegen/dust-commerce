@@ -11,6 +11,7 @@ import 'package:dust_dart/db.dart';
 
 part 'product_media.dart';
 part 'create/insert_options.dart';
+part 'create/product.dart';
 
 /// Why an administrator was not bootstrapped.
 enum AdminBootstrapFailure {
@@ -60,135 +61,6 @@ Future<Result<AdminProductCreateContext, SqlxError>>
       )),
     Err(:final error) => Err(error),
   };
-}
-
-/// Creates a complete sellable product graph in one transaction.
-Future<
-    Result<Result<AdminProductDetailResponse, AdminCreateProductFailure>,
-        SqlxError>> createAdminProduct(
-  CommerceDatabase database,
-  AdminCreateProduct input, {
-  required String Function() nextId,
-  required AdminMediaStorage mediaStorage,
-}) async {
-  final claims = [for (final item in input.media) (id: item.id, url: item.url)];
-  if (!mediaStorage.claim(claims)) {
-    return const Ok(Err(AdminCreateProductFailure.invalidMedia));
-  }
-  try {
-    return await database.transaction((tx) async {
-      final writes = AdminProductCreateRepository(tx);
-      final currencies = await writes.activeCurrencies();
-      if (currencies case Err(:final error)) return Err(error);
-      if (input.typeId case final typeId?) {
-        final typeCount = await writes.activeProductTypeCount(typeId);
-        if (typeCount case Err(:final error)) return Err(error);
-        if ((typeCount as Ok<int, SqlxError>).value == 0) {
-          return const Ok(Err(AdminCreateProductFailure.invalidProductType));
-        }
-      }
-      final prepared = _prepareProduct(
-        input,
-        (currencies as Ok<List<AdminProductCurrencyResponse>, SqlxError>)
-            .value
-            .map((row) => row.currencyCode)
-            .toList(),
-        mediaStorage,
-      );
-      if (prepared case Err(:final error)) return Ok(Err(error));
-      final product =
-          (prepared as Ok<_PreparedProduct, AdminCreateProductFailure>).value;
-      final productId = nextId();
-      final inserted = await writes.insertProduct(
-        productId,
-        product.title,
-        product.handle,
-        product.subtitle,
-        product.material,
-        product.description,
-        product.thumbnail,
-        input.typeId,
-        product.discountable ? 1 : 0,
-        product.status.name,
-      );
-      if (inserted case Err(:final error)) return Err(error);
-      if ((inserted as Ok<ExecResult, SqlxError>).value.rowsAffected == 0) {
-        return const Ok(Err(AdminCreateProductFailure.handleConflict));
-      }
-
-      for (var rank = 0; rank < product.media.length; rank++) {
-        final imageWrite = await writes.insertImage(
-          nextId(),
-          productId,
-          product.media[rank].url,
-          rank,
-        );
-        if (imageWrite case Err(:final error)) return Err(error);
-      }
-
-      final optionWrite = await _insertCreatedOptions(
-        writes,
-        productId,
-        product.options,
-        nextId,
-      );
-      if (optionWrite case Err(:final error)) return Err(error);
-      final createdOptions =
-          (optionWrite as Ok<Map<String, _CreatedOption>, SqlxError>).value;
-
-      for (final variant in product.variants) {
-        final variantId = nextId();
-        final variantWrite = await writes.insertVariant(
-          variantId,
-          productId,
-          variant.title,
-          variant.sku,
-          variant.inventoryQuantity,
-          variant.manageInventory ? 1 : 0,
-          variant.allowBackorder ? 1 : 0,
-        );
-        if (variantWrite case Err(:final error)) return Err(error);
-        if ((variantWrite as Ok<ExecResult, SqlxError>).value.rowsAffected ==
-            0) {
-          final cleanup = await writes.deleteCreatedProduct(productId);
-          if (cleanup case Err(:final error)) return Err(error);
-          return const Ok(Err(AdminCreateProductFailure.skuConflict));
-        }
-        for (final selection in variant.optionValues.entries) {
-          final option = createdOptions[selection.key]!;
-          final link = await writes.insertVariantOptionValue(
-            variantId,
-            option.id,
-            option.values[selection.value]!,
-          );
-          if (link case Err(:final error)) return Err(error);
-        }
-        for (final price in variant.prices) {
-          final priceWrite = await writes.insertPrice(
-            variantId,
-            price.currencyCode,
-            price.amount,
-          );
-          if (priceWrite case Err(:final error)) return Err(error);
-        }
-      }
-
-      final refreshed =
-          await AdminProductReadRepository(tx).findById(productId);
-      if (refreshed case Err(:final error)) return Err(error);
-      return switch (optionOf(
-        (refreshed as Ok<AdminProductDetailResponse?, SqlxError>).value,
-      )) {
-        Some(:final value) => Ok(Ok(value)),
-        None() => switch (await writes.deleteCreatedProduct(productId)) {
-            Ok() => const Ok(Err(AdminCreateProductFailure.unavailable)),
-            Err(:final error) => Err(error),
-          },
-      };
-    });
-  } finally {
-    mediaStorage.release(claims);
-  }
 }
 
 /// Creates an admin profile and provider identity in one transaction.
