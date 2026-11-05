@@ -1,3 +1,4 @@
+import 'package:commerce_server/commerce_server.dart';
 import 'package:commerce_shared/commerce_shared.dart';
 import 'package:test/test.dart';
 
@@ -59,6 +60,41 @@ void main() {
       expect(order.email, 'ada@example.com');
       expect(order.shippingAddress.city, 'London');
       expect(order.billingAddress, order.shippingAddress);
+    });
+
+    test('keeps receipt lines in Medusa newest-first order', () async {
+      final ada = await harness.account('ada@example.com');
+      final cartId = await harness.cartWith(
+        'var_small',
+        token: ada.token,
+      );
+      final add = harness.client.post('/store/carts/$cartId/line-items')
+        ..bearer(ada.token)
+        ..json({'variant_id': 'var_large', 'quantity': 1});
+      (await add.send()).assertOk();
+
+      final placed = await harness.checkout(cartId, token: ada.token);
+      placed.assertCreated();
+      final order = Order.fromJson(placed.json! as Map<String, Object?>);
+
+      await queryExecute(
+        "UPDATE order_items SET created_at = CASE variant_id "
+        "WHEN 'var_small' THEN TIMESTAMPTZ '2100-01-01T12:00:00Z' "
+        "WHEN 'var_large' THEN TIMESTAMPTZ '2100-01-01T12:00:01Z' "
+        'END WHERE order_id = \$1',
+        [order.id],
+      ).execute(harness.database.executor);
+
+      final request = harness.client.get('/store/orders/${order.id}')
+        ..bearer(ada.token);
+      final refreshed = Order.fromJson(
+        (await request.send()).json! as Map<String, Object?>,
+      );
+
+      expect(
+        refreshed.items.map((item) => item.variantId),
+        ['var_large', 'var_small'],
+      );
     });
 
     test('hides an order from another authenticated customer', () async {

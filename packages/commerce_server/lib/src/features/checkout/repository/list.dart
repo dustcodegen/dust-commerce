@@ -95,7 +95,7 @@ SELECT o.id, o.display_id, o.email, o.customer_id, o.currency_code, o.subtotal,
              'return_dismissed_quantity',
                coalesce(returned.dismissed_quantity, 0)
            )
-         ))
+         ) ORDER BY i.created_at DESC, i.id DESC)
          FROM order_items i
          LEFT JOIN (
            SELECT item.order_item_id,
