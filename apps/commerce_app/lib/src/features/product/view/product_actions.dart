@@ -25,6 +25,8 @@ class ProductActions extends StatelessWidget {
           const SizedBox(height: 8),
         ProductPrice(state: state),
         const SizedBox(height: 8),
+        ProductAvailability(state: state),
+        const SizedBox(height: 8),
         ProductPurchaseButton(state: state),
       ],
     );

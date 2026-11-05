@@ -3,6 +3,7 @@ library;
 
 export 'mobile_product_actions.dart';
 export 'product_actions.dart';
+export 'product_availability.dart';
 export 'product_gallery.dart';
 export 'product_info.dart';
 export 'product_layout.dart';
