@@ -100,7 +100,10 @@ customer-visible contract from the allowlisted `Product` model: currency-scoped
 prices, SKU, stock availability, product images, option properties and variant
 URLs. The browser implementation owns one marked `application/ld+json` script
 node and removes it when the product route is left; native Flutter targets use
-the no-op platform implementation.
+the no-op platform implementation. When the selected selling region has a
+validated public policy, each offer also carries the source-shaped shipping
+rate, destination, delivery-time and merchant-return-policy structures; an
+unpublished policy is omitted rather than guessed.
 
 JSON-LD is serialized explicitly rather than by dumping the full response
 model. Merchant text escapes `<` before entering the script element, preventing

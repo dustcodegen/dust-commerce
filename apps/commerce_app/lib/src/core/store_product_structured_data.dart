@@ -11,6 +11,8 @@ String buildStoreProductStructuredData({
   required Product product,
   required String currencyCode,
   required String productUrl,
+  String countryCode = '',
+  StoreRegionPolicy? policy,
 }) {
   final currency = currencyCode.toUpperCase();
   final images = <String>[
@@ -36,7 +38,7 @@ String buildStoreProductStructuredData({
     Money price,
     String url,
   ) {
-    return {
+    final offer = <String, Object?>{
       '@type': 'Offer',
       'url': url,
       if (variant.sku case final sku?) 'sku': sku,
@@ -47,6 +49,45 @@ String buildStoreProductStructuredData({
           : 'https://schema.org/OutOfStock',
       'itemCondition': 'https://schema.org/NewCondition',
     };
+    if (policy != null && countryCode.isNotEmpty) {
+      offer.addAll({
+        'shippingDetails': {
+          '@type': 'OfferShippingDetails',
+          'shippingRate': {
+            '@type': 'MonetaryAmount',
+            'value': num.parse(policy.shippingRate),
+            'currency': currency,
+          },
+          'shippingDestination': {
+            '@type': 'DefinedRegion',
+            'addressCountry': countryCode.toUpperCase(),
+          },
+          'deliveryTime': {
+            '@type': 'ShippingDeliveryTime',
+            'handlingTime': _businessDays(
+              policy.handlingDaysMin,
+              policy.handlingDaysMax,
+            ),
+            'transitTime': _businessDays(
+              policy.transitDaysMin,
+              policy.transitDaysMax,
+            ),
+          },
+        },
+        'hasMerchantReturnPolicy': {
+          '@type': 'MerchantReturnPolicy',
+          'applicableCountry': countryCode.toUpperCase(),
+          'returnPolicyCategory':
+              'https://schema.org/MerchantReturnFiniteReturnWindow',
+          'merchantReturnDays': policy.returnWindowDays,
+          'returnMethod': 'https://schema.org/ReturnByMail',
+          'returnFees': policy.freeReturns
+              ? 'https://schema.org/FreeReturn'
+              : 'https://schema.org/ReturnFeesCustomerResponsibility',
+        },
+      });
+    }
+    return offer;
   }
 
   final data = <String, Object?>{
@@ -105,3 +146,10 @@ String buildStoreProductStructuredData({
   // closing-script sequence.
   return jsonEncode(data).replaceAll('<', r'\u003c');
 }
+
+Map<String, Object?> _businessDays(int minimum, int maximum) => {
+      '@type': 'QuantitativeValue',
+      'minValue': minimum,
+      'maxValue': maximum,
+      'unitCode': 'DAY',
+    };

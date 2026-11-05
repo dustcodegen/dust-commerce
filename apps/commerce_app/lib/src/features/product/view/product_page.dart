@@ -57,6 +57,15 @@ class _ProductPageState extends State<ProductPage> {
   @override
   Widget build(BuildContext context) {
     final state = context.watchProductViewModel().value;
+    final shell = context.watchStoreShellViewModel().value;
+    final countryCode = shell.selectedCountryCode.match(
+      some: (value) => value,
+      none: () => '',
+    );
+    final policy = shell.selectedRegion.match(
+      some: (region) => region.policy,
+      none: () => null,
+    );
     final content = switch (state.status) {
       ProductDetailStatus.idle ||
       ProductDetailStatus.loading =>
@@ -71,6 +80,8 @@ class _ProductPageState extends State<ProductPage> {
           ProductDocumentMetadata(
             product: state.product,
             currencyCode: state.currencyCode,
+            countryCode: countryCode,
+            policy: policy,
           ),
           content,
         ],
