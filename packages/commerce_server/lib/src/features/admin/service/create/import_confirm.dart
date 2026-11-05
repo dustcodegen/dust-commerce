@@ -86,18 +86,15 @@ Future<Result<void, AdminProductImportConfirmError>> confirmAdminProductImport(
           nextId: nextId,
         );
         if (prepared case Err(:final error)) {
-          return Err(AdminProductImportConfirmStorage(error));
+          return switch (error) {
+            AdminProductImportPreflightStorage(:final cause) =>
+              Err(AdminProductImportConfirmStorage(cause)),
+            AdminProductImportPreflightRejected(:final failure) =>
+              Err(AdminProductImportConfirmRejected(failure)),
+          };
         }
-        final outcome = (prepared as Ok<
-                Result<List<PreparedImportedProduct>,
-                    AdminProductImportConfirmFailure>,
-                SqlxError>)
-            .value;
-        if (outcome case Err(:final error)) {
-          return Err(AdminProductImportConfirmRejected(error));
-        }
-        final products = (outcome as Ok<List<PreparedImportedProduct>,
-                AdminProductImportConfirmFailure>)
+        final products = (prepared as Ok<List<PreparedImportedProduct>,
+                AdminProductImportPreflightError>)
             .value;
         final productWrites = AdminProductImportProductRepository(tx);
         final variantWrites = AdminProductImportVariantRepository(tx);
