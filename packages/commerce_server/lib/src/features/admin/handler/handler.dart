@@ -173,13 +173,22 @@ Future<Result<Response, Rejection>> deleteAdminProductOptionHandler(
   final deps = (state as Ok<AdminDeps, Rejection>).value;
   final result = await deleteAdminProductOption(deps.database, id);
   return switch (result) {
-    Ok(value: Ok()) => Ok(noContent()),
-    Ok(value: Err(error: AdminDeleteProductOptionFailure.notFound)) =>
+    Ok() => Ok(noContent()),
+    Err(
+      error: AdminDeleteProductOptionRejected(
+        failure: AdminDeleteProductOptionFailure.notFound,
+      )
+    ) =>
       Err(Rejection.notFound('Product option "$id"')),
-    Ok(value: Err(error: AdminDeleteProductOptionFailure.inUse)) =>
+    Err(
+      error: AdminDeleteProductOptionRejected(
+        failure: AdminDeleteProductOptionFailure.inUse,
+      )
+    ) =>
       const Err(Rejection.conflict(
         'Remove this option from every product before deleting it',
       )),
-    Err() => const Err(Rejection.internal()),
+    Err(error: AdminDeleteProductOptionStorage()) =>
+      const Err(Rejection.internal()),
   };
 }
