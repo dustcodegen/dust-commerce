@@ -330,12 +330,24 @@ source-owned `Thank you!`, `Your order was placed successfully.`, `Summary`,
 This closes the source-runtime checkout blocker for structural comparison; it
 is HTML/content evidence, not a raster claim.
 
+On 2026-11-06, the same completed state was captured in both local browsers at
+the default `1280 × 720` viewport. The pinned source route was
+`http://127.0.0.1:8000/dk/order/order_01M6Q13F0T1YYPRBPK28GX8AC5/confirmed`;
+the Dust route was
+`http://127.0.0.1:13001/order/id_pGobH8p22jl1yedRcPdib7etfwo-n2yYn9lAkl-LWMI/confirmed`.
+Both renders show the
+same source-owned hierarchy in the same order: confirmation heading and email,
+order date and number, Summary with line item and totals, Delivery, Payment,
+Need help?, and the footer. The source uses `MEDUSA STORE`, a seeded black
+`Medusa T-Shirt`, and EUR; Dust intentionally uses `MORROW`, its seeded white
+`Classic White Tee`, and USD. Dust also retains the product's Collections footer
+column and replaces the source's Medusa attribution with `Powered by dust`.
+These are content/branding fixture differences, not missing confirmation
+sections. This is a same-viewport structural/raster comparison; exact pixel
+identity is not claimed across different content, currency, or branding.
+
 ## Open findings
 
-- P2 — Capture a screenshot of the pinned-source confirmation state from the
-  local same-state stack, then judge visible differences before declaring
-  rendered parity; the source HTML/content state is now reachable, while the
-  public preview remains unavailable.
 - P2 — Repeat the verification success/failure capture against the live Medusa
   preview when its route is reachable, because its current cart failure is a
   separate runtime issue.
