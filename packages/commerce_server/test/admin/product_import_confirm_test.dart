@@ -36,7 +36,7 @@ void main() {
       nextId: () => 'other_${++id}',
       passwordWork: PasswordWorkLimiter(),
     );
-    if (other case Ok(value: Ok<AdminUserResponse, AdminBootstrapFailure>())) {
+    if (other case Ok()) {
       // The second identity exists only to prove object-level ownership.
     } else {
       fail('Second admin bootstrap failed: $other');
