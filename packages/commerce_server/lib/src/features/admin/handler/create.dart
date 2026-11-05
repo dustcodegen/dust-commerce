@@ -70,41 +70,77 @@ Future<Result<AdminProductDetailResponse, Rejection>> createAdminProductHandler(
     mediaStorage: deps.mediaStorage,
   );
   return switch (result) {
-    Ok(value: Ok(value: final product)) => Ok(product),
-    Ok(value: Err(error: AdminCreateProductFailure.handleConflict)) =>
+    Ok(:final value) => Ok(value),
+    Err(
+      error: AdminCreateProductRejected(
+        failure: AdminCreateProductFailure.handleConflict,
+      )
+    ) =>
       const Err(Rejection.conflict('Another product already uses this handle')),
-    Ok(value: Err(error: AdminCreateProductFailure.skuConflict)) =>
+    Err(
+      error: AdminCreateProductRejected(
+        failure: AdminCreateProductFailure.skuConflict,
+      )
+    ) =>
       const Err(Rejection.conflict('Another variant already uses this SKU')),
-    Ok(value: Err(error: AdminCreateProductFailure.invalidCurrency)) =>
+    Err(
+      error: AdminCreateProductRejected(
+        failure: AdminCreateProductFailure.invalidCurrency,
+      )
+    ) =>
       const Err(Rejection.status(
         422,
         'Add one price for every active storefront currency',
       )),
-    Ok(value: Err(error: AdminCreateProductFailure.invalidMedia)) =>
+    Err(
+      error: AdminCreateProductRejected(
+        failure: AdminCreateProductFailure.invalidMedia,
+      )
+    ) =>
       const Err(Rejection.status(
         422,
         'Use unique product images returned by the upload endpoint',
       )),
-    Ok(value: Err(error: AdminCreateProductFailure.invalidProductType)) =>
+    Err(
+      error: AdminCreateProductRejected(
+        failure: AdminCreateProductFailure.invalidProductType,
+      )
+    ) =>
       const Err(Rejection.status(422, 'Choose an active product type')),
-    Ok(value: Err(error: AdminCreateProductFailure.invalidHandle)) =>
+    Err(
+      error: AdminCreateProductRejected(
+        failure: AdminCreateProductFailure.invalidHandle,
+      )
+    ) =>
       const Err(Rejection.status(
         422,
         'Use a non-empty lowercase product handle',
       )),
-    Ok(value: Err(error: AdminCreateProductFailure.invalidOptions)) =>
+    Err(
+      error: AdminCreateProductRejected(
+        failure: AdminCreateProductFailure.invalidOptions,
+      )
+    ) =>
       const Err(Rejection.status(
         422,
         'Every variant must select one valid value for every option',
       )),
-    Ok(value: Err(error: AdminCreateProductFailure.invalidVariants)) =>
+    Err(
+      error: AdminCreateProductRejected(
+        failure: AdminCreateProductFailure.invalidVariants,
+      )
+    ) =>
       const Err(Rejection.status(
         422,
         'Add at least one unique, valid product variant',
       )),
-    Ok(value: Err(error: AdminCreateProductFailure.unavailable)) =>
+    Err(
+      error: AdminCreateProductRejected(
+        failure: AdminCreateProductFailure.unavailable,
+      )
+    ) =>
       const Err(Rejection.internal()),
-    Err() => const Err(Rejection.internal()),
+    Err(error: AdminCreateProductStorage()) => const Err(Rejection.internal()),
   };
 }
 
