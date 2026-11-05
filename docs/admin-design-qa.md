@@ -86,6 +86,12 @@
   `packages/admin/dashboard/src/routes/products/product-detail/components/product-option-section/`
   and `packages/admin/dashboard/src/routes/product-options/product-option-edit/`
   at the pinned commit.
+- Stock-location source:
+  `packages/admin/dashboard/src/routes/settings/locations/location-list/`
+  and its `location-list-table.tsx` at the pinned commit. The reference uses a
+  searchable 20-row list under Settings > Locations with a create action and
+  row navigation; this slice intentionally implements only the supported
+  read/search projection.
 - Global product-option source:
   `packages/admin/dashboard/src/routes/product-options/product-option-list/`,
   `product-option-detail/`, and `product-option-create/` at the pinned commit.
