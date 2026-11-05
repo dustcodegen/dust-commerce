@@ -268,6 +268,16 @@ Search hits use the same subtle hover surface as the source
 The first non-empty debounced query enters the source `Searching…` state
 immediately instead of leaving the start message visible until the timer fires.
 
+## Release catalogue pagination slice
+
+On 2026-11-05, release-mode Morrow ran on `13001` against the seeded local API
+on `3878` and PostgreSQL on `55433`. The Store rendered the first page with
+the source-shaped four-column product grid and visible `1`/`2` controls. Moving
+to page `2` changed the route to `/store?page=2` and rendered the next product
+set (`Swim Shorts`, `Tailored Chinos`, `Training Shorts`, and `Weekend Track
+Pants`) instead of repeating page one. A fresh release browser tab recorded no
+console warnings or errors during the navigation.
+
 ## Live Medusa checkout comparison attempt
 
 On 2026-11-04 the current Medusa preview rendered its live `/dk/store` with
