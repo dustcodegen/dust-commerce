@@ -37,8 +37,7 @@ final class AdminHarness {
       firstName: 'Store',
       lastName: 'Owner',
     );
-    if (created
-        case Ok(value: Ok<AdminUserResponse, AdminBootstrapFailure>())) {
+    if (created case Ok()) {
       // Start only after the non-public bootstrap succeeds.
     } else {
       fail('Admin bootstrap failed: $created');

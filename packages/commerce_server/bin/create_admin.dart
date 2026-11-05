@@ -49,11 +49,15 @@ Future<void> main() async {
       lastName: _optional(environment['COMMERCE_ADMIN_LAST_NAME']),
     );
     switch (result) {
-      case Ok(value: Ok()):
+      case Ok():
         stdout.writeln('Admin ready.');
-      case Ok(value: Err(error: AdminBootstrapFailure.alreadyExists)):
+      case Err(
+          error: AdminBootstrapRejected(
+            failure: AdminBootstrapFailure.alreadyExists,
+          )
+        ):
         stdout.writeln('Admin already exists.');
-      case Err():
+      case Err(error: AdminBootstrapStorage()):
         stderr.writeln('Could not create the admin account.');
         exitCode = 1;
     }

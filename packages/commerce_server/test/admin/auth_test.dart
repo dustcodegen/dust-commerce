@@ -46,8 +46,11 @@ void main() {
         nextId: () => 'repeat_${++next}',
         passwordWork: PasswordWorkLimiter(),
       );
-      if (repeated case Ok(value: Err(:final error))) {
-        expect(error, AdminBootstrapFailure.alreadyExists);
+      if (repeated
+          case Err(
+            error: AdminBootstrapRejected(:final failure),
+          )) {
+        expect(failure, AdminBootstrapFailure.alreadyExists);
       } else {
         fail('Repeated bootstrap unexpectedly succeeded: $repeated');
       }

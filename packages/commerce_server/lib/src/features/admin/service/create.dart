@@ -10,6 +10,7 @@ import 'package:commerce_server/src/infra/option.dart';
 import 'package:dust_dart/db.dart';
 
 part 'product_media.dart';
+part 'create/bootstrap.dart';
 part 'create/insert_options.dart';
 part 'create/product.dart';
 
@@ -61,58 +62,6 @@ Future<Result<AdminProductCreateContext, SqlxError>>
       )),
     Err(:final error) => Err(error),
   };
-}
-
-/// Creates an admin profile and provider identity in one transaction.
-Future<Result<Result<AdminUserResponse, AdminBootstrapFailure>, SqlxError>>
-    bootstrapAdmin(
-  CommerceDatabase database,
-  AdminCredentials credentials, {
-  required String Function() nextId,
-  required PasswordWorkLimiter passwordWork,
-  String? firstName,
-  String? lastName,
-}) async {
-  final email = credentials.email.trim().toLowerCase();
-  final passwordHash = await Passwords.hash(
-    credentials.password,
-    limiter: passwordWork,
-  );
-  final userId = nextId();
-  final authIdentityId = nextId();
-  final providerIdentityId = nextId();
-
-  return database.transaction((tx) async {
-    final writes = AdminCreateRepository(tx);
-    final inserted = await writes.insertAdmin(
-      userId,
-      email,
-      firstName,
-      lastName,
-    );
-    if (inserted case Err(:final error)) return Err(error);
-    final user = optionOf(
-      (inserted as Ok<AdminUserResponse?, SqlxError>).value,
-    );
-    if (user case None()) {
-      return const Ok(Err(AdminBootstrapFailure.alreadyExists));
-    }
-
-    final identity = await writes.insertAuthIdentity(
-      authIdentityId,
-      jsonEncode({'admin_user_id': userId}),
-    );
-    if (identity case Err(:final error)) return Err(error);
-    final provider = await writes.insertProviderIdentity(
-      providerIdentityId,
-      email,
-      authIdentityId,
-      jsonEncode({'password': passwordHash}),
-    );
-    if (provider case Err(:final error)) return Err(error);
-
-    return Ok(Ok((user as Some<AdminUserResponse>).value));
-  });
 }
 
 /// Exchanges valid admin credentials for a short-lived opaque token.
