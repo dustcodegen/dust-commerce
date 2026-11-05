@@ -8,6 +8,7 @@ export 'src/core/product_image.dart';
 export 'src/core/store_scaffold.dart';
 export 'src/core/store_date.dart';
 export 'src/core/store_document_metadata.dart';
+export 'src/core/store_home_structured_data.dart';
 export 'src/core/store_product_structured_data.dart';
 export 'src/core/store_error_message.dart';
 export 'src/core/store_interactive_link.dart';

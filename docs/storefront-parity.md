@@ -117,6 +117,23 @@ flutter test apps/commerce_app/test/storefront/store_product_structured_data_tes
 3 tests passed
 ```
 
+## Home structured-data slice
+
+The current Medusa home route publishes Organization and WebSite JSON-LD. Dust
+now mirrors that public contract: validated return policies are emitted once
+per served country, and the WebSite entity exposes the source-shaped
+`/search?q={search_term_string}` action. Regions without a complete public
+policy are omitted instead of publishing guessed merchant terms. The home
+script has its own marker, so product and home route transitions cannot leave
+stale JSON-LD behind.
+
+The pure contract gate passed locally:
+
+```text
+flutter test apps/commerce_app/test/storefront/store_home_structured_data_test.dart
+2 tests passed
+```
+
 ## Source-to-Dust map
 
 | Medusa source | Flutter/Dust owner | Status |

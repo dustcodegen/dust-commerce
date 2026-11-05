@@ -6,6 +6,7 @@ import 'package:dust_flutter/route.dart';
 import 'package:flutter/material.dart';
 
 import 'featured_product_rail_view.dart';
+import 'home_document_metadata.dart';
 import 'home_hero.dart';
 
 /// Home hero and collection rails translated from the Medusa DTC source.
@@ -37,9 +38,11 @@ class _CatalogPageState extends State<CatalogPage> {
   @override
   Widget build(BuildContext context) {
     final state = context.watchCatalogViewModel().value;
+    final regions = context.watchStoreShellViewModel().value.regions;
     return StoreScaffold(
       body: CustomScrollView(
         slivers: [
+          SliverToBoxAdapter(child: HomeDocumentMetadata(regions: regions)),
           const SliverToBoxAdapter(child: HomeHero()),
           switch (state.status) {
             CatalogStatus.idle ||

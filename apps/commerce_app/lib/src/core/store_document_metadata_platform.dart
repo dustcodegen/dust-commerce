@@ -9,3 +9,9 @@ void applyPlatformDocumentMetadata({
 
 /// Restores metadata on non-web targets.
 void resetPlatformDocumentMetadata() {}
+
+/// Applies home JSON-LD on platforms without a document head.
+void applyPlatformHomeStructuredData(String structuredData) {}
+
+/// Removes home JSON-LD on platforms without a document head.
+void resetPlatformHomeStructuredData() {}
