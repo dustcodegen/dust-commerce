@@ -16,7 +16,7 @@ SELECT status FROM orders WHERE id = $1 AND deleted_at IS NULL
 ''')
   Future<Result<AdminCompleteOrderTarget?, SqlxError>> target(String orderId);
 
-  /// Marks any non-canceled order completed; SQLite owns `updated_at`.
+  /// Marks any non-canceled order completed; PostgreSQL owns `updated_at`.
   @Query(r'''
 UPDATE orders SET status = 'completed'
 WHERE id = $1 AND status <> 'canceled' AND deleted_at IS NULL

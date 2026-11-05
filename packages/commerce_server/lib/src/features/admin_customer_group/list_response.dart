@@ -12,7 +12,7 @@ final class AdminCustomerGroupCustomerResponse
   /// Creates one group membership reference.
   const AdminCustomerGroupCustomerResponse({required this.id});
 
-  /// Decodes one customer id from SQLite's nested JSON projection.
+  /// Decodes one customer id from PostgreSQL's nested JSON projection.
   factory AdminCustomerGroupCustomerResponse.fromJson(
     Map<String, Object?> json,
   ) =>

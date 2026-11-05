@@ -33,7 +33,7 @@ final class OrderReturnDeps {
 
   Future<void> _writeTail = Future<void>.value();
 
-  /// Serializes return transactions on SQLite's single connection.
+  /// Serializes return transactions through PostgreSQL transactions.
   Future<T> serialWrite<T>(Future<T> Function() write) {
     final previous = _writeTail;
     final completed = Completer<void>();

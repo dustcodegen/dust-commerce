@@ -60,7 +60,7 @@ WHERE id = $1
 ''')
   Future<Result<AdminCustomerServiceResponse?, SqlxError>> find(String id);
 
-  /// Replaces lifecycle and lets SQLite own resolution and update instants.
+  /// Replaces lifecycle and lets PostgreSQL own resolution and update instants.
   @Query(r'''
 UPDATE customer_service_requests
 SET status = $2,

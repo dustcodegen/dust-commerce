@@ -48,7 +48,7 @@ ORDER BY created_at, id
     String fulfillmentId,
   );
 
-  /// Marks one still-pending physical fulfillment shipped using SQLite time.
+  /// Marks one still-pending physical fulfillment shipped using PostgreSQL time.
   @Query(r'''
 UPDATE fulfillments
 SET shipped_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now'),

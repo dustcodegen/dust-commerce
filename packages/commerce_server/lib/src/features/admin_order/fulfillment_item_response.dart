@@ -20,7 +20,7 @@ final class AdminFulfillmentItemResponse with _$AdminFulfillmentItemResponse {
     required this.updatedAt,
   });
 
-  /// Decodes one JSON row selected by SQLite.
+  /// Decodes one JSON row selected by PostgreSQL.
   factory AdminFulfillmentItemResponse.fromJson(Map<String, Object?> json) =>
       _$AdminFulfillmentItemResponseFromJson(json);
 

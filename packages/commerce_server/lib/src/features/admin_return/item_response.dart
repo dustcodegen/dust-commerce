@@ -17,7 +17,7 @@ final class AdminReturnItemResponse with _$AdminReturnItemResponse {
     required this.note,
   });
 
-  /// Decodes one item projected by SQLite JSON aggregation.
+  /// Decodes one item projected by PostgreSQL JSON aggregation.
   factory AdminReturnItemResponse.fromJson(Map<String, Object?> json) =>
       _$AdminReturnItemResponseFromJson(json);
 

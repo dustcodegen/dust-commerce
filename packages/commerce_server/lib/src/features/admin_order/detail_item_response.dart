@@ -22,7 +22,7 @@ final class AdminOrderItemResponse with _$AdminOrderItemResponse {
     required this.createdAt,
   });
 
-  /// Decodes one JSON row selected by SQLite.
+  /// Decodes one JSON row selected by PostgreSQL.
   factory AdminOrderItemResponse.fromJson(Map<String, Object?> json) =>
       _$AdminOrderItemResponseFromJson(json);
 

@@ -26,7 +26,7 @@ WHERE order_row.id = $1 AND fulfillment.id = $2
     String fulfillmentId,
   );
 
-  /// Cancels one pending fulfillment using SQLite's UTC clock.
+  /// Cancels one pending fulfillment using PostgreSQL's UTC clock.
   @Query(r'''
 UPDATE fulfillments
 SET canceled_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now'), canceled_by = $3

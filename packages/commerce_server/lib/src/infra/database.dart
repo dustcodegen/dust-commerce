@@ -21,7 +21,7 @@ abstract class CommerceDatabase implements DatabaseClient {
   @override
   Connection get connection;
 
-  /// Legacy test entry point; PostgreSQL ignores the old SQLite file name.
+  /// Legacy test entry point; the positional URL is ignored for compatibility.
   @Deprecated('Use connect with COMMERCE_DATABASE_URL in new code.')
   static CommerceDatabase open(
     String _, {

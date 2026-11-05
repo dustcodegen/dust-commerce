@@ -27,7 +27,7 @@ final class AdminOrderDeps {
   /// Complete filtered order/item reads used only by CSV export.
   final AdminOrderExportRepository exports;
 
-  /// Shared opaque identifier source; SQLite owns all timestamps.
+  /// Shared opaque identifier source; PostgreSQL owns all timestamps.
   final String Function() nextId;
 
   /// Protected order-list reads.
@@ -35,7 +35,7 @@ final class AdminOrderDeps {
 
   Future<void> _writeTail = Future<void>.value();
 
-  /// Serializes fulfillment transactions on SQLite's single connection.
+  /// Serializes fulfillment transactions through PostgreSQL transactions.
   Future<T> serialWrite<T>(Future<T> Function() write) {
     final previous = _writeTail;
     final completed = Completer<void>();

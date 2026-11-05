@@ -29,7 +29,7 @@ final class AdminOrderFulfillmentResponse with _$AdminOrderFulfillmentResponse {
     required this.labels,
   });
 
-  /// Decodes one JSON object selected by SQLite.
+  /// Decodes one JSON object selected by PostgreSQL.
   factory AdminOrderFulfillmentResponse.fromJson(Map<String, Object?> json) =>
       _$AdminOrderFulfillmentResponseFromJson(json);
 

@@ -54,7 +54,7 @@ final class AppliedPromotionResponse with _$AppliedPromotionResponse {
   }
 }
 
-/// Decodes a customer-facing applied amount selected as SQLite JSON.
+/// Decodes a customer-facing applied amount selected as PostgreSQL JSON.
 final class AppliedPromotionMoneyFromJson
     implements SqlxTryFrom<Money, String> {
   /// Creates the stateless converter.

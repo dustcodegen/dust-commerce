@@ -37,7 +37,7 @@ WHERE id = $1 AND deleted_at IS NULL AND status <> 'canceled'
 ''')
   Future<Result<ExecResult, SqlxError>> cancelPayment(String paymentId);
 
-  /// Records one full refund; SQLite owns its event timestamp.
+  /// Records one full refund; PostgreSQL owns its event timestamp.
   @Query(r'''
 INSERT INTO refunds (
   id, payment_collection_id, amount, currency_code, created_by
@@ -65,7 +65,7 @@ WHERE manage_inventory = 1 AND EXISTS (
 ''')
   Future<Result<ExecResult, SqlxError>> releaseInventory(String orderId);
 
-  /// Applies the terminal order state and audit using SQLite's UTC clock.
+  /// Applies the terminal order state and audit using PostgreSQL's UTC clock.
   @Query(r'''
 UPDATE orders
 SET status = 'canceled', payment_status = $3,

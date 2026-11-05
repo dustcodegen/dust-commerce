@@ -18,7 +18,7 @@ final class AdminReturnDeps {
 
   Future<void> _writeTail = Future<void>.value();
 
-  /// Serializes receipt transactions on SQLite's single connection.
+  /// Serializes receipt transactions through PostgreSQL transactions.
   Future<T> serialWrite<T>(Future<T> Function() write) {
     final previous = _writeTail;
     final completed = Completer<void>();

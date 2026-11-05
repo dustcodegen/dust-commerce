@@ -33,7 +33,7 @@ WHERE id = $1 AND deleted_at IS NULL
 ''')
   Future<Result<int, SqlxError>> activeReasonCount(String reasonId);
 
-  /// Writes one auditable refund; SQLite owns the event timestamp.
+  /// Writes one auditable refund; PostgreSQL owns the event timestamp.
   @Query(r'''
 INSERT INTO refunds (
   id, payment_collection_id, amount, currency_code,

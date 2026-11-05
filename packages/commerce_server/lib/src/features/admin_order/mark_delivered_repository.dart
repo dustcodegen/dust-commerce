@@ -24,7 +24,7 @@ WHERE order_row.id = $1 AND fulfillment.id = $2
     String fulfillmentId,
   );
 
-  /// Marks one active fulfillment delivered using SQLite's UTC clock.
+  /// Marks one active fulfillment delivered using PostgreSQL's UTC clock.
   @Query(r'''
 UPDATE fulfillments
 SET delivered_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')

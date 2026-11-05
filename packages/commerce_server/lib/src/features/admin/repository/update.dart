@@ -12,7 +12,7 @@ abstract final class AdminProductUpdateRepository {
   /// Replaces supported general fields when no active product owns [handle].
   ///
   /// The single statement makes handle conflict detection race-safe under
-  /// SQLite's serialized writer lock. Database triggers own `updated_at`.
+  /// PostgreSQL transaction serialization. Database triggers own `updated_at`.
   @Query(r'''
 UPDATE products
 SET title = trim($2),
