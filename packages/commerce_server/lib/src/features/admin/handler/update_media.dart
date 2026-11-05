@@ -29,14 +29,23 @@ Future<Result<AdminProductDetailResponse, Rejection>>
     mediaStorage: deps.mediaStorage,
   );
   return switch (result) {
-    Ok(value: Ok(value: final product)) => Ok(product),
-    Ok(value: Err(error: AdminUpdateProductMediaFailure.notFound)) =>
+    Ok(:final value) => Ok(value),
+    Err(
+      error: AdminUpdateProductMediaRejected(
+        failure: AdminUpdateProductMediaFailure.notFound,
+      )
+    ) =>
       Err(Rejection.notFound('Product "$id"')),
-    Ok(value: Err(error: AdminUpdateProductMediaFailure.invalidMedia)) =>
+    Err(
+      error: AdminUpdateProductMediaRejected(
+        failure: AdminUpdateProductMediaFailure.invalidMedia,
+      )
+    ) =>
       const Err(Rejection.status(
         422,
         'Use unique existing images or files returned by the upload endpoint',
       )),
-    Err() => const Err(Rejection.internal()),
+    Err(error: AdminUpdateProductMediaStorage()) =>
+      const Err(Rejection.internal()),
   };
 }

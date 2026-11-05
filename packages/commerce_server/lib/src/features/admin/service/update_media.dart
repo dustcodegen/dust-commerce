@@ -15,10 +15,35 @@ enum AdminUpdateProductMediaFailure {
   invalidMedia,
 }
 
+/// Error crossing the Admin product-media update boundary.
+sealed class AdminUpdateProductMediaError {
+  /// Creates one product-media update error.
+  const AdminUpdateProductMediaError();
+}
+
+/// A business rejection that is safe to expose to the handler.
+final class AdminUpdateProductMediaRejected
+    extends AdminUpdateProductMediaError {
+  /// Creates one business rejection.
+  const AdminUpdateProductMediaRejected(this.failure);
+
+  /// The stable business reason.
+  final AdminUpdateProductMediaFailure failure;
+}
+
+/// A storage failure retained for logging without exposing SQL details.
+final class AdminUpdateProductMediaStorage
+    extends AdminUpdateProductMediaError {
+  /// Creates one storage failure.
+  const AdminUpdateProductMediaStorage(this.cause);
+
+  /// The original SQLx failure.
+  final SqlxError cause;
+}
+
 /// Atomically replaces image order, membership, and thumbnail.
-Future<
-    Result<Result<AdminProductDetailResponse, AdminUpdateProductMediaFailure>,
-        SqlxError>> updateAdminProductMedia(
+Future<Result<AdminProductDetailResponse, AdminUpdateProductMediaError>>
+    updateAdminProductMedia(
   CommerceDatabase database,
   String productId,
   AdminUpdateProductMedia input, {
@@ -28,72 +53,101 @@ Future<
   var claims = <AdminMediaClaim>[];
   var claimed = false;
   try {
-    return await database.transaction((tx) async {
-      final reads = AdminProductReadRepository(tx);
-      final currentResult = await reads.findById(productId);
-      if (currentResult case Err(:final error)) return Err(error);
-      final current = optionOf(
-        (currentResult as Ok<AdminProductDetailResponse?, SqlxError>).value,
-      );
-      if (current case None()) {
-        return const Ok(Err(AdminUpdateProductMediaFailure.notFound));
-      }
-
-      final prepared = _prepareMediaUpdate(
-        input.media,
-        (current as Some<AdminProductDetailResponse>).value.images,
-        mediaStorage,
-      );
-      if (prepared case Err()) {
-        return const Ok(Err(AdminUpdateProductMediaFailure.invalidMedia));
-      }
-      final update =
-          (prepared as Ok<_PreparedMediaUpdate, AdminUpdateProductMediaFailure>)
-              .value;
-      claims = update.claims;
-      if (claims.isNotEmpty) {
-        claimed = mediaStorage.claim(claims);
-        if (!claimed) {
-          return const Ok(Err(AdminUpdateProductMediaFailure.invalidMedia));
+    return await transactionResult<AdminProductDetailResponse,
+        AdminUpdateProductMediaError>(
+      database,
+      (tx) async {
+        final reads = AdminProductReadRepository(tx);
+        final currentResult = await reads.findById(productId);
+        if (currentResult case Err(:final error)) {
+          return Err(AdminUpdateProductMediaStorage(error));
         }
-      }
+        final current = optionOf(
+          (currentResult as Ok<AdminProductDetailResponse?, SqlxError>).value,
+        );
+        if (current case None()) {
+          return const Err(AdminUpdateProductMediaRejected(
+            AdminUpdateProductMediaFailure.notFound,
+          ));
+        }
 
-      final writes = AdminProductUpdateRepository(tx);
-      final maxRank = await writes.maxImageRank(productId);
-      if (maxRank case Err(:final error)) return Err(error);
-      final offset =
-          (maxRank as Ok<int, SqlxError>).value + update.media.length + 1;
-      final shifted = await writes.shiftImageRanks(productId, offset);
-      if (shifted case Err(:final error)) return Err(error);
+        final prepared = _prepareMediaUpdate(
+          input.media,
+          (current as Some<AdminProductDetailResponse>).value.images,
+          mediaStorage,
+        );
+        if (prepared case Err()) {
+          return const Err(AdminUpdateProductMediaRejected(
+            AdminUpdateProductMediaFailure.invalidMedia,
+          ));
+        }
+        final update = (prepared
+                as Ok<_PreparedMediaUpdate, AdminUpdateProductMediaFailure>)
+            .value;
+        claims = update.claims;
+        if (claims.isNotEmpty) {
+          claimed = mediaStorage.claim(claims);
+          if (!claimed) {
+            return const Err(AdminUpdateProductMediaRejected(
+              AdminUpdateProductMediaFailure.invalidMedia,
+            ));
+          }
+        }
 
-      for (var rank = 0; rank < update.media.length; rank++) {
-        final item = update.media[rank];
-        final write = update.existingIds.contains(item.id)
-            ? await writes.rankImage(item.id, productId, rank)
-            : await writes.insertImage(nextId(), productId, item.url, rank);
-        if (write case Err(:final error)) return Err(error);
-      }
+        final writes = AdminProductUpdateRepository(tx);
+        final maxRank = await writes.maxImageRank(productId);
+        if (maxRank case Err(:final error)) {
+          return Err(AdminUpdateProductMediaStorage(error));
+        }
+        final offset =
+            (maxRank as Ok<int, SqlxError>).value + update.media.length + 1;
+        final shifted = await writes.shiftImageRanks(productId, offset);
+        if (shifted case Err(:final error)) {
+          return Err(AdminUpdateProductMediaStorage(error));
+        }
 
-      final links = AdminProductImageVariantRepository(tx);
-      final unlinked = await links.removeForShiftedImages(productId, offset);
-      if (unlinked case Err(:final error)) return Err(error);
-      final removed = await writes.deleteShiftedImages(productId, offset);
-      if (removed case Err(:final error)) return Err(error);
-      final thumbnail = await writes.updateThumbnail(
-        productId,
-        update.thumbnail,
-      );
-      if (thumbnail case Err(:final error)) return Err(error);
+        for (var rank = 0; rank < update.media.length; rank++) {
+          final item = update.media[rank];
+          final write = update.existingIds.contains(item.id)
+              ? await writes.rankImage(item.id, productId, rank)
+              : await writes.insertImage(nextId(), productId, item.url, rank);
+          if (write case Err(:final error)) {
+            return Err(AdminUpdateProductMediaStorage(error));
+          }
+        }
 
-      final refreshed = await reads.findById(productId);
-      if (refreshed case Err(:final error)) return Err(error);
-      return switch (optionOf(
-        (refreshed as Ok<AdminProductDetailResponse?, SqlxError>).value,
-      )) {
-        Some(:final value) => Ok(Ok(value)),
-        None() => const Ok(Err(AdminUpdateProductMediaFailure.notFound)),
-      };
-    });
+        final links = AdminProductImageVariantRepository(tx);
+        final unlinked = await links.removeForShiftedImages(productId, offset);
+        if (unlinked case Err(:final error)) {
+          return Err(AdminUpdateProductMediaStorage(error));
+        }
+        final removed = await writes.deleteShiftedImages(productId, offset);
+        if (removed case Err(:final error)) {
+          return Err(AdminUpdateProductMediaStorage(error));
+        }
+        final thumbnail = await writes.updateThumbnail(
+          productId,
+          update.thumbnail,
+        );
+        if (thumbnail case Err(:final error)) {
+          return Err(AdminUpdateProductMediaStorage(error));
+        }
+
+        final refreshed = await reads.findById(productId);
+        if (refreshed case Err(:final error)) {
+          return Err(AdminUpdateProductMediaStorage(error));
+        }
+        return switch (optionOf(
+          (refreshed as Ok<AdminProductDetailResponse?, SqlxError>).value,
+        )) {
+          Some(:final value) => Ok(value),
+          None() => const Err(AdminUpdateProductMediaRejected(
+              AdminUpdateProductMediaFailure.notFound,
+            )),
+        };
+      },
+      storageError: AdminUpdateProductMediaStorage.new,
+    );
   } finally {
     if (claimed) mediaStorage.release(claims);
   }
