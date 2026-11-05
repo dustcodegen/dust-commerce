@@ -97,10 +97,10 @@ final class _AdminHome extends StatefulWidget {
 final class _AdminHomeState extends State<_AdminHome>
     with
         _AdminCustomerGroupActions,
-        _AdminCreationActions,
-        _AdminInventoryActions,
         _AdminSupportActions,
         _AdminHomeActions,
+        _AdminCreationActions,
+        _AdminInventoryActions,
         _AdminHomeNavigation {
   @override
   final _customerSearchFocus = FocusNode();

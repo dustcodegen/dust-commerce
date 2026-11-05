@@ -1,13 +1,11 @@
 part of 'admin_gate.dart';
 
 /// Owns the authenticated Inventory/Locations route transition.
-mixin _AdminInventoryActions on State<_AdminHome> {
+mixin _AdminInventoryActions on State<_AdminHome>, _AdminHomeActions {
+  @override
   FocusNode get _stockLocationSearchFocus;
-  _AdminRoute get _route;
-  set _route(_AdminRoute value);
-  String get _selectedId;
-  set _selectedId(String value);
 
+  @override
   void _showStockLocations() {
     context.readAdminStockLocationViewModel().load(offset: 0);
     setState(() {
@@ -16,6 +14,7 @@ mixin _AdminInventoryActions on State<_AdminHome> {
     });
   }
 
+  @override
   void _requestInventorySearch() {
     _showStockLocations();
     WidgetsBinding.instance.addPostFrameCallback((_) {

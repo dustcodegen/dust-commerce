@@ -12,11 +12,6 @@ mixin _AdminHomeActions
   FocusNode get _promotionSearchFocus;
   FocusNode get _stockLocationSearchFocus;
 
-  _AdminRoute get _route;
-  set _route(_AdminRoute value);
-  String get _selectedId;
-  set _selectedId(String value);
-
   void _showStockLocations();
   void _requestInventorySearch();
   Future<void> _createProduct();
