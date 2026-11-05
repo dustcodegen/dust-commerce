@@ -122,11 +122,20 @@ Future<Result<AdminProductTypeResponse, Rejection>>
     nextId: deps.clock.nextId,
   );
   return switch (result) {
-    Ok(value: Ok(value: final productType)) => Ok(productType),
-    Ok(value: Err(error: AdminCreateProductTypeFailure.invalid)) =>
+    Ok(value: final productType) => Ok(productType),
+    Err(
+      error: AdminCreateProductTypeRejected(
+        failure: AdminCreateProductTypeFailure.invalid,
+      )
+    ) =>
       const Err(Rejection.status(422, 'Enter a product type')),
-    Ok(value: Err(error: AdminCreateProductTypeFailure.valueConflict)) =>
+    Err(
+      error: AdminCreateProductTypeRejected(
+        failure: AdminCreateProductTypeFailure.valueConflict,
+      )
+    ) =>
       const Err(Rejection.conflict('Another product type uses this value')),
-    Err() => const Err(Rejection.internal()),
+    Err(error: AdminCreateProductTypeStorage()) =>
+      const Err(Rejection.internal()),
   };
 }
