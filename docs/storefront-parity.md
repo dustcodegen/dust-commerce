@@ -70,6 +70,28 @@ flutter test apps/commerce_app/test/storefront/source_conversion_test.dart
 10 tests passed
 ```
 
+## Product document metadata slice
+
+The current Medusa product route derives a title, description, Open Graph
+image and canonical URL from the loaded product instead of leaving the static
+index metadata in place. Dust now mirrors that contract through the
+`ProductDocumentMetadata` route companion. It is a no-op on native Flutter
+targets and uses the web DOM only when the storefront is running in a browser,
+so mobile and desktop builds share the same product route without importing a
+web-only library into their runtime.
+
+The canonical URL preserves the country-prefixed product path while removing
+variant query state, matching the source route's product identity. Empty
+descriptions fall back to the product title, and leaving the route restores the
+static Morrow shell metadata.
+
+The pure contract gate passed locally:
+
+```text
+flutter test apps/commerce_app/test/storefront/product_document_metadata_test.dart
+2 tests passed
+```
+
 ## Source-to-Dust map
 
 | Medusa source | Flutter/Dust owner | Status |
