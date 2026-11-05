@@ -47,14 +47,27 @@ Future<Result<AdminProductOptionDetailResponse, Rejection>>
     nextId: deps.clock.nextId,
   );
   return switch (result) {
-    Ok(value: Ok(value: final option)) => Ok(option),
-    Ok(value: Err(error: AdminCreateProductOptionFailure.invalid)) =>
+    Ok(:final value) => Ok(value),
+    Err(
+      error: AdminCreateProductOptionRejected(
+        failure: AdminCreateProductOptionFailure.invalid,
+      )
+    ) =>
       const Err(Rejection.status(422, 'Add at least one unique option value')),
-    Ok(value: Err(error: AdminCreateProductOptionFailure.titleConflict)) =>
+    Err(
+      error: AdminCreateProductOptionRejected(
+        failure: AdminCreateProductOptionFailure.titleConflict,
+      )
+    ) =>
       const Err(Rejection.conflict('Another option already uses this title')),
-    Ok(value: Err(error: AdminCreateProductOptionFailure.unavailable)) =>
+    Err(
+      error: AdminCreateProductOptionRejected(
+        failure: AdminCreateProductOptionFailure.unavailable,
+      )
+    ) =>
       const Err(Rejection.internal()),
-    Err() => const Err(Rejection.internal()),
+    Err(error: AdminCreateProductOptionStorage()) =>
+      const Err(Rejection.internal()),
   };
 }
 
