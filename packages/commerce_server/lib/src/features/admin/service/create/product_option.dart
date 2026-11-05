@@ -17,12 +17,35 @@ enum AdminCreateProductOptionFailure {
   unavailable,
 }
 
+/// Error crossing the Admin product-option creation boundary.
+sealed class AdminCreateProductOptionError {
+  /// Creates one product-option error.
+  const AdminCreateProductOptionError();
+}
+
+/// A business rejection that is safe to expose to the handler.
+final class AdminCreateProductOptionRejected
+    extends AdminCreateProductOptionError {
+  /// Creates one business rejection.
+  const AdminCreateProductOptionRejected(this.failure);
+
+  /// The stable business reason.
+  final AdminCreateProductOptionFailure failure;
+}
+
+/// A storage failure retained for logging without exposing SQL details.
+final class AdminCreateProductOptionStorage
+    extends AdminCreateProductOptionError {
+  /// Creates one storage failure.
+  const AdminCreateProductOptionStorage(this.cause);
+
+  /// The original SQLx failure.
+  final SqlxError cause;
+}
+
 /// Creates one global product option and its values atomically.
-Future<
-    Result<
-        Result<AdminProductOptionDetailResponse,
-            AdminCreateProductOptionFailure>,
-        SqlxError>> createAdminProductOption(
+Future<Result<AdminProductOptionDetailResponse, AdminCreateProductOptionError>>
+    createAdminProductOption(
   CommerceDatabase database,
   AdminCreateProductOption input, {
   required String Function() nextId,
@@ -30,35 +53,54 @@ Future<
   final title = input.title.trim();
   final values = input.values.map((value) => value.trim()).toList();
   if (!_validCreatedOption(title, values)) {
-    return const Ok(Err(AdminCreateProductOptionFailure.invalid));
+    return const Err(
+      AdminCreateProductOptionRejected(AdminCreateProductOptionFailure.invalid),
+    );
   }
-  return database.transaction((tx) async {
-    final options = AdminProductOptionRepository(tx);
-    final writes = AdminProductOptionUpdateRepository(tx);
-    final optionId = nextId();
-    final inserted = await options.insert(optionId, title);
-    if (inserted case Err(:final error)) return Err(error);
-    if ((inserted as Ok<ExecResult, SqlxError>).value.rowsAffected == 0) {
-      return const Ok(Err(AdminCreateProductOptionFailure.titleConflict));
-    }
-    for (var rank = 0; rank < values.length; rank++) {
-      final write = await writes.insertValue(
-        nextId(),
-        optionId,
-        values[rank],
-        rank,
-      );
-      if (write case Err(:final error)) return Err(error);
-    }
-    final refreshed = await options.findById(optionId);
-    if (refreshed case Err(:final error)) return Err(error);
-    return switch (optionOf(
-      (refreshed as Ok<AdminProductOptionDetailResponse?, SqlxError>).value,
-    )) {
-      Some(:final value) => Ok(Ok(value)),
-      None() => const Ok(Err(AdminCreateProductOptionFailure.unavailable)),
-    };
-  });
+  return transactionResult<AdminProductOptionDetailResponse,
+      AdminCreateProductOptionError>(
+    database,
+    (tx) async {
+      final options = AdminProductOptionRepository(tx);
+      final writes = AdminProductOptionUpdateRepository(tx);
+      final optionId = nextId();
+      final inserted = await options.insert(optionId, title);
+      if (inserted case Err(:final error)) {
+        return Err(AdminCreateProductOptionStorage(error));
+      }
+      if ((inserted as Ok<ExecResult, SqlxError>).value.rowsAffected == 0) {
+        return const Err(
+          AdminCreateProductOptionRejected(
+            AdminCreateProductOptionFailure.titleConflict,
+          ),
+        );
+      }
+      for (var rank = 0; rank < values.length; rank++) {
+        final write = await writes.insertValue(
+          nextId(),
+          optionId,
+          values[rank],
+          rank,
+        );
+        if (write case Err(:final error)) {
+          return Err(AdminCreateProductOptionStorage(error));
+        }
+      }
+      final refreshed = await options.findById(optionId);
+      if (refreshed case Err(:final error)) {
+        return Err(AdminCreateProductOptionStorage(error));
+      }
+      return switch (optionOf(
+        (refreshed as Ok<AdminProductOptionDetailResponse?, SqlxError>).value,
+      )) {
+        Some(:final value) => Ok(value),
+        None() => const Err(AdminCreateProductOptionRejected(
+            AdminCreateProductOptionFailure.unavailable,
+          )),
+      };
+    },
+    storageError: AdminCreateProductOptionStorage.new,
+  );
 }
 
 bool _validCreatedOption(String title, List<String> values) =>

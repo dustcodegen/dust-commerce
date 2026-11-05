@@ -47,14 +47,27 @@ Future<Result<AdminProductOptionDetailResponse, Rejection>>
     nextId: deps.clock.nextId,
   );
   return switch (result) {
-    Ok(value: Ok(value: final option)) => Ok(option),
-    Ok(value: Err(error: AdminCreateProductOptionFailure.invalid)) =>
+    Ok(:final value) => Ok(value),
+    Err(
+      error: AdminCreateProductOptionRejected(
+        failure: AdminCreateProductOptionFailure.invalid,
+      )
+    ) =>
       const Err(Rejection.status(422, 'Add at least one unique option value')),
-    Ok(value: Err(error: AdminCreateProductOptionFailure.titleConflict)) =>
+    Err(
+      error: AdminCreateProductOptionRejected(
+        failure: AdminCreateProductOptionFailure.titleConflict,
+      )
+    ) =>
       const Err(Rejection.conflict('Another option already uses this title')),
-    Ok(value: Err(error: AdminCreateProductOptionFailure.unavailable)) =>
+    Err(
+      error: AdminCreateProductOptionRejected(
+        failure: AdminCreateProductOptionFailure.unavailable,
+      )
+    ) =>
       const Err(Rejection.internal()),
-    Err() => const Err(Rejection.internal()),
+    Err(error: AdminCreateProductOptionStorage()) =>
+      const Err(Rejection.internal()),
   };
 }
 
@@ -115,20 +128,35 @@ Future<Result<AdminProductOptionDetailResponse, Rejection>>
     nextId: deps.clock.nextId,
   );
   return switch (result) {
-    Ok(value: Ok(value: final option)) => Ok(option),
-    Ok(value: Err(error: AdminUpdateProductOptionDetailFailure.notFound)) =>
+    Ok(:final value) => Ok(value),
+    Err(
+      error: AdminUpdateProductOptionDetailRejected(
+        failure: AdminUpdateProductOptionDetailFailure.notFound,
+      )
+    ) =>
       Err(Rejection.notFound('Product option "$id"')),
-    Ok(value: Err(error: AdminUpdateProductOptionDetailFailure.invalid)) =>
+    Err(
+      error: AdminUpdateProductOptionDetailRejected(
+        failure: AdminUpdateProductOptionDetailFailure.invalid,
+      )
+    ) =>
       const Err(Rejection.status(422, 'Add at least one unique option value')),
-    Ok(
-      value: Err(error: AdminUpdateProductOptionDetailFailure.titleConflict)
+    Err(
+      error: AdminUpdateProductOptionDetailRejected(
+        failure: AdminUpdateProductOptionDetailFailure.titleConflict,
+      )
     ) =>
       const Err(Rejection.conflict('Another option already uses this title')),
-    Ok(value: Err(error: AdminUpdateProductOptionDetailFailure.valueInUse)) =>
+    Err(
+      error: AdminUpdateProductOptionDetailRejected(
+        failure: AdminUpdateProductOptionDetailFailure.valueInUse,
+      )
+    ) =>
       const Err(Rejection.conflict(
         'A product variant still uses one of the removed values',
       )),
-    Err() => const Err(Rejection.internal()),
+    Err(error: AdminUpdateProductOptionDetailStorage()) =>
+      const Err(Rejection.internal()),
   };
 }
 
