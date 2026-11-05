@@ -27,6 +27,16 @@ void main() {
         product: product,
         currencyCode: 'usd',
         productUrl: 'https://shop.test/products/t-shirt',
+        countryCode: 'dk',
+        policy: const StoreRegionPolicy(
+          freeReturns: true,
+          handlingDaysMax: 2,
+          handlingDaysMin: 1,
+          returnWindowDays: 30,
+          shippingRate: '10',
+          transitDaysMax: 3,
+          transitDaysMin: 2,
+        ),
       ),
     ) as Map<String, Object?>;
 
@@ -36,6 +46,18 @@ void main() {
     expect(
       (json['offers']! as Map<String, Object?>)['availability'],
       'https://schema.org/InStock',
+    );
+    final offer = json['offers']! as Map<String, Object?>;
+    final shipping = offer['shippingDetails']! as Map<String, Object?>;
+    expect(
+      (shipping['shippingDestination']!
+          as Map<String, Object?>)['addressCountry'],
+      'DK',
+    );
+    expect(
+      (offer['hasMerchantReturnPolicy']!
+          as Map<String, Object?>)['merchantReturnDays'],
+      30,
     );
   });
 
