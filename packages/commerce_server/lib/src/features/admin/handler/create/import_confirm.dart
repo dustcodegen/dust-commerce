@@ -25,15 +25,32 @@ Future<Result<Response, Rejection>> confirmAdminProductImportHandler(
     nextId: deps.clock.nextId,
   );
   return switch (result) {
-    Ok(value: Ok()) => Ok(Response(202)),
-    Ok(value: Err(error: AdminProductImportConfirmFailure.notFound)) =>
+    Ok() => Ok(Response(202)),
+    Err(
+      error: AdminProductImportConfirmRejected(
+        failure: AdminProductImportConfirmFailure.notFound,
+      )
+    ) =>
       Err(Rejection.notFound('Product import "$transactionId"')),
-    Ok(value: Err(error: AdminProductImportConfirmFailure.unavailable)) =>
+    Err(
+      error: AdminProductImportConfirmRejected(
+        failure: AdminProductImportConfirmFailure.unavailable,
+      )
+    ) =>
       const Err(Rejection.conflict('Product import is no longer available')),
-    Ok(value: Err(error: AdminProductImportConfirmFailure.invalid)) =>
+    Err(
+      error: AdminProductImportConfirmRejected(
+        failure: AdminProductImportConfirmFailure.invalid,
+      )
+    ) =>
       const Err(Rejection.status(422, 'Product import is invalid')),
-    Ok(value: Err(error: AdminProductImportConfirmFailure.conflict)) =>
+    Err(
+      error: AdminProductImportConfirmRejected(
+        failure: AdminProductImportConfirmFailure.conflict,
+      )
+    ) =>
       const Err(Rejection.conflict('Product catalogue changed after preview')),
-    Err() => const Err(Rejection.internal()),
+    Err(error: AdminProductImportConfirmStorage()) =>
+      const Err(Rejection.internal()),
   };
 }
