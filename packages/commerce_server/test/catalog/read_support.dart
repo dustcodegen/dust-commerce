@@ -21,6 +21,15 @@ Future<void> seedCatalogRead(CommerceDatabase database) async {
     r"('prod_secret', NULL, NULL, 'Hoodie', 'secret-hoodie', NULL, 'draft')",
   );
   await run(
+    r'''
+INSERT INTO regions
+      (id, name, currency_code, tax_rate, countries, metadata)
+    VALUES
+      ('reg_us', 'United States', 'usd', 0, 'us',
+       '{"return_window_days":30,"free_returns":true,"shipping_rate":0,"handling_days_min":0,"handling_days_max":1,"transit_days_min":2,"transit_days_max":3}')
+''',
+  );
+  await run(
     r"INSERT INTO product_categories (id, name, handle) VALUES "
     r"('cat_clothing', 'Clothing', 'clothing'), "
     r"('cat_shirts', 'Shirts', 'clothing/shirts')",

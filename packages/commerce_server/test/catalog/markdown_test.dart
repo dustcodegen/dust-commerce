@@ -41,6 +41,10 @@ void main() {
     );
     expect(
       response.body,
+      contains('- Shipping: free, ships in 0-1 business days'),
+    );
+    expect(
+      response.body,
       contains('POST `variant_id={variant_id}&quantity={n}`'),
     );
     expect(response.body, isNot(contains('inventory_quantity')));
