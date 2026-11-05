@@ -20,6 +20,8 @@ final class StoreDocumentMetadata {
     Product product,
     Uri currentUri, {
     String currencyCode = 'usd',
+    String countryCode = '',
+    StoreRegionPolicy? policy,
   }) {
     final description = product.description?.trim();
     final canonicalUrl = _canonicalUrl(currentUri);
@@ -34,6 +36,8 @@ final class StoreDocumentMetadata {
         product: product,
         currencyCode: currencyCode,
         productUrl: canonicalUrl,
+        countryCode: countryCode,
+        policy: policy,
       ),
     );
   }

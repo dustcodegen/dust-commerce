@@ -8,6 +8,8 @@ class ProductDocumentMetadata extends StatefulWidget {
   const ProductDocumentMetadata({
     required this.product,
     required this.currencyCode,
+    required this.countryCode,
+    required this.policy,
     super.key,
   });
 
@@ -16,6 +18,12 @@ class ProductDocumentMetadata extends StatefulWidget {
 
   /// Currency selected for the product route.
   final String currencyCode;
+
+  /// Country used by the active selling region.
+  final String countryCode;
+
+  /// Published shipping and return policy, when available.
+  final StoreRegionPolicy? policy;
 
   @override
   State<ProductDocumentMetadata> createState() =>
@@ -33,7 +41,9 @@ class _ProductDocumentMetadataState extends State<ProductDocumentMetadata> {
   void didUpdateWidget(ProductDocumentMetadata oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.product != widget.product ||
-        oldWidget.currencyCode != widget.currencyCode) {
+        oldWidget.currencyCode != widget.currencyCode ||
+        oldWidget.countryCode != widget.countryCode ||
+        oldWidget.policy != widget.policy) {
       _sync();
     }
   }
@@ -59,6 +69,8 @@ class _ProductDocumentMetadataState extends State<ProductDocumentMetadata> {
             product,
             Uri.base,
             currencyCode: widget.currencyCode,
+            countryCode: widget.countryCode,
+            policy: widget.policy,
           ),
         );
       }
