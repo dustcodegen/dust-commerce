@@ -81,7 +81,7 @@ void main() {
         "UPDATE order_items SET created_at = CASE variant_id "
         "WHEN 'var_small' THEN TIMESTAMPTZ '2100-01-01T12:00:00Z' "
         "WHEN 'var_large' THEN TIMESTAMPTZ '2100-01-01T12:00:01Z' "
-        'END WHERE order_id = \$1',
+        r'END WHERE order_id = $1',
         [order.id],
       ).execute(harness.database.executor);
 
