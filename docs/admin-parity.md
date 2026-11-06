@@ -17,6 +17,13 @@ The repository's 180-code-line gate still reports 6 legacy files. New slices
 add no over-limit handwritten file, and touched legacy files are split by
 responsibility. The remaining debt stays visible instead of weakening the gate.
 
+## Current local package gate
+
+On 2026-11-06 at `f18c474d`, `./scripts/verify_package.sh apps/admin_app`
+completed with Dust `261/261` clean, Flutter analysis clean, and `175` Admin
+non-widget tests passing. No widget tests were added; CI and remote merge remain
+deferred until the one-day local review window ends.
+
 ## Promotion creation slice
 
 `POST /admin/promotions` now closes the first write gap in the protected
