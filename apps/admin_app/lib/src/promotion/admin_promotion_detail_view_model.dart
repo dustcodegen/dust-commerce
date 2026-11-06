@@ -56,8 +56,40 @@ final class AdminPromotionDetailViewModel
     }
   }
 
+  /// Retires the loaded promotion while preserving the detail until navigation.
+  Future<bool> delete(String id) async {
+    final revision = ++_revision;
+    final current = state;
+    emit(current.copyWith(
+      status: AdminPromotionDetailStatus.deleting,
+      failure: const None(),
+    ));
+    try {
+      await args.api.deletePromotion(id);
+      if (revision != _revision) return true;
+      return true;
+    } on DioException catch (error) {
+      if (revision != _revision) return false;
+      _deleteFailed(error.response?.statusCode == 404
+          ? 'This promotion no longer exists.'
+          : error.response?.statusCode == 401
+              ? 'Your admin session has expired.'
+              : 'Unable to delete this promotion. Try again.');
+      return false;
+    } on Object {
+      if (revision != _revision) return false;
+      _deleteFailed('Unable to delete this promotion. Try again.');
+      return false;
+    }
+  }
+
   void _fail(String message) => emit(AdminPromotionDetailState(
         status: AdminPromotionDetailStatus.failed,
+        failure: Some(message),
+      ));
+
+  void _deleteFailed(String message) => emit(state.copyWith(
+        status: AdminPromotionDetailStatus.ready,
         failure: Some(message),
       ));
 }

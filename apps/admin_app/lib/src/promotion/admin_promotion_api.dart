@@ -33,4 +33,8 @@ abstract interface class AdminPromotionApi {
   /// Reads one active promotion detail.
   @GET('/admin/promotions/{id}')
   Future<AdminPromotionDetail> promotion(@Path() String id);
+
+  /// Retires one active promotion.
+  @DELETE('/admin/promotions/{id}')
+  Future<AdminPromotionDeleted> deletePromotion(@Path() String id);
 }

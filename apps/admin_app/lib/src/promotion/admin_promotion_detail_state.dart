@@ -14,6 +14,9 @@ enum AdminPromotionDetailStatus {
   /// The requested promotion is ready.
   ready,
 
+  /// The promotion is being retired.
+  deleting,
+
   /// The request failed with display-safe copy.
   failed,
 }

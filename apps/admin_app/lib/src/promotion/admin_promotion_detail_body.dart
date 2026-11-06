@@ -8,11 +8,19 @@ final class AdminPromotionDetailBody extends StatelessWidget {
   const AdminPromotionDetailBody({
     required this.promotion,
     required this.onBack,
+    required this.onDelete,
+    required this.deleting,
     super.key,
   });
 
   /// Returns to the promotion table.
   final VoidCallback onBack;
+
+  /// Retires this promotion after confirmation.
+  final VoidCallback onDelete;
+
+  /// Whether the retirement request is in flight.
+  final bool deleting;
 
   /// Explicit loaded promotion.
   final AdminPromotion promotion;
@@ -33,7 +41,29 @@ final class AdminPromotionDetailBody extends StatelessWidget {
                     label: const Text('Promotions'),
                   ),
                   const SizedBox(height: 6),
-                  AdminPromotionGeneralSection(promotion: promotion),
+                  Row(
+                    children: [
+                      Expanded(
+                        child:
+                            AdminPromotionGeneralSection(promotion: promotion),
+                      ),
+                      const SizedBox(width: 16),
+                      OutlinedButton.icon(
+                        onPressed: deleting ? null : onDelete,
+                        icon: deleting
+                            ? const SizedBox.square(
+                                dimension: 16,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Icon(Icons.delete_outline),
+                        label: const Text('Delete'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
