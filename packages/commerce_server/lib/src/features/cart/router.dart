@@ -1,5 +1,6 @@
 import 'package:commerce_server/src/features/account/extractor.dart';
 import 'package:commerce_server/src/features/cart/extractor.dart';
+import 'package:commerce_server/src/features/cart/handler/add_form.dart';
 import 'package:commerce_server/src/features/cart/handler/handler.dart';
 import 'package:dust_server/server.dart';
 
@@ -11,7 +12,8 @@ Router cartRoutes() {
   final create = Router()
     ..routeLayer(fromExtractor(const OptionalCustomerAuth()))
     ..route('/carts/buy', post(buyCartHandler, status: 201))
-    ..route('/carts', post(createCartHandler, status: 201));
+    ..route('/carts', post(createCartHandler, status: 201))
+    ..route('/cart/add', post(addFormLineHandler));
   final byId = Router()
     ..routeLayer(fromExtractor(const CartAccessExtractor()))
     ..route(

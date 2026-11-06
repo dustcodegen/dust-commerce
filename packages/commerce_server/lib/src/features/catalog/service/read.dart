@@ -74,7 +74,7 @@ $variants
 
 ## Buy
 
-- Add to cart: POST `variant_id={variant_id}&quantity={n}` (form-encoded) to $base/cart/add
+- Add to cart: POST `variant_id={variant_id}&quantity={n}` (form-encoded) to $origin/store/cart/add
 - Checkout link: $origin/buy/{variant_id}:{quantity}?context/address_country=${countryCode.toUpperCase()}
 
 ## Policies
