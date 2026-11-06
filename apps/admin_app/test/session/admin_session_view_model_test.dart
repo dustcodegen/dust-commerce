@@ -77,6 +77,16 @@ void main() {
     );
   });
 
+  test('normalizes offset-bearing stored expiry to UTC', () {
+    final stored = StoredAdminSession.fromJson({
+      'token': 'session-token',
+      'expires_at': '2100-01-08T18:30:00+06:30',
+    });
+
+    expect(stored.expiresAt, DateTime.utc(2100, 1, 8, 12));
+    expect(stored.expiresAt.isUtc, isTrue);
+  });
+
   test('expired local bearer is cleared without an API request', () async {
     sessions.value = Some(StoredAdminSession(
       token: 'expired-secret',

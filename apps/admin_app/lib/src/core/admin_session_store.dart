@@ -18,7 +18,7 @@ final class StoredAdminSession {
     }
     return StoredAdminSession(
       token: token,
-      expiresAt: DateTime.parse(expiresAt),
+      expiresAt: DateTime.parse(expiresAt).toUtc(),
     );
   }
 
