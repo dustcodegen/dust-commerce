@@ -154,6 +154,21 @@ void main() {
       (await apply(cartId, 'SPENT')).assertUnprocessable();
     });
 
+    test('a retired promotion cannot be redeemed again', () async {
+      final cartId = await cartWorth(2000);
+      await queryExecute('''
+UPDATE promotions
+SET deleted_at = CURRENT_TIMESTAMP
+WHERE code = 'SAVE10'
+''', []).execute(database.executor);
+
+      final response = await apply(cartId, 'SAVE10');
+
+      response
+        ..assertUnprocessable()
+        ..assertTextContains('no promotion with the code');
+    });
+
     test('a fixed code in another currency is refused', () async {
       final cartId = await cartWorth(2000);
 
