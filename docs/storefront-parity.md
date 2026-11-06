@@ -353,6 +353,8 @@ changes recalculate percentage amounts transactionally, and checkout freezes
 the applied code and counts redemption only after the order write succeeds.
 This vertical slice intentionally supports one promotion per cart; applying a
 second code replaces the first until combination and exclusion policy exists.
+Promotion lookup also excludes soft-deleted policies at the SQL boundary, so an
+Admin-retired code cannot be redeemed by a stale storefront cart request.
 
 Checkout addresses keep company and secondary street line as independent
 optional values from Flutter input through the frozen order snapshot. The
