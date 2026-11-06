@@ -1,11 +1,9 @@
 import 'package:admin_app/src/product_option/admin_product_option_pagination.dart';
 import 'package:admin_app/src/product_option/admin_product_option_delete.dart';
+import 'package:admin_app/src/product_option/admin_product_option_page_body.dart';
 import 'package:admin_app/src/product_option/admin_product_option_page_header.dart';
-import 'package:admin_app/src/product_option/admin_product_option_state.dart';
-import 'package:admin_app/src/product_option/admin_product_option_table.dart';
 import 'package:admin_app/src/product_option/admin_product_option_view_model.dart';
 import 'package:commerce_admin_shared/commerce_admin_shared.dart';
-import 'package:dust_dart/fp.dart';
 import 'package:flutter/material.dart';
 
 /// Medusa's global product-options route backed by the authenticated API.
@@ -72,51 +70,18 @@ final class _AdminProductOptionPageState extends State<AdminProductOptionPage> {
                 Divider(height: 1, color: Theme.of(context).dividerColor),
                 const AdminProductOptionToolbar(),
                 Divider(height: 1, color: Theme.of(context).dividerColor),
-                _body(context, state),
+                AdminProductOptionPageBody(
+                  state: state,
+                  onRetry: context.readAdminProductOptionViewModel().load,
+                  onOpen: widget.onOpen,
+                  onDelete: (option) => _delete(context, option),
+                ),
                 AdminProductOptionPagination(state: state),
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-
-  Widget _body(BuildContext context, AdminProductOptionState state) {
-    if (state.status == AdminProductOptionStatus.loading &&
-        state.productOptions.isEmpty) {
-      return const SizedBox(
-        height: 120,
-        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-      );
-    }
-    if (state.failure case Some(value: final message)) {
-      return SizedBox(
-        height: 120,
-        child: Center(
-          child: OutlinedButton(
-            onPressed: context.readAdminProductOptionViewModel().load,
-            child: Text('$message Retry'),
-          ),
-        ),
-      );
-    }
-    if (state.productOptions.isEmpty) {
-      return const SizedBox(
-        height: 120,
-        child: Center(child: Text('No records')),
-      );
-    }
-    return Stack(
-      children: [
-        AdminProductOptionTable(
-          productOptions: state.productOptions,
-          onOpen: widget.onOpen,
-          onDelete: (option) => _delete(context, option),
-        ),
-        if (state.status == AdminProductOptionStatus.loading)
-          const LinearProgressIndicator(minHeight: 2),
-      ],
     );
   }
 
