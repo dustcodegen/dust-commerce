@@ -2,7 +2,6 @@ import 'package:commerce_admin_shared/commerce_admin_shared.dart';
 import 'package:commerce_server/src/features/admin/extractor.dart';
 import 'package:commerce_server/src/features/admin_promotion/delete_service.dart';
 import 'package:commerce_server/src/features/admin_promotion/deps.dart';
-import 'package:commerce_server/src/http/http.dart';
 import 'package:dust_server/server.dart';
 
 /// `DELETE /admin/promotions/{id}` — retires one active promotion.

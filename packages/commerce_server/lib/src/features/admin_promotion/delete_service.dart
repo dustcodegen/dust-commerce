@@ -3,7 +3,10 @@ import 'package:commerce_server/src/features/admin_promotion/delete_repository.d
 import 'package:dust_dart/db.dart';
 
 /// Why one promotion cannot be retired.
-enum AdminPromotionDeleteFailure { notFound }
+enum AdminPromotionDeleteFailure {
+  /// The promotion is missing or already retired.
+  notFound,
+}
 
 /// Error crossing the promotion-retirement boundary.
 sealed class AdminPromotionDeleteError {
@@ -12,15 +15,19 @@ sealed class AdminPromotionDeleteError {
 
 /// Expected business refusal safe for transport mapping.
 final class AdminPromotionDeleteRejected extends AdminPromotionDeleteError {
+  /// Creates a safe business refusal.
   const AdminPromotionDeleteRejected(this.failure);
 
+  /// Stable refusal reason for transport mapping.
   final AdminPromotionDeleteFailure failure;
 }
 
 /// SQLx failure retained for the internal error boundary.
 final class AdminPromotionDeleteStorage extends AdminPromotionDeleteError {
+  /// Creates a storage failure wrapper.
   const AdminPromotionDeleteStorage(this.cause);
 
+  /// Original SQLx failure for internal diagnostics.
   final SqlxError cause;
 }
 
