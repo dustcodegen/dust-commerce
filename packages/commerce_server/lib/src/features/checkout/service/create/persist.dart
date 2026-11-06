@@ -1,5 +1,4 @@
 import 'package:commerce_server/src/features/cart/model/cart.dart';
-import 'package:commerce_server/src/features/cart/model/promotion.dart';
 import 'package:commerce_server/src/features/cart/repository/repository.dart';
 import 'package:commerce_server/src/features/cart/service/service.dart';
 import 'package:commerce_server/src/features/checkout/model.dart';
@@ -81,6 +80,7 @@ Future<Result<CheckoutPlacementOutcome, SqlxError>> persistOrder(
   }
 
   final orderId = nextId();
+  final promotion = cart.promotions.firstOrNull;
   final written = await orders.insertOrder(
     orderId,
     cartId,
@@ -98,7 +98,7 @@ Future<Result<CheckoutPlacementOutcome, SqlxError>> persistOrder(
     cart.total.amount,
     shippingMethod.optionId,
     shippingMethod.name,
-    cart.promotions.firstOrNull?.code,
+    promotion?.code,
     placedAt.toUtc().toIso8601String(),
   );
   if (written case Err(:final error)) return Err(error);
@@ -144,16 +144,9 @@ Future<Result<CheckoutPlacementOutcome, SqlxError>> persistOrder(
     if (recorded case Err(:final error)) return Err(error);
   }
 
-  if (!cart.discountTotal.isZero) {
-    final promotion = await carts.promotionOn(cartId);
-    if (promotion case Err(:final error)) return Err(error);
-    final applied = optionOf(
-      (promotion as Ok<AppliedPromotionResponse?, SqlxError>).value,
-    );
-    if (applied case Some(value: final promotion)) {
-      final counted = await orders.countRedemption(promotion.code);
-      if (counted case Err(:final error)) return Err(error);
-    }
+  if (!cart.discountTotal.isZero && promotion != null) {
+    final counted = await orders.countRedemption(promotion.id);
+    if (counted case Err(:final error)) return Err(error);
   }
 
   final completed = await orders.completeCart(
