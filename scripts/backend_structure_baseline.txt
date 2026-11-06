@@ -17,6 +17,7 @@ packages/commerce_server/lib/src/features/admin/service/image_variants.dart
 packages/commerce_server/lib/src/features/admin/service/product_media.dart
 packages/commerce_server/lib/src/features/admin/service/update_media.dart
 packages/commerce_server/lib/src/features/admin/service/update_variant.dart
+packages/commerce_server/lib/src/features/cart/handler/add_form.dart
 packages/commerce_server/lib/src/features/checkout/repository/customer_read.dart
 packages/commerce_server/lib/src/features/order_return/handler/history.dart
 packages/commerce_server/lib/src/features/order_return/service/history.dart
