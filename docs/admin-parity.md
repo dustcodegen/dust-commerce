@@ -37,6 +37,18 @@ Admin promotions page now has a focused create surface for code, type, value,
 currency, and usage limit, with server-owned error handling and a generated
 client integration test that returns to the newly created detail route.
 
+## Promotion retirement slice
+
+`DELETE /admin/promotions/{id}` now retires one active promotion behind the
+same route-level Admin bearer guard. The direct SQLx update sets the existing
+`deleted_at` audit field with PostgreSQL time, returns a standalone
+`{id, object, deleted}` acknowledgement, hides the row from Admin reads, and
+leaves redemption history intact. The generated Admin client and detail route
+include confirmation, safe failure copy, and a server-authoritative loading
+state. Focused PostgreSQL coverage verifies authorization, soft deletion,
+repeat/missing failures, and the refreshed hidden detail; the Admin package
+gate covers the generated client and ViewModel flow without widget tests.
+
 ## Isolation boundary
 
 - `apps/commerce_app` is the customer storefront on port `13001`.

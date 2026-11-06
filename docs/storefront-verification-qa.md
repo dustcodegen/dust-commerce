@@ -9,7 +9,7 @@ comparison against a live Medusa preview.
 
 ## Evidence
 
-On 2026-11-05, from `main` revision `d77d53ae`, the repository-root contract
+On 2026-11-06, from `feat/admin-promotion-create` revision `b3461e97`, the repository-root contract
 completed successfully:
 
 ```bash
@@ -20,7 +20,7 @@ The run reported:
 
 - Dust generated-output checks: clean
 - Flutter analysis: no issues
-- Flutter tests: 170 passed
+- Flutter tests: 178 passed
 - Widget tests: none added
 
 The verification is intentionally scoped to the storefront package. Server,
