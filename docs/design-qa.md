@@ -293,6 +293,26 @@ free-shipping fixture are intentional content differences. This closes the
 previously unavailable rendered-pagination comparison as a structural/raster
 check without claiming byte-identical pixels.
 
+## Free-shipping popup comparison boundary
+
+The pinned Medusa storefront code contains the source popup component, but its
+current seed does not provide the price state that component requires. The
+source seed at commit `4a1d53dc434ed124a78c4e2c9f312e1f47d4e9eb` creates only
+flat `Standard Shipping` and `Express Shipping` prices in
+`apps/backend/src/migration-scripts/initial-data-seed.ts`; neither has a
+zero-price `item_total` rule. The component filters for exactly that shape
+before rendering `FreeShippingPriceNudge`.
+
+Live local source inspection confirmed the boundary: with the seeded EUR cart
+and address, `/store/shipping-options?cart_id=...` returned the two flat
+shipping prices plus pickup, and no price containing an `item_total` rule. A
+disposable QA insert of a zero-price conditional option was removed before the
+source database was stopped. Dust's seeded USD cart does expose the equivalent
+state and its popup rendered `Unlock Free Shipping`, `Only USD 85.00 away`, the
+progress track, and both source actions. This is a source-fixture limitation,
+not a missing Dust behavior; a same-state source raster would require changing
+the pinned Medusa seed.
+
 ## Live Medusa checkout comparison attempt
 
 On 2026-11-04 the current Medusa preview rendered its live `/dk/store` with
