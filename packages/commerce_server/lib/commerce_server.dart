@@ -11,6 +11,7 @@ export 'src/features/admin_fulfillment_context/admin_fulfillment_context.dart';
 export 'src/features/admin_customer_group/admin_customer_group.dart';
 export 'src/features/admin_customer_service/admin_customer_service.dart';
 export 'src/features/admin_order/admin_order.dart';
+export 'src/features/admin_promotion/admin_promotion.dart';
 export 'src/features/admin_return/admin_return.dart';
 export 'src/features/admin_sales_channel/admin_sales_channel.dart';
 export 'src/features/admin_shipping_profile/admin_shipping_profile.dart';

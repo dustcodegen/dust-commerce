@@ -6,6 +6,8 @@ import 'package:commerce_server/src/features/admin_promotion/service.dart';
 import 'package:commerce_server/src/http/http.dart';
 import 'package:dust_server/server.dart';
 
+export 'handler/create.dart';
+
 /// `GET /admin/promotions` — lists discount policies for a proven merchant.
 Future<Result<AdminPromotionListResponse, Rejection>>
     listAdminPromotionsHandler(Request request) async {

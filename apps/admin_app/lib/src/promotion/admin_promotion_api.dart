@@ -13,6 +13,12 @@ abstract interface class AdminPromotionApi {
   /// Binds promotion requests to one configured Dio instance.
   factory AdminPromotionApi(Dio dio, {String? baseUrl}) = _$AdminPromotionApi;
 
+  /// Creates one guarded code-based promotion.
+  @POST('/admin/promotions')
+  Future<AdminPromotionDetail> createPromotion(
+    @Body() AdminCreatePromotion body,
+  );
+
   /// Reads one searchable page of promotions.
   @GET('/admin/promotions')
   Future<AdminPromotionList> list(

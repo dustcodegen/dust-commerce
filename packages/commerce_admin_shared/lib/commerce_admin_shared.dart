@@ -9,6 +9,7 @@ export 'src/admin_create_shipment.dart';
 export 'src/admin_create_customer.dart';
 export 'src/admin_create_customer_address.dart';
 export 'src/admin_create_customer_group.dart';
+export 'src/admin_create_promotion.dart';
 export 'src/admin_customer.dart';
 export 'src/admin_customer_group.dart';
 export 'src/admin_customer_group_deleted.dart';

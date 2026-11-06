@@ -77,6 +77,8 @@ extension AdminStateRegistration on Router {
     ));
     withState(AdminPromotionDeps(
       promotions: AdminPromotionRepository(executor),
+      creates: AdminPromotionCreateRepository(executor),
+      clock: clock,
     ));
     withState(AdminRegionDeps(regions: AdminRegionRepository(executor)));
     withState(AdminFulfillmentContextDeps(
