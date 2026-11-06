@@ -79,6 +79,13 @@ Future<Result<Response, Rejection>> deleteAdminMediaHandler(
   final key = pathParametersOf(request)['key'];
   if (key == null) return const Err(Rejection.notFound('Media not found'));
   final url = deps.mediaStorage.urlFor(key);
+  if (!deps.mediaStorage.accepts(key, url)) {
+    return const Err(Rejection.notFound('Media not found'));
+  }
+  final found = await deps.mediaStorage.find(key);
+  if (found case None()) {
+    return const Err(Rejection.notFound('Media not found'));
+  }
   final references = await deps.media.countReferences(url);
   if (references case Err()) return const Err(Rejection.internal());
   if ((references as Ok<int, SqlxError>).value > 0) {
@@ -87,7 +94,8 @@ Future<Result<Response, Rejection>> deleteAdminMediaHandler(
     );
   }
   try {
-    await deps.mediaStorage.delete(key);
+    final deleted = await deps.mediaStorage.delete(key);
+    if (!deleted) return const Err(Rejection.notFound('Media not found'));
     return Ok(noContent());
   } on Object {
     return const Err(Rejection.internal());

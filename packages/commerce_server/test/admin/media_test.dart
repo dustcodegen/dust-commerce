@@ -49,6 +49,15 @@ void main() {
         .assertNotFound();
   });
 
+  test('missing staged media returns not found instead of a false success',
+      () async {
+    final token = await harness.adminToken();
+    final remove = harness.client.delete('/admin/uploads/missing_media.png')
+      ..bearer(token);
+
+    (await remove.send()).assertNotFound();
+  });
+
   test('rejects invalid or excessive uploads without leftovers', () async {
     final token = await harness.adminToken();
     for (final request in [
