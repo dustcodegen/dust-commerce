@@ -22,3 +22,23 @@ The development database already contained one cart line before this run, so
 the smoke intentionally did not claim a clean-cart starting state. No order was
 placed. This is functional evidence; same-state Medusa raster comparison stays
 tracked separately in the parity ledger.
+
+## Fresh migration smoke
+
+Validated 2026-11-06 against the current `feat/admin-promotion-create` branch
+with a fresh PostgreSQL database (`dust_commerce_smoke`). SQLx applied all 65
+committed migrations, including `20261104120000` (`shipping option
+fulfillments`), without checksum or DDL errors. The Dust API listened on
+`127.0.0.1:3878` and the Flutter Store on `127.0.0.1:13001`.
+
+- `/` rendered the Morrow shell and `Powered by dust` attribution.
+- `/store` loaded seeded products, search, sort choices, and color/size facets.
+- `/products/t-shirt?v_id=var_tshirt_m_black` rendered the black M variant with
+  price, stock state, and Add to cart.
+- Add to cart changed the badge to `Cart (1)` and opened the cart preview with
+  the T-shirt line, quantity 1, and `USD 15.00` subtotal.
+- Go to cart rendered the line item, quantity control, promotion entry, taxes,
+  total (`USD 16.50`), and Go to checkout action.
+
+No order was placed. This is local functional evidence only; it does not claim
+CI, deployment, or same-state raster parity with Medusa.
