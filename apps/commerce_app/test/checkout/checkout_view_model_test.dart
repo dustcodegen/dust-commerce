@@ -66,6 +66,23 @@ void main() {
     expect(model.state.order!.paymentStatus, PaymentStatus.captured);
   });
 
+  test('pickup selection keeps the store details in client cart state', () async {
+    final model = context.checkout()..prepare();
+    expect(await saveTestAddress(model), isTrue);
+    expect(await model.loadDelivery(), isTrue);
+
+    final pickup = context.cart.state.shippingOptions.singleWhere(
+      (option) => option.fulfillmentType == ShippingFulfillmentType.pickup,
+    );
+    expect(await model.chooseDelivery(pickup.optionId), isTrue);
+
+    final selected = context.cart.state.cart!.cart.shippingMethod!;
+    expect(selected.optionId, pickup.optionId);
+    expect(selected.fulfillmentType, ShippingFulfillmentType.pickup);
+    expect(selected.pickupName, 'Morrow New York');
+    expect(selected.pickupAddress, '100 Broadway, New York, NY');
+  });
+
   test('reset drops payment state after the selling region changes', () async {
     final model = context.checkout()..prepare();
     await saveTestAddress(model);
