@@ -9,7 +9,7 @@ comparison against a live Medusa preview.
 
 ## Evidence
 
-On 2026-11-06, from `feat/admin-promotion-create` revision `f18c474d`, the repository-root contract
+On 2026-11-06, from `feat/admin-promotion-create` revision `2a9ad6ff`, the repository-root contract
 completed successfully:
 
 ```bash
@@ -18,7 +18,7 @@ completed successfully:
 
 The run reported:
 
-- Dust generated-output checks: clean
+- Dust generated-output checks: `199/199` clean
 - Flutter analysis: no issues
 - Flutter tests: 178 passed
 - Widget tests: none added
