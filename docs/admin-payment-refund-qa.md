@@ -23,6 +23,9 @@ Pinned source truth:
   note. An omitted amount refunds the complete remaining balance.
 - One serialized SQLx transaction validates payment state, reason ownership
   and remaining value before recording the immutable refund audit.
+- The target payment and order rows are locked with `FOR UPDATE` inside that
+  transaction, so two server nodes cannot validate the same remaining balance
+  concurrently.
 - The public service result is flat. SQLx failures are translated inside the
   feature and cannot form `Result<Result<...>>`.
 - Admin responses are direct SQLx `FromRow` allowlists. Provider metadata and

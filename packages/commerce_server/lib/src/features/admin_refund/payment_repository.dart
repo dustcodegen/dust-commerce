@@ -23,6 +23,8 @@ FROM payment_collections payment
 JOIN orders order_row ON order_row.id = payment.order_id
 WHERE payment.id = $1 AND payment.deleted_at IS NULL
   AND order_row.deleted_at IS NULL
+-- Keep refund validation atomic across server nodes, not only in-process.
+FOR UPDATE OF payment, order_row
 ''')
   Future<Result<AdminPaymentRefundTarget?, SqlxError>> target(String paymentId);
 

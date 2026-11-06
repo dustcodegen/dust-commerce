@@ -27,6 +27,8 @@ FROM orders order_row
 LEFT JOIN payment_collections payment
   ON payment.order_id = order_row.id AND payment.deleted_at IS NULL
 WHERE order_row.id = $1 AND order_row.deleted_at IS NULL
+-- Cancellation and refund decisions must serialize across server nodes.
+FOR UPDATE OF order_row
 ''')
   Future<Result<AdminCancelOrderTarget?, SqlxError>> target(String orderId);
 
