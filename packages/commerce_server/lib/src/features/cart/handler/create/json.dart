@@ -6,7 +6,7 @@ import 'package:commerce_server/src/features/cart/service/service.dart';
 import 'package:commerce_shared/commerce_shared.dart';
 import 'package:dust_server/server.dart';
 
-/// The body of a create, when one was sent.
+/// The JSON body of a create, when one was sent.
 ///
 /// A body is optional: `POST /carts` with nothing starts a cart in the default
 /// region, which is what a storefront does before it knows where the customer

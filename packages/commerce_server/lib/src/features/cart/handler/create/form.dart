@@ -12,7 +12,7 @@ const FormExtractable _form = FormExtractable();
 
 /// `POST /store/cart/add` — form-compatible add-to-cart boundary.
 ///
-/// This is the backend equivalent of Medusa's no-JavaScript product form. A
+/// This handles the backend request from Medusa's no-JavaScript product form. A
 /// missing `cart_id` creates a cart and its first line atomically; an existing
 /// capability is checked with the same ownership guard as the JSON route.
 Future<Result<CartViewResponse, Rejection>> addFormLineHandler(
