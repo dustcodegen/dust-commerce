@@ -36,8 +36,7 @@ abstract interface class CommerceApi {
   /// Replaces editable fields on the authenticated customer profile.
   @PATCH('/store/customers/me')
   Future<Customer> updateCustomerProfile(
-    @Body() UpdateCustomerProfileBody body,
-  );
+      @Body() UpdateCustomerProfileBody body);
 
   /// Rotates the password and revokes every session for this customer.
   @PATCH('/store/customers/me/password')
@@ -50,15 +49,12 @@ abstract interface class CommerceApi {
   /// Adds one reusable address to the authenticated customer.
   @POST('/store/customers/me/addresses')
   Future<CustomerAddressView> createCustomerAddress(
-    @Body() CustomerAddressInput body,
-  );
+      @Body() CustomerAddressInput body);
 
   /// Replaces one reusable address owned by the authenticated customer.
   @PATCH('/store/customers/me/addresses/{id}')
   Future<CustomerAddressView> updateCustomerAddress(
-    @Path() String id,
-    @Body() CustomerAddressInput body,
-  );
+      @Path() String id, @Body() CustomerAddressInput body);
 
   /// Soft-deletes one reusable address owned by the authenticated customer.
   @DELETE('/store/customers/me/addresses/{id}')
@@ -71,8 +67,7 @@ abstract interface class CommerceApi {
   /// Payment providers enabled for one selling region.
   @GET('/store/payment-providers')
   Future<PaymentProviderListView> paymentProviders(
-    @Query('region_id') String regionId,
-  );
+      @Query('region_id') String regionId);
 
   /// Revokes the bearer token configured on the Dio client.
   @DELETE('/auth/session')
@@ -174,10 +169,7 @@ abstract interface class CommerceApi {
 
   /// Adds a variant to a cart, answering with the cart it produced.
   @POST('/store/carts/{id}/line-items')
-  Future<CartView> addLine(
-    @Path() String id,
-    @Body() AddLineBody body,
-  );
+  Future<CartView> addLine(@Path() String id, @Body() AddLineBody body);
 
   /// Replaces one line's quantity after the server rechecks stock.
   @PATCH('/store/carts/{id}/line-items/{lineId}')
