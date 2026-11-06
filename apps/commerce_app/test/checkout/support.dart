@@ -35,6 +35,7 @@ final class CheckoutTestContext {
       options: commerceOptions,
     );
     await seedDevelopmentStore(database);
+    await seedDevelopmentDemoCatalog(database);
     final server = await TestClient.serve(buildApp(database));
     final api = CommerceApi(Dio(), baseUrl: server.origin);
     final cartIds = MemoryCartIdStore();
