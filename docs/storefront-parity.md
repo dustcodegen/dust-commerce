@@ -129,6 +129,24 @@ Dust: 171/171 and 505/505 clean
 604 server tests passed
 ```
 
+## Form add-to-cart boundary
+
+The current Medusa product form posts `variant_id` and `quantity` to a
+server route before redirecting to the storefront cart. Dust now exposes the
+same form-encoded input at `POST /store/cart/add`; `region_id` selects the
+selling region and an optional opaque `cart_id` adds to an existing cart.
+Without a cart capability, the cart and first line are committed atomically
+through `buyCart`; with one, the existing customer/guest ownership guard is
+reused before `addLine` runs. The API returns the normal JSON cart view rather
+than a 303 because the backend does not own the storefront cookie boundary.
+
+The focused PostgreSQL-backed contract gate passed locally on 2026-11-06:
+
+```text
+dart test packages/commerce_server/test/cart/form_add_test.dart
+4 tests passed
+```
+
 ## Product structured-data slice
 
 The current Medusa product source publishes a schema.org Product or
