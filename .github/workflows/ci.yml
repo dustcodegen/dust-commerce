@@ -116,7 +116,9 @@ jobs:
           set -euo pipefail
           (cd packages/commerce_admin_shared && dart test)
           (cd packages/commerce_shared && dart test)
-          (cd packages/commerce_server && dart test)
+          # Each server test owns an isolated PostgreSQL database. Serializing
+          # this one suite avoids exhausting runner database/temp capacity.
+          (cd packages/commerce_server && dart test --concurrency=1)
           (cd apps/commerce_app && flutter test --no-pub)
           (cd apps/admin_app && flutter test --no-pub)
 

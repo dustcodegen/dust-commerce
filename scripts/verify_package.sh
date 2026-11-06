@@ -50,6 +50,10 @@ fi
 
 if grep -q 'sdk: flutter' "$PACKAGE/pubspec.yaml"; then
   (cd "$PACKAGE" && flutter analyze --no-pub && flutter test --no-pub)
+elif [[ "$PACKAGE" == "packages/commerce_server" ]]; then
+  # Each server test owns an isolated PostgreSQL database; serial execution
+  # keeps local and constrained runners from exhausting database/temp space.
+  (cd "$PACKAGE" && dart analyze && dart test --concurrency=1)
 else
   (cd "$PACKAGE" && dart analyze && dart test)
 fi
