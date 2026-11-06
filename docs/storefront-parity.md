@@ -106,6 +106,27 @@ DUST_DATABASE_URL=postgres://dust:dust@127.0.0.1:5432/dust_commerce?sslmode=disa
 3 tests passed
 ```
 
+## Product Markdown URL alias slice
+
+The current Medusa storefront rewrites `/products/:handle.md` to the same
+machine-readable projection. Dust now dispatches that suffix through the
+existing public Markdown handler, strips only the transport suffix before the
+catalogue lookup, and keeps draft-product privacy and country validation
+unchanged. The route remains read-only and does not widen the JSON product
+allowlist.
+
+The focused alias regression and the full server package gate passed locally
+on 2026-11-06 at `b255b327`:
+
+```text
+dart test packages/commerce_server/test/catalog/markdown_test.dart
+4 tests passed
+
+./scripts/verify_package.sh packages/commerce_server
+Dust: 171/171 and 505/505 clean
+604 server tests passed
+```
+
 ## Product structured-data slice
 
 The current Medusa product source publishes a schema.org Product or
@@ -161,7 +182,7 @@ flutter test apps/commerce_app/test/storefront/store_home_structured_data_test.d
 | `products/components/product-preview` | product card | implemented in #19; product cards use the source `thumbnail || images[0]` image fallback, Medusa UI card rest/hover shadows with the 150ms transition, horizontal sale-price treatment, `txt-compact-medium` typography and link semantics |
 | `store/templates` | catalogue | partial in #18 and #19; current-source six-choice server sorting, relevance as the clean `/store` default, 12-item API paging, stable repeated option-value filtering, optional filter discovery, current-source `q` search, and Store sales-channel availability are implemented. Desktop grid and compact refinement geometry passed rendered source comparison. Compact page controls now match the pinned 18px/28.8px medium type and exact 12px visible gap, page 2 retains sort and repeated option queries, refinement changes reset to page 1, and search is retained in route state against the real API. Repeated option values now require every selected value in both page rows and counts, and channel-hidden products cannot be listed, read, added or quantity-updated. A same-state local comparison now captures Medusa's hydrated `product[page]=2` route beside Dust's `/store?page=2`: both render the source-shaped sidebar, search row, four-column product grid and pagination controls. Product names, currencies, filter facets and seeded ordering intentionally differ, so this closes the prior unavailable-render claim without claiming byte-identical pixels; evidence is recorded in `design-qa.md`. |
 | `products/templates` | product detail route | implemented in #22; source-ordered mobile and sticky desktop composition plus variant-specific image filtering, with desktop geometry, compact simple-product accordions, equivalent sold-out actions and option-sheet chrome passing rendered source comparison; compact selected state, desktop add-feedback and fixture-backed unavailable-combination rendering are browser-verified |
-| `products/[handle]/markdown` | machine-readable product representation | implemented as a public text/Markdown projection over the same allowlisted Store product read; it includes source-shaped availability, variant price/stock rows, buy links and policy destinations without exposing inventory columns or internal product fields, and draft products remain 404 |
+| `products/[handle]/markdown` | machine-readable product representation | implemented as a public text/Markdown projection over the same allowlisted Store product read; it includes source-shaped availability, variant price/stock rows, buy links and policy destinations without exposing inventory columns or internal product fields, draft products remain 404, and the current-source `/products/:handle.md` alias is supported |
 | `products/components/product-actions` | variant state and add to cart | implemented in #22, including source-selectable option values, exact-variant resolution, query-preserving `v_id`, unavailable combinations, variant-associated gallery reloads and a labelled, console-clean sticky-mobile option dialog |
 | `products/components/related-products` | API-backed recommendations | implemented in #22 with loading, empty, failure and success states |
 | `layout/components/cart-dropdown` | cart preview | implemented in #21 with hover, five-second post-add feedback, live removal, subtotal and empty state; preview item titles and prices follow the source `text-base-regular` rhythm, variant/quantity rows keep the source compact line rhythm, thumbnail slots follow the source `Thumbnail` square subtle card-rest treatment, subtotal footer text follows source `text-small-regular`/`text-large-semi` with only the `Subtotal` label semibold, the empty badge/message follow the source `bg-gray-900 text-small-regular` and default 16px span rhythm, and the populated desktop preview passed rendered source comparison |
