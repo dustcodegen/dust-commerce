@@ -42,3 +42,19 @@ fulfillments`), without checksum or DDL errors. The Dust API listened on
 
 No order was placed. This is local functional evidence only; it does not claim
 CI, deployment, or same-state raster parity with Medusa.
+
+## Atomic form-add smoke
+
+Validated 2026-11-06 on the same local stack after the storefront switched its
+generated client and cart ViewModel to `POST /store/cart/add` with
+`application/x-www-form-urlencoded` fields.
+
+- `/products/t-shirt?v_id=var_tshirt_m_black` rendered the selected Black/M
+  variant and enabled Add to cart.
+- Add to cart completed without an intermediate empty-cart state; the header
+  badge changed from `Cart (1)` to `Cart (2)`.
+- The free-shipping progress amount changed from `USD 85.00` to `USD 70.00`,
+  proving the refreshed server cart reached the shell.
+
+No order was placed. This is local browser evidence only; no CI, remote push,
+or merge was triggered.
