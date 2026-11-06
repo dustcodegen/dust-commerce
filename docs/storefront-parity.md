@@ -139,12 +139,24 @@ Without a cart capability, the cart and first line are committed atomically
 through `buyCart`; with one, the existing customer/guest ownership guard is
 reused before `addLine` runs. The API returns the normal JSON cart view rather
 than a 303 because the backend does not own the storefront cookie boundary.
+The generated `CommerceApi` now sends this form boundary, and the storefront
+cart ViewModel uses it for both first adds and existing-capability adds, so the
+visible product action does not create an empty cart as a separate write.
 
 The focused PostgreSQL-backed contract gate passed locally on 2026-11-06:
 
 ```text
 dart test packages/commerce_server/test/cart/form_add_test.dart
 4 tests passed
+```
+
+The generated-client and cart ViewModel round-trip gate also passed locally:
+
+```text
+./scripts/verify_package.sh apps/commerce_app
+Dust: 199/199 clean
+analyzer clean
+179 tests passed
 ```
 
 ## Product structured-data slice
