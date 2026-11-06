@@ -118,6 +118,19 @@ void main() {
       expect(withLine.total, Money.of(4398, 'usd'));
     });
 
+    test('adds a product through the form-compatible atomic boundary',
+        () async {
+      final response = await api.addFormLine(
+        variantId: 'var_small',
+        quantity: 2,
+        regionId: 'reg_us',
+      );
+
+      expect(response.cart.items.single.variantId, 'var_small');
+      expect(response.itemCount, 2);
+      expect(response.total, Money.of(4398, 'usd'));
+    });
+
     test('agrees with the domain model computing the same totals', () async {
       final created = await api.createCart(const CreateCartBody());
       final response = await api.addLine(

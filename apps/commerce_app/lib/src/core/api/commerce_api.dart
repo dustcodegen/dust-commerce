@@ -140,6 +140,16 @@ abstract interface class CommerceApi {
   @POST('/store/carts/buy')
   Future<CartView> createCartWithItems(@Body() BuyCartBody body);
 
+  /// Adds a product through the same form boundary as Medusa's product route.
+  @FormUrlEncoded()
+  @POST('/store/cart/add')
+  Future<CartView> addFormLine({
+    @Field('variant_id') required String variantId,
+    @Field('quantity') int? quantity,
+    @Field('cart_id') String? cartId,
+    @Field('region_id') String? regionId,
+  });
+
   /// One cart with the totals the server computed.
   @GET('/store/carts/{id}')
   Future<CartView> cart(@Path() String id);

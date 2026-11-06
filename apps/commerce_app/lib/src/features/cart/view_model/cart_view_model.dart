@@ -54,21 +54,20 @@ class CartViewModel extends $CartViewModel {
     if (!_begin(CartOperation.add)) return false;
     var current = state.cart;
     try {
-      if (current == null) {
-        current = await args.api.createCart(CreateCartBody(
-          regionId: args.selectedRegion().match(
-                some: (region) => region.id,
-                none: () => null,
-              ),
-        ));
-        await args.cartIds.write(args.storageScope, current.cart.id);
-      }
-      return _succeed(
-        await args.api.addLine(
-          current.cart.id,
-          AddLineBody(variantId: variant.id),
-        ),
+      final added = await args.api.addFormLine(
+        variantId: variant.id,
+        cartId: current?.cart.id,
+        regionId: current == null
+            ? args.selectedRegion().match(
+                  some: (region) => region.id,
+                  none: () => null,
+                )
+            : null,
       );
+      if (current == null) {
+        await args.cartIds.write(args.storageScope, added.cart.id);
+      }
+      return _succeed(added);
     } on Object catch (error) {
       _fail(CartOperation.add, error, cart: current);
       return false;
