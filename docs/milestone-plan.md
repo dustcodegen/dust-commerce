@@ -15,10 +15,14 @@ Delivery also needs the deployed API origin in the GitHub repository variable
 `PRODUCTION_API_BASE_URL`. The merge starts a fresh Verify run on `main`, and
 Delivery packages that revision after Verify succeeds.
 
-Release evidence:
+Local verification at `54eddcce`:
 
-- Server Dust generation, analyzer, and 609 tests pass locally.
-- Store Dust generation, analyzer, and 179 tests pass locally.
+- All five package gates passed, including 616 server, 179 Store, and 175
+  Admin tests. The server suite covers Markdown region selection, renamed
+  promotion redemption, and overlapping refund and cancellation requests.
+- All 65 SQLx migrations applied, reverted, and reapplied against disposable
+  PostgreSQL. The repository-wide format, structure, file-size, and
+  generated-output checks passed.
 - Browser smoke proves the Medusa-compatible atomic form add-to-cart path.
 - No widget tests were added.
 
