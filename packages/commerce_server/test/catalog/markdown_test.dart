@@ -71,6 +71,18 @@ VALUES
     expect(response.body, contains('`var_small`'));
   });
 
+  test('supports the Medusa Accept header on the product URL', () async {
+    final response = await (client.get('/store/products/t-shirt?country=us')
+          ..header('accept', 'text/markdown; q=1.0, application/json'))
+        .send();
+
+    response
+      ..assertOk()
+      ..assertHeader('content-type', 'text/markdown; charset=utf-8');
+    expect(response.body, contains('# T-Shirt'));
+    expect(response.body, contains('`var_small`'));
+  });
+
   test('keeps missing products private', () async {
     (await client.get('/store/products/secret-hoodie/markdown').send())
         .assertNotFound();

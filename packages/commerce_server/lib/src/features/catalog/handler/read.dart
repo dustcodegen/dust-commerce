@@ -41,10 +41,19 @@ Future<Result<ProductResponse, Rejection>> readProductHandler(
 /// Serves JSON products and the Medusa-compatible `.md` URL alias.
 Future<Object?> readProductRouteHandler(Request request) {
   final handle = pathParametersOf(request)['handle'];
-  if (handle?.endsWith('.md') == true) {
+  if (handle?.endsWith('.md') == true || _acceptsMarkdown(request)) {
     return readProductMarkdownHandler(request);
   }
   return readProductHandler(request);
+}
+
+bool _acceptsMarkdown(Request request) {
+  final accept = request.headers['accept'];
+  if (accept == null) return false;
+  return accept.split(',').any((value) {
+    final mediaType = value.trim().split(';').first.trim().toLowerCase();
+    return mediaType == 'text/markdown';
+  });
 }
 
 /// `GET /products/{handle}/markdown` — a public Markdown product projection.
