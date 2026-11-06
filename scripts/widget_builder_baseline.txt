@@ -10,5 +10,4 @@ apps/admin_app/lib/src/product/admin_product_media_editor_tile.dart:2
 apps/admin_app/lib/src/product/admin_product_media_editor_view.dart:3
 apps/admin_app/lib/src/product/admin_product_option_edit_chrome.dart:2
 apps/admin_app/lib/src/product/admin_product_option_edit_fields.dart:3
-apps/admin_app/lib/src/product_type/admin_product_type_edit_drawer.dart:2
 apps/admin_app/lib/src/product_type/detail/admin_product_type_products_section.dart:1
