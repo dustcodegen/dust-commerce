@@ -10,5 +10,7 @@ Router catalogRoutes() {
     ..route('/products', get(listProductsHandler))
     ..route('/product-options', get(listProductOptionsHandler))
     ..route('/products/{handle}/markdown', get(readProductMarkdownHandler))
-    ..route('/products/{handle}', get(readProductHandler));
+    // Medusa rewrites `/products/:handle.md` to the Markdown projection. Dust
+    // keeps one typed route parameter, so the handler owns that suffix check.
+    ..route('/products/{handle}', get(readProductRouteHandler));
 }
