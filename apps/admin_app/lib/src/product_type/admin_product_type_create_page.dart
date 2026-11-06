@@ -1,4 +1,5 @@
 import 'package:admin_app/src/product_type/admin_product_type_view_model.dart';
+import 'package:admin_app/src/product_type/admin_product_type_create_chrome.dart';
 import 'package:commerce_admin_shared/commerce_admin_shared.dart';
 import 'package:dust_dart/fp.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +54,10 @@ final class _CreateFormState extends State<_CreateForm> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _header(),
+              AdminProductTypeCreateHeader(
+                busy: _busy,
+                onClose: () => Navigator.of(context).pop(),
+              ),
               Expanded(
                 child: Align(
                   alignment: Alignment.topCenter,
@@ -98,59 +102,17 @@ final class _CreateFormState extends State<_CreateForm> {
                   ),
                 ),
               ),
-              _footer(),
+              AdminProductTypeCreateFooter(
+                busy: _busy,
+                onCancel: () => Navigator.of(context).pop(),
+                onSave: _save,
+              ),
             ],
           ),
         ),
       ),
     );
   }
-
-  Widget _header() => Container(
-        height: 56,
-        padding: const EdgeInsets.symmetric(horizontal: 18),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: Theme.of(context).dividerColor),
-          ),
-        ),
-        child: Row(children: [
-          IconButton(
-            tooltip: 'Close',
-            onPressed: _busy ? null : Navigator.of(context).pop,
-            icon: const Icon(Icons.close_rounded, size: 18),
-          ),
-          const SizedBox(width: 6),
-          Text('Create Product Type',
-              style: Theme.of(context).textTheme.titleMedium),
-        ]),
-      );
-
-  Widget _footer() => Container(
-        height: 64,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(color: Theme.of(context).dividerColor),
-          ),
-        ),
-        child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-          OutlinedButton(
-            onPressed: _busy ? null : Navigator.of(context).pop,
-            child: const Text('Cancel'),
-          ),
-          const SizedBox(width: 8),
-          FilledButton(
-            onPressed: _busy ? null : _save,
-            child: _busy
-                ? const SizedBox.square(
-                    dimension: 15,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Create'),
-          ),
-        ]),
-      );
 
   String? _validate(String? value) {
     final input = value?.trim() ?? '';
