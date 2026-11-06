@@ -278,6 +278,21 @@ set (`Swim Shorts`, `Tailored Chinos`, `Training Shorts`, and `Weekend Track
 Pants`) instead of repeating page one. A fresh release browser tab recorded no
 console warnings or errors during the navigation.
 
+On 2026-11-06, the pinned Medusa DTC source at commit
+`4a1d53dc434ed124a78c4e2c9f312e1f47d4e9eb` was captured at
+`http://127.0.0.1:8000/dk/store?product%5Bpage%5D=2` after InstantSearch
+hydration and selecting page `2`. Dust was captured at
+`http://127.0.0.1:13001/store?page=2`. Both renders showed the same
+source-owned desktop structure: `All products`, search, the refinement
+sidebar, a four-column product grid and visible numbered pagination. Medusa's
+page-two cards began with `Relaxed Merino Socks`, `Classic Merino Beanie`,
+`Vintage Linen Shorts` and `Lightweight Fleece Socks`; Dust's seeded cards began
+with `Swim Shorts`, `Tailored Chinos`, `Training Shorts` and `Weekend Track
+Pants`. The differing catalogues, currencies, facet inventory, branding and
+free-shipping fixture are intentional content differences. This closes the
+previously unavailable rendered-pagination comparison as a structural/raster
+check without claiming byte-identical pixels.
+
 ## Live Medusa checkout comparison attempt
 
 On 2026-11-04 the current Medusa preview rendered its live `/dk/store` with
