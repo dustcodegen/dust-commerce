@@ -67,6 +67,7 @@ export 'src/admin_update_product_variant.dart';
 export 'src/admin_update_customer.dart';
 export 'src/admin_update_customer_address.dart';
 export 'src/admin_update_customer_group.dart';
+export 'src/admin_update_promotion.dart';
 export 'src/admin_update_customer_service.dart';
 export 'src/admin_user.dart';
 export 'src/admin_variant_price.dart';

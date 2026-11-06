@@ -12,5 +12,7 @@ Router adminPromotionRoutes() => Router()
   )
   ..route(
     '/promotions/{id}',
-    get(readAdminPromotionHandler).delete(deleteAdminPromotionHandler),
+    get(readAdminPromotionHandler)
+        .patch(updateAdminPromotionHandler)
+        .delete(deleteAdminPromotionHandler),
   );
