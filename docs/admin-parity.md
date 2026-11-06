@@ -55,9 +55,11 @@ Admin uploads now perform a best-effort cleanup pass before accepting new
 multipart data. The direct SQLx media projection supplies only active product
 image URLs; the local adapter protects claimed files and removes unreferenced
 files older than one hour, including abandoned staged files. Cleanup failures
-never reject a valid upload. The focused media gate covers authorization,
-public reads, attached-file protection, invalid uploads, and old-orphan
-reclamation; object storage remains the separate multi-node boundary.
+never reject a valid upload and only generated asset or pending names are
+eligible for deletion, so unrelated files in the media root are preserved. The
+focused media gate covers authorization, public reads, attached-file
+protection, invalid uploads, old-orphan reclamation, and foreign-file safety;
+object storage remains the separate multi-node boundary.
 
 ## Isolation boundary
 
