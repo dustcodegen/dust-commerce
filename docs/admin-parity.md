@@ -19,8 +19,8 @@ responsibility. The remaining debt stays visible instead of weakening the gate.
 
 ## Current local package gate
 
-On 2026-11-06 at `64b084da`, `./scripts/verify_package.sh apps/admin_app`
-completed with Dust `263/263` clean, Flutter analysis clean, and `175` Admin
+On 2026-11-06 at `0bcbe288`, `./scripts/verify_package.sh apps/admin_app`
+completed with Dust `264/264` clean, Flutter analysis clean, and `175` Admin
 non-widget tests passing. No widget tests were added; CI and remote merge remain
 deferred until the one-day local review window ends.
 
