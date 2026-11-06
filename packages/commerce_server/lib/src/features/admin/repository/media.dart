@@ -1,16 +1,7 @@
 import 'package:dust_dart/db.dart';
+import 'media_model.dart';
 
 part 'media.g.dart';
-
-/// Private SQLx projection used by staged-media cleanup.
-@Derive([FromRow()])
-final class AdminMediaReference {
-  /// Creates one active public media reference.
-  const AdminMediaReference({required this.url});
-
-  /// Public URL retained by an active product image.
-  final String url;
-}
 
 /// Reference checks that keep attached product files from being deleted.
 @SqlxDao()
