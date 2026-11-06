@@ -31,7 +31,11 @@ if [[ "$SOURCE_COUNT" == "0" ]]; then
 fi
 
 CHANGED_SOURCES="$(mktemp)"
-trap 'rm -f "$CHANGED_SOURCES"' EXIT
+cleanup() {
+  rm -f "$CHANGED_SOURCES"
+  "$ROOT_DIR/scripts/cleanup_test_databases.sh"
+}
+trap cleanup EXIT
 {
   git diff --name-only --diff-filter=ACMRT HEAD -- "$PACKAGE"
   git diff-tree --no-commit-id --name-only --diff-filter=ACMRT -r HEAD \
@@ -53,7 +57,6 @@ if grep -q 'sdk: flutter' "$PACKAGE/pubspec.yaml"; then
 elif [[ "$PACKAGE" == "packages/commerce_server" ]]; then
   # Each server test owns an isolated PostgreSQL database; serial execution
   # keeps local and constrained runners from exhausting database/temp space.
-  trap "$ROOT_DIR/scripts/cleanup_test_databases.sh" EXIT
   (cd "$PACKAGE" && dart analyze && dart test --concurrency=1)
 else
   (cd "$PACKAGE" && dart analyze && dart test)
