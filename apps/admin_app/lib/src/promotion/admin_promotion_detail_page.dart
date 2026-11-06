@@ -3,6 +3,7 @@ import 'package:admin_app/src/promotion/admin_promotion_detail_failure.dart';
 import 'package:admin_app/src/promotion/admin_promotion_detail_state.dart';
 import 'package:admin_app/src/promotion/admin_promotion_detail_view_model.dart';
 import 'package:admin_app/src/promotion/admin_promotion_delete.dart';
+import 'package:admin_app/src/promotion/admin_promotion_edit_page.dart';
 import 'package:commerce_admin_shared/commerce_admin_shared.dart';
 import 'package:dust_dart/fp.dart';
 import 'package:flutter/material.dart';
@@ -47,6 +48,8 @@ final class _AdminPromotionDetailPageState
           promotion: value,
           onBack: widget.onBack,
           deleting: state.status == AdminPromotionDetailStatus.deleting,
+          updating: state.status == AdminPromotionDetailStatus.updating,
+          onEdit: () => _edit(context, value),
           onDelete: () => _delete(context, value),
         ),
       None() when state.status == AdminPromotionDetailStatus.loading =>
@@ -68,5 +71,12 @@ final class _AdminPromotionDetailPageState
       code: promotion.code,
     );
     if (deleted && mounted) widget.onBack();
+  }
+
+  Future<void> _edit(BuildContext context, AdminPromotion promotion) async {
+    final updated = await showAdminPromotionEditPage(context, promotion);
+    if (updated != null && mounted) {
+      this.context.readAdminPromotionDetailViewModel().load(updated.id);
+    }
   }
 }

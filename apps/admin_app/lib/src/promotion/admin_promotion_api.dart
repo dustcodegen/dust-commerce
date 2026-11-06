@@ -34,6 +34,13 @@ abstract interface class AdminPromotionApi {
   @GET('/admin/promotions/{id}')
   Future<AdminPromotionDetail> promotion(@Path() String id);
 
+  /// Replaces one guarded active promotion.
+  @PATCH('/admin/promotions/{id}')
+  Future<AdminPromotionDetail> updatePromotion(
+    @Path() String id,
+    @Body() AdminUpdatePromotion body,
+  );
+
   /// Retires one active promotion.
   @DELETE('/admin/promotions/{id}')
   Future<AdminPromotionDeleted> deletePromotion(@Path() String id);

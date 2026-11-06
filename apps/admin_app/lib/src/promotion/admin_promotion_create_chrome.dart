@@ -3,10 +3,17 @@ import 'package:flutter/material.dart';
 /// Title bar for the focused promotion creation route.
 final class AdminPromotionCreateHeader extends StatelessWidget {
   /// Creates the title bar.
-  const AdminPromotionCreateHeader({required this.busy, super.key});
+  const AdminPromotionCreateHeader({
+    required this.busy,
+    this.title = 'Create Promotion',
+    super.key,
+  });
 
   /// Whether the form can be dismissed.
   final bool busy;
+
+  /// Focused form title.
+  final String title;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -24,8 +31,7 @@ final class AdminPromotionCreateHeader extends StatelessWidget {
             icon: const Icon(Icons.close_rounded, size: 18),
           ),
           const SizedBox(width: 6),
-          Text('Create Promotion',
-              style: Theme.of(context).textTheme.titleMedium),
+          Text(title, style: Theme.of(context).textTheme.titleMedium),
         ]),
       );
 }
@@ -37,6 +43,7 @@ final class AdminPromotionCreateFooter extends StatelessWidget {
     required this.busy,
     required this.onCancel,
     required this.onCreate,
+    this.actionLabel = 'Create',
     super.key,
   });
 
@@ -48,6 +55,9 @@ final class AdminPromotionCreateFooter extends StatelessWidget {
 
   /// Submits the form.
   final VoidCallback onCreate;
+
+  /// Primary action label.
+  final String actionLabel;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -68,7 +78,7 @@ final class AdminPromotionCreateFooter extends StatelessWidget {
                     dimension: 15,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Text('Create'),
+                : Text(actionLabel),
           ),
         ]),
       );
