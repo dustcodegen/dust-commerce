@@ -414,7 +414,9 @@ Partial refunds retain Captured and the remaining action; a full refund changes
 the aggregate status to Refunded and disables it. Manual-provider desktop and
 390px browser QA passed. Refund reasons now support guarded create, edit and
 soft-retire mutations through direct SQLx projections; historical refund rows
-retain retired reason data. External provider adapters remain unavailable.
+retain retired reason data. The Admin app's generated Dio client exposes the
+same typed mutation contracts while keeping bearer ownership in its
+interceptor. External provider adapters remain unavailable.
 
 Fulfillment shipment now follows Medusa's order-detail lifecycle and focus-form
 source. A route-level Admin guard and explicit authenticated-admin extraction
