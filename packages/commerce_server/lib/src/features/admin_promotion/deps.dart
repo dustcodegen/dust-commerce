@@ -1,5 +1,6 @@
 import 'package:commerce_server/src/features/admin_promotion/repository.dart';
 import 'package:commerce_server/src/features/admin_promotion/repository/create.dart';
+import 'package:commerce_server/src/features/admin_promotion/delete_repository.dart';
 import 'package:commerce_server/src/http/http.dart';
 import 'package:dust_server/server.dart';
 
@@ -9,11 +10,15 @@ final class AdminPromotionDeps {
   const AdminPromotionDeps({
     required this.promotions,
     required this.creates,
+    required this.deletes,
     required this.clock,
   });
 
   /// Direct promotion inserts.
   final AdminPromotionCreateRepository creates;
+
+  /// Soft-deletion writes for active promotions.
+  final AdminPromotionDeleteRepository deletes;
 
   /// Database-owned id source for new promotions.
   final Clock clock;

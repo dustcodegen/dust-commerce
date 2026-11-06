@@ -7,6 +7,7 @@ import 'package:commerce_server/src/http/http.dart';
 import 'package:dust_server/server.dart';
 
 export 'handler/create.dart';
+export 'delete_handler.dart';
 
 /// `GET /admin/promotions` — lists discount policies for a proven merchant.
 Future<Result<AdminPromotionListResponse, Rejection>>

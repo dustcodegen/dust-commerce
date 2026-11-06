@@ -10,4 +10,7 @@ Router adminPromotionRoutes() => Router()
       status: 201,
     ),
   )
-  ..route('/promotions/{id}', get(readAdminPromotionHandler));
+  ..route(
+    '/promotions/{id}',
+    get(readAdminPromotionHandler).delete(deleteAdminPromotionHandler),
+  );
