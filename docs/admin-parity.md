@@ -412,7 +412,9 @@ direct SQLx allowlists, the generated Dio client owns authorization, and the
 dedicated right-side drawer reloads the authoritative order after saving.
 Partial refunds retain Captured and the remaining action; a full refund changes
 the aggregate status to Refunded and disables it. Manual-provider desktop and
-390px browser QA passed; external provider adapters remain unavailable.
+390px browser QA passed. Refund reasons now support guarded create, edit and
+soft-retire mutations through direct SQLx projections; historical refund rows
+retain retired reason data. External provider adapters remain unavailable.
 
 Fulfillment shipment now follows Medusa's order-detail lifecycle and focus-form
 source. A route-level Admin guard and explicit authenticated-admin extraction

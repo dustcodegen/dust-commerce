@@ -6,6 +6,7 @@ import 'package:commerce_server/src/features/admin_customer_service/admin_custom
 import 'package:commerce_server/src/features/admin_fulfillment_context/admin_fulfillment_context.dart';
 import 'package:commerce_server/src/features/admin_order/admin_order.dart';
 import 'package:commerce_server/src/features/admin_promotion/admin_promotion.dart';
+import 'package:commerce_server/src/features/admin_refund/admin_refund.dart';
 import 'package:commerce_server/src/features/admin_region/admin_region.dart';
 import 'package:commerce_server/src/features/admin_return/admin_return.dart';
 import 'package:commerce_server/src/features/admin_sales_channel/admin_sales_channel.dart';
@@ -80,6 +81,10 @@ extension AdminStateRegistration on Router {
       creates: AdminPromotionCreateRepository(executor),
       deletes: AdminPromotionDeleteRepository(executor),
       updates: AdminPromotionUpdateRepository(executor),
+      clock: clock,
+    ));
+    withState(AdminRefundReasonDeps(
+      reasons: AdminRefundReasonRepository(executor),
       clock: clock,
     ));
     withState(AdminRegionDeps(regions: AdminRegionRepository(executor)));

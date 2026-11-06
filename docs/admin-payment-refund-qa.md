@@ -89,6 +89,5 @@ local merchant.
 ## Remaining gaps
 
 - External provider adapters and reconciliation references are not available.
-- Refund-reason merchant CRUD is separate from the seeded reason discovery.
 - Same-state raster comparison with a running Medusa Admin remains open.
 - Customer notification remains disabled until a real adapter exists.

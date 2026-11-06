@@ -2,30 +2,48 @@ import 'package:commerce_admin_shared/commerce_admin_shared.dart';
 import 'package:commerce_server/src/features/admin/extractor.dart';
 import 'package:commerce_server/src/features/admin_order/deps.dart';
 import 'package:commerce_server/src/features/admin_refund/failure.dart';
+import 'package:commerce_server/src/features/admin_refund/reason_deps.dart';
+import 'package:commerce_server/src/features/admin_refund/reason_failure.dart';
 import 'package:commerce_server/src/features/admin_refund/payment_model.dart';
 import 'package:commerce_server/src/features/admin_refund/payment_service.dart';
 import 'package:commerce_server/src/features/admin_refund/reason_model.dart';
-import 'package:commerce_server/src/features/admin_refund/reason_repository.dart';
 import 'package:commerce_server/src/features/admin_refund/reason_service.dart';
+import 'package:commerce_server/src/features/admin_refund/reason_mutation_service.dart';
 import 'package:commerce_server/src/http/http.dart';
 import 'package:dust_server/server.dart';
 
 const JsonExtractable<AdminRefundPayment> _body =
     JsonExtractable(AdminRefundPayment.fromJson);
 
+const ValidatedExtractable<AdminCreateRefundReason> _createReasonBody =
+    ValidatedExtractable(
+  StrictJsonExtractable<AdminCreateRefundReason>(
+    AdminCreateRefundReason.fromJson,
+    fields: {'label', 'code', 'description'},
+  ),
+);
+
+const ValidatedExtractable<AdminUpdateRefundReason> _updateReasonBody =
+    ValidatedExtractable(
+  StrictJsonExtractable<AdminUpdateRefundReason>(
+    AdminUpdateRefundReason.fromJson,
+    fields: {'label', 'code', 'description'},
+  ),
+);
+
 /// `GET /admin/refund-reasons` lists active merchant choices.
 Future<Result<AdminRefundReasonListResponse, Rejection>>
     listAdminRefundReasonsHandler(Request request) async {
   final actor = await const Extension<AuthenticatedAdmin>().extract(request);
   if (actor case Err(:final error)) return Err(error);
-  final state = await adminOrderDeps(request);
+  final state = await adminRefundReasonDeps(request);
   if (state case Err(:final error)) return Err(error);
   final query = request.requestedUri.queryParameters;
   final limit = int.tryParse(query['limit'] ?? '') ?? defaultLimit;
   final offset = int.tryParse(query['offset'] ?? '') ?? 0;
-  final deps = (state as Ok<AdminOrderDeps, Rejection>).value;
+  final deps = (state as Ok<AdminRefundReasonDeps, Rejection>).value;
   final result = await listAdminRefundReasons(
-    AdminRefundReasonRepository(deps.database.connection),
+    deps.reasons,
     query: query['q'] ?? '',
     limit: limit.clamp(1, 1000),
     offset: offset < 0 ? 0 : offset,
@@ -35,6 +53,83 @@ Future<Result<AdminRefundReasonListResponse, Rejection>>
     Err() => const Err(Rejection.internal()),
   };
 }
+
+/// `POST /admin/refund-reasons` — creates one merchant reason.
+Future<Result<AdminRefundReasonResponse, Rejection>>
+    createAdminRefundReasonHandler(Request request) async {
+  final actor = await const Extension<AuthenticatedAdmin>().extract(request);
+  if (actor case Err(:final error)) return Err(error);
+  final decoded = await _createReasonBody.extract(request);
+  if (decoded case Err(:final error)) return Err(error);
+  final state = await adminRefundReasonDeps(request);
+  if (state case Err(:final error)) return Err(error);
+  final deps = (state as Ok<AdminRefundReasonDeps, Rejection>).value;
+  return _reasonMutationResult(await createAdminRefundReason(
+    deps.reasons,
+    (decoded as Ok<AdminCreateRefundReason, Rejection>).value,
+    nextId: deps.clock.nextId,
+  ));
+}
+
+/// `PATCH /admin/refund-reasons/{id}` — edits one active merchant reason.
+Future<Result<AdminRefundReasonResponse, Rejection>>
+    updateAdminRefundReasonHandler(Request request) async {
+  final actor = await const Extension<AuthenticatedAdmin>().extract(request);
+  if (actor case Err(:final error)) return Err(error);
+  final id = pathParametersOf(request)['id'];
+  if (id == null || id.isEmpty) {
+    return const Err(Rejection.badRequest('A refund reason id is required'));
+  }
+  final decoded = await _updateReasonBody.extract(request);
+  if (decoded case Err(:final error)) return Err(error);
+  final state = await adminRefundReasonDeps(request);
+  if (state case Err(:final error)) return Err(error);
+  final deps = (state as Ok<AdminRefundReasonDeps, Rejection>).value;
+  return _reasonMutationResult(await updateAdminRefundReason(
+    deps.reasons,
+    id,
+    (decoded as Ok<AdminUpdateRefundReason, Rejection>).value,
+  ));
+}
+
+/// `DELETE /admin/refund-reasons/{id}` — retires one active reason.
+Future<Result<AdminRefundReasonDeleted, Rejection>>
+    deleteAdminRefundReasonHandler(Request request) async {
+  final actor = await const Extension<AuthenticatedAdmin>().extract(request);
+  if (actor case Err(:final error)) return Err(error);
+  final id = pathParametersOf(request)['id'];
+  if (id == null || id.isEmpty) {
+    return const Err(Rejection.badRequest('A refund reason id is required'));
+  }
+  final state = await adminRefundReasonDeps(request);
+  if (state case Err(:final error)) return Err(error);
+  final deps = (state as Ok<AdminRefundReasonDeps, Rejection>).value;
+  return switch (await retireAdminRefundReason(deps.reasons, id)) {
+    Ok(:final value) => Ok(AdminRefundReasonDeleted(id: value, deleted: true)),
+    Err(error: AdminRefundReasonRejected(:final failure)) => switch (failure) {
+        AdminRefundReasonFailure.notFound =>
+          Err(Rejection.notFound('Refund reason "$id"')),
+        AdminRefundReasonFailure.codeConflict =>
+          const Err(Rejection.conflict('Refund reason code conflicts')),
+      },
+    Err(error: AdminRefundReasonStorage()) => const Err(Rejection.internal()),
+  };
+}
+
+Result<AdminRefundReasonResponse, Rejection> _reasonMutationResult(
+  Result<AdminRefundReasonResponse, AdminRefundReasonError> result,
+) =>
+    switch (result) {
+      Ok(:final value) => Ok(value),
+      Err(error: AdminRefundReasonRejected(:final failure)) => switch (
+            failure) {
+          AdminRefundReasonFailure.notFound =>
+            const Err(Rejection.notFound('Refund reason')),
+          AdminRefundReasonFailure.codeConflict => const Err(
+              Rejection.conflict('Another refund reason uses this code')),
+        },
+      Err(error: AdminRefundReasonStorage()) => const Err(Rejection.internal()),
+    };
 
 /// `POST /admin/payments/{id}/refund` records one independent refund.
 Future<Result<AdminRefundedPaymentResponse, Rejection>>
