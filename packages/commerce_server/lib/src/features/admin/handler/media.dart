@@ -11,6 +11,17 @@ Future<Result<AdminUploadedFileList, Rejection>> uploadAdminMediaHandler(
   final state = await adminDeps(request);
   if (state case Err(:final error)) return Err(error);
   final deps = (state as Ok<AdminDeps, Rejection>).value;
+  final references = await deps.media.activeUrls();
+  if (references case Ok(:final value)) {
+    try {
+      await deps.mediaStorage.cleanup(
+        referencedUrls: value.map((reference) => reference.url).toSet(),
+        now: deps.clock.now(),
+      );
+    } on Object {
+      // Cleanup is best effort; a transient storage failure must not reject a valid upload.
+    }
+  }
   final body = await const StreamedMultipartExtractable(
     limit: adminMediaFileCountLimit * adminMediaFileLimit + 64 * 1024,
   ).extract(request);

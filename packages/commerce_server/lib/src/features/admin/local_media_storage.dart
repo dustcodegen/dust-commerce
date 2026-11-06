@@ -2,6 +2,9 @@ part of 'media_storage.dart';
 
 /// Durable single-node media storage with streamed, signature-checked writes.
 final class LocalAdminMediaStorage implements AdminMediaStorage {
+  /// Files left staged for longer than this are safe to reclaim.
+  static const stagedRetention = Duration(hours: 1);
+
   /// Creates a local storage adapter.
   LocalAdminMediaStorage({
     required Directory root,
@@ -68,6 +71,29 @@ final class LocalAdminMediaStorage implements AdminMediaStorage {
       mimeType: format.mimeType,
       size: await file.length(),
     ));
+  }
+
+  @override
+  Future<void> cleanup({
+    required Set<String> referencedUrls,
+    required DateTime now,
+  }) async {
+    if (!_root.existsSync()) return;
+    final cutoff = now.toUtc().subtract(stagedRetention);
+    for (final entity in _root.listSync()) {
+      if (entity is! File) continue;
+      final key = entity.path.split(Platform.pathSeparator).last;
+      if (_claimed.contains(key) || _deleting.contains(key)) continue;
+      if (referencedUrls.contains(urlFor(key))) continue;
+      final modified = entity.statSync().modified.toUtc();
+      if (modified.isAfter(cutoff)) continue;
+      _deleting.add(key);
+      try {
+        entity.deleteSync();
+      } finally {
+        _deleting.remove(key);
+      }
+    }
   }
 
   @override

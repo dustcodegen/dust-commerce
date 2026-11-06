@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:test/test.dart';
 
@@ -67,5 +68,17 @@ void main() {
       (await request.send()).assertUnprocessable();
       expect(harness.mediaDirectory.listSync(), isEmpty);
     }
+  });
+
+  test('reclaims old unreferenced staged files before a new upload', () async {
+    final orphan = File('${harness.mediaDirectory.path}/orphan.png')
+      ..writeAsBytesSync(pngBytes);
+    await orphan.setLastModified(
+      DateTime.utc(2099, 1, 1),
+    );
+
+    await harness.uploadPng();
+
+    expect(orphan.existsSync(), isFalse);
   });
 }
