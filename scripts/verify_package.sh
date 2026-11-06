@@ -53,6 +53,7 @@ if grep -q 'sdk: flutter' "$PACKAGE/pubspec.yaml"; then
 elif [[ "$PACKAGE" == "packages/commerce_server" ]]; then
   # Each server test owns an isolated PostgreSQL database; serial execution
   # keeps local and constrained runners from exhausting database/temp space.
+  trap "$ROOT_DIR/scripts/cleanup_test_databases.sh" EXIT
   (cd "$PACKAGE" && dart analyze && dart test --concurrency=1)
 else
   (cd "$PACKAGE" && dart analyze && dart test)

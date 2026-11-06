@@ -122,6 +122,10 @@ jobs:
           (cd apps/commerce_app && flutter test --no-pub)
           (cd apps/admin_app && flutter test --no-pub)
 
+      - name: Remove isolated test databases
+        if: always()
+        run: ./scripts/cleanup_test_databases.sh
+
       # The 180-line rule from CONTRIBUTING.md, enforced rather than trusted.
       # Generated files are exempt: they are output, not source.
       - name: File size budget
