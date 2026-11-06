@@ -42,6 +42,7 @@ mixin _AdminHomeNavigation on State<_AdminHome>, _AdminHomeActions {
       onPromotionsRequested: _showPromotions,
       onProductTypesRequested: _showProductTypes,
       onShippingProfilesRequested: _showShippingProfiles,
+      onRefundReasonsRequested: _showRefundReasons,
       selectedSection: switch (_route) {
         _AdminRoute.customers ||
         _AdminRoute.customer ||
@@ -68,6 +69,7 @@ mixin _AdminHomeNavigation on State<_AdminHome>, _AdminHomeActions {
         _AdminRoute.shippingProfiles ||
         _AdminRoute.shippingProfile =>
           AdminShellSection.shippingProfiles,
+        _AdminRoute.refundReasons => AdminShellSection.refundReasons,
       },
       onSignOut: widget.state.isBusy
           ? null
@@ -157,6 +159,9 @@ mixin _AdminHomeNavigation on State<_AdminHome>, _AdminHomeActions {
         _AdminRoute.shippingProfile => AdminShippingProfileDetailPage(
             shippingProfileId: selectedIdForNavigation,
             onBack: _showShippingProfiles,
+          ),
+        _AdminRoute.refundReasons => AdminRefundReasonPage(
+            searchFocus: _refundReasonSearchFocus,
           ),
       },
     );

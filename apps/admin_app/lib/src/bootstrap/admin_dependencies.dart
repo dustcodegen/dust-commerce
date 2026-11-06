@@ -29,6 +29,7 @@ import 'package:admin_app/src/promotion/admin_promotion_api.dart';
 import 'package:admin_app/src/promotion/admin_promotion_create_view_model.dart';
 import 'package:admin_app/src/promotion/admin_promotion_detail_view_model.dart';
 import 'package:admin_app/src/promotion/admin_promotion_view_model.dart';
+import 'package:admin_app/src/refund_reason/admin_refund_reason_view_model.dart';
 import 'package:admin_app/src/session/admin_session_view_model.dart';
 import 'package:admin_app/src/shipping_profile/admin_shipping_profile_api.dart';
 import 'package:admin_app/src/shipping_profile/admin_shipping_profile_detail_view_model.dart';
@@ -119,6 +120,9 @@ final class AdminDependencies {
       stockLocations: AdminStockLocationViewModel(
         AdminStockLocationViewModelArgs(api: stockLocationApi),
       ),
+      refundReasons: AdminRefundReasonViewModel(
+        AdminRefundReasonViewModelArgs(api: orderDetailApi),
+      ),
     );
   }
 
@@ -144,6 +148,7 @@ final class AdminDependencies {
     required this.promotionCreate,
     required this.promotionDetail,
     required this.stockLocations,
+    required this.refundReasons,
   });
 
   /// Signed-in Admin session state.
@@ -208,4 +213,7 @@ final class AdminDependencies {
 
   /// Inventory/Locations collection state.
   final AdminStockLocationViewModel stockLocations;
+
+  /// Merchant refund-reason settings state.
+  final AdminRefundReasonViewModel refundReasons;
 }

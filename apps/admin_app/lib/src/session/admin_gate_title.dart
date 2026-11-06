@@ -55,4 +55,5 @@ String _adminShellTitle({
           Some(:final value) => 'Shipping Profiles  ›  ${value.name}',
           None() => 'Shipping Profiles',
         },
+      _AdminRoute.refundReasons => 'Settings  ›  Refund Reasons',
     };

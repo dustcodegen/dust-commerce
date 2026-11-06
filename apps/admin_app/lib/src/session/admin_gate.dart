@@ -34,6 +34,8 @@ import 'package:admin_app/src/promotion/admin_promotion_detail_view_model.dart';
 import 'package:admin_app/src/promotion/admin_promotion_create_page.dart';
 import 'package:admin_app/src/promotion/admin_promotion_page.dart';
 import 'package:admin_app/src/promotion/admin_promotion_view_model.dart';
+import 'package:admin_app/src/refund_reason/admin_refund_reason_page.dart';
+import 'package:admin_app/src/refund_reason/admin_refund_reason_view_model.dart';
 import 'package:admin_app/src/session/admin_session_state.dart';
 import 'package:admin_app/src/session/admin_session_view_model.dart';
 import 'package:admin_app/src/session/admin_sign_in.dart';
@@ -124,6 +126,8 @@ final class _AdminHomeState extends State<_AdminHome>
   @override
   final _stockLocationSearchFocus = FocusNode();
   @override
+  final _refundReasonSearchFocus = FocusNode();
+  @override
   _AdminRoute _route = _AdminRoute.products;
   @override
   String _selectedId = '';
@@ -153,6 +157,7 @@ final class _AdminHomeState extends State<_AdminHome>
     _profileSearchFocus.dispose();
     _promotionSearchFocus.dispose();
     _stockLocationSearchFocus.dispose();
+    _refundReasonSearchFocus.dispose();
     super.dispose();
   }
 
@@ -180,4 +185,5 @@ enum _AdminRoute {
   stockLocations,
   shippingProfiles,
   shippingProfile,
+  refundReasons,
 }
