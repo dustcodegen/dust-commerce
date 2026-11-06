@@ -32,7 +32,10 @@ standalone Admin allowlist rather than inheriting persistence fields.
 The focused PostgreSQL route gate covers unauthenticated access, normalized
 percentage and fixed creation, scheduled status, duplicate codes, invalid
 cross-field definitions, and no-write rejection. The generated Admin client
-exposes the body-only create method; bearer ownership remains in Dio.
+exposes the body-only create method; bearer ownership remains in Dio. The
+Admin promotions page now has a focused create surface for code, type, value,
+currency, and usage limit, with server-owned error handling and a generated
+client integration test that returns to the newly created detail route.
 
 ## Isolation boundary
 
