@@ -71,14 +71,20 @@ void main() {
   });
 
   test('reclaims old unreferenced staged files before a new upload', () async {
-    final orphan = File('${harness.mediaDirectory.path}/orphan.png')
+    final orphan = File('${harness.mediaDirectory.path}/stale_media_1.png')
       ..writeAsBytesSync(pngBytes);
+    final foreign = File('${harness.mediaDirectory.path}/.keep')
+      ..writeAsStringSync('leave this file alone');
     await orphan.setLastModified(
+      DateTime.utc(2099, 1, 1),
+    );
+    await foreign.setLastModified(
       DateTime.utc(2099, 1, 1),
     );
 
     await harness.uploadPng();
 
     expect(orphan.existsSync(), isFalse);
+    expect(foreign.existsSync(), isTrue);
   });
 }

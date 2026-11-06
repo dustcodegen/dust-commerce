@@ -83,6 +83,7 @@ final class LocalAdminMediaStorage implements AdminMediaStorage {
     for (final entity in _root.listSync()) {
       if (entity is! File) continue;
       final key = entity.path.split(Platform.pathSeparator).last;
+      if (!_validKey.hasMatch(key) && !_pendingKey.hasMatch(key)) continue;
       if (_claimed.contains(key) || _deleting.contains(key)) continue;
       if (referencedUrls.contains(urlFor(key))) continue;
       final modified = entity.statSync().modified.toUtc();
@@ -153,6 +154,8 @@ final class LocalAdminMediaStorage implements AdminMediaStorage {
   }
 
   static final RegExp _opaqueKey = RegExp(r'^[A-Za-z0-9_-]{8,128}$');
+  static final RegExp _pendingKey =
+      RegExp(r'^\.[A-Za-z0-9_-]{8,128}\.pending$');
   static final RegExp _validKey =
       RegExp(r'^[A-Za-z0-9_-]{8,128}\.(?:jpg|png|gif|webp)$');
 
