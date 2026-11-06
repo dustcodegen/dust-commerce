@@ -6,9 +6,14 @@ window allows one remote cycle.
 
 ## Epic 1 — storefront/admin parity stack
 
-Status: PR #55 is open. Local validation is green; the first remote run exposed
-two frozen-debt baselines, both corrected locally. The latest baseline fix is
-`9d41e3fa` and is waiting for the one-hour CI window before push.
+[PR #55](https://github.com/dustcodegen/dust-commerce/pull/55) is open. The
+first two Verify runs found file-size and handler-naming regressions. The
+checkout contract tests now have their own file, and the cart form handler
+lives under `handler/create/`. Both frozen checks pass locally.
+
+Delivery also needs the deployed API origin in the GitHub repository variable
+`PRODUCTION_API_BASE_URL`. The merge starts a fresh Verify run on `main`, and
+Delivery packages that revision after Verify succeeds.
 
 Release evidence:
 
@@ -19,10 +24,19 @@ Release evidence:
 
 ## Epic 2 — verified customer email change
 
-Build a separate pending-email capability with current-password confirmation,
-single-use hashed token delivery, atomic provider/customer email replacement,
-session revocation, and a standalone Flutter profile editor. Do not reuse the
-registration verification row for a different lifecycle.
+Use the Medusa profile editor layout and add real email verification. The
+[Medusa reference](https://github.com/medusajs/dtc-starter/blob/4a1d53dc434ed124a78c4e2c9f312e1f47d4e9eb/apps/storefront/src/modules/account/components/profile-email/index.tsx)
+has a placeholder submit action.
+
+- Require the current password on the authenticated request. Keep the existing
+  login active while a dedicated, expiring capability is pending. Send the link
+  to the normalized new address and require an explicit confirmation action.
+- Atomically consume the capability, update the customer and provider email,
+  and revoke sessions. Coordinate with sign-in and password rotation. Preserve
+  the customer ID and existing order snapshots.
+- Prove expiry, replay, supersession, duplicate-email races, delivery failure,
+  retry, and concurrent sign-in in local API tests. Verify the confirmation
+  and sign-in flow in desktop and compact browsers using test SMTP.
 
 ## Epic 3 — external payment/refund providers
 
@@ -38,6 +52,8 @@ contracts with the Store package.
 
 ## Release rule
 
-Never start another CI run within one hour of the previous run. After one epic
-passes local and remote validation, merge that epic, pull `main`, and begin the
-next milestone from a fresh feature branch.
+Before publishing an epic, run its package gates and the repository format,
+file-size, structure, and generated-output checks locally. Check the latest CI
+start time before pushing or merging. Leave at least one hour between CI starts,
+including the run started by the merge. After the epic passes Verify and merges,
+fast-forward local `main` and start the next milestone from a fresh branch.
