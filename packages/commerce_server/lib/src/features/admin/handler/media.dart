@@ -11,6 +11,17 @@ Future<Result<AdminUploadedFileList, Rejection>> uploadAdminMediaHandler(
   final state = await adminDeps(request);
   if (state case Err(:final error)) return Err(error);
   final deps = (state as Ok<AdminDeps, Rejection>).value;
+  final references = await deps.media.activeUrls();
+  if (references case Ok(:final value)) {
+    try {
+      await deps.mediaStorage.cleanup(
+        referencedUrls: value.map((reference) => reference.url).toSet(),
+        now: deps.clock.now(),
+      );
+    } on Object {
+      // Cleanup is best effort; a transient storage failure must not reject a valid upload.
+    }
+  }
   final body = await const StreamedMultipartExtractable(
     limit: adminMediaFileCountLimit * adminMediaFileLimit + 64 * 1024,
   ).extract(request);
@@ -68,6 +79,13 @@ Future<Result<Response, Rejection>> deleteAdminMediaHandler(
   final key = pathParametersOf(request)['key'];
   if (key == null) return const Err(Rejection.notFound('Media not found'));
   final url = deps.mediaStorage.urlFor(key);
+  if (!deps.mediaStorage.accepts(key, url)) {
+    return const Err(Rejection.notFound('Media not found'));
+  }
+  final found = await deps.mediaStorage.find(key);
+  if (found case None()) {
+    return const Err(Rejection.notFound('Media not found'));
+  }
   final references = await deps.media.countReferences(url);
   if (references case Err()) return const Err(Rejection.internal());
   if ((references as Ok<int, SqlxError>).value > 0) {
@@ -76,7 +94,8 @@ Future<Result<Response, Rejection>> deleteAdminMediaHandler(
     );
   }
   try {
-    await deps.mediaStorage.delete(key);
+    final deleted = await deps.mediaStorage.delete(key);
+    if (!deleted) return const Err(Rejection.notFound('Media not found'));
     return Ok(noContent());
   } on Object {
     return const Err(Rejection.internal());

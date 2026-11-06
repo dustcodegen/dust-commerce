@@ -26,8 +26,10 @@ import 'package:admin_app/src/product_option/admin_product_option_view_model.dar
 import 'package:admin_app/src/product_type/admin_product_type_detail_view_model.dart';
 import 'package:admin_app/src/product_type/admin_product_type_view_model.dart';
 import 'package:admin_app/src/promotion/admin_promotion_api.dart';
+import 'package:admin_app/src/promotion/admin_promotion_create_view_model.dart';
 import 'package:admin_app/src/promotion/admin_promotion_detail_view_model.dart';
 import 'package:admin_app/src/promotion/admin_promotion_view_model.dart';
+import 'package:admin_app/src/refund_reason/admin_refund_reason_view_model.dart';
 import 'package:admin_app/src/session/admin_session_view_model.dart';
 import 'package:admin_app/src/shipping_profile/admin_shipping_profile_api.dart';
 import 'package:admin_app/src/shipping_profile/admin_shipping_profile_detail_view_model.dart';
@@ -109,11 +111,17 @@ final class AdminDependencies {
       promotions: AdminPromotionViewModel(
         AdminPromotionViewModelArgs(api: promotionApi),
       ),
+      promotionCreate: AdminPromotionCreateViewModel(
+        AdminPromotionCreateViewModelArgs(api: promotionApi),
+      ),
       promotionDetail: AdminPromotionDetailViewModel(
         AdminPromotionDetailViewModelArgs(api: promotionApi),
       ),
       stockLocations: AdminStockLocationViewModel(
         AdminStockLocationViewModelArgs(api: stockLocationApi),
+      ),
+      refundReasons: AdminRefundReasonViewModel(
+        AdminRefundReasonViewModelArgs(api: orderDetailApi),
       ),
     );
   }
@@ -137,8 +145,10 @@ final class AdminDependencies {
     required this.shippingProfiles,
     required this.shippingProfileDetail,
     required this.promotions,
+    required this.promotionCreate,
     required this.promotionDetail,
     required this.stockLocations,
+    required this.refundReasons,
   });
 
   /// Signed-in Admin session state.
@@ -195,9 +205,15 @@ final class AdminDependencies {
   /// Promotion collection state.
   final AdminPromotionViewModel promotions;
 
+  /// Focused promotion creation command state.
+  final AdminPromotionCreateViewModel promotionCreate;
+
   /// Selected promotion detail state.
   final AdminPromotionDetailViewModel promotionDetail;
 
   /// Inventory/Locations collection state.
   final AdminStockLocationViewModel stockLocations;
+
+  /// Merchant refund-reason settings state.
+  final AdminRefundReasonViewModel refundReasons;
 }

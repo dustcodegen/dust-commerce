@@ -181,7 +181,7 @@ SELECT id, code, type, value, currency_code,
        starts_at, ends_at,
        usage_limit, usage_count
 FROM promotions
-WHERE code = UPPER($1)
+WHERE code = UPPER($1) AND deleted_at IS NULL
 ''')
   Future<Result<PromotionPolicy?, SqlxError>> promotionByCode(String code);
 

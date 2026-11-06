@@ -10,6 +10,12 @@ abstract final class AdminCancelOrderRepository {
   const factory AdminCancelOrderRepository(Executor db) =
       _$AdminCancelOrderRepository;
 
+  /// Locks the same order row as a standalone refund.
+  @Query(r'''
+SELECT id FROM orders WHERE id = $1 AND deleted_at IS NULL FOR UPDATE
+''')
+  Future<Result<String?, SqlxError>> lockOrder(String orderId);
+
   /// Reads every fact required before the first irreversible local write.
   @Query(r'''
 SELECT order_row.status, order_row.payment_status, order_row.currency_code,

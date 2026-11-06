@@ -10,4 +10,7 @@ export 'payment_service.dart';
 export 'reason_model.dart';
 export 'reason_repository.dart';
 export 'reason_service.dart';
+export 'reason_deps.dart';
+export 'reason_failure.dart';
+export 'reason_mutation_service.dart';
 export 'router.dart';

@@ -38,9 +38,38 @@ Future<Result<ProductResponse, Rejection>> readProductHandler(
   };
 }
 
+/// Serves JSON products and the Medusa-compatible `.md` URL alias.
+Future<Object?> readProductRouteHandler(Request request) {
+  final handle = pathParametersOf(request)['handle'];
+  if (handle?.endsWith('.md') == true || _acceptsMarkdown(request)) {
+    return readProductMarkdownHandler(request);
+  }
+  return readProductHandler(request);
+}
+
+bool _acceptsMarkdown(Request request) {
+  final accept = request.headers['accept'];
+  if (accept == null) return false;
+  return accept.split(',').any((value) {
+    final parts = value.split(';');
+    if (parts.first.trim().toLowerCase() != 'text/markdown') return false;
+    for (final parameter in parts.skip(1)) {
+      final fields = parameter.split('=');
+      if (fields.first.trim().toLowerCase() != 'q') continue;
+      if (fields.length != 2) return false;
+      final quality = double.tryParse(fields.last.trim());
+      return quality != null && quality > 0 && quality <= 1;
+    }
+    return true;
+  });
+}
+
 /// `GET /products/{handle}/markdown` — a public Markdown product projection.
 Future<Object?> readProductMarkdownHandler(Request request) async {
-  final handle = pathParametersOf(request)['handle'];
+  final rawHandle = pathParametersOf(request)['handle'];
+  final handle = rawHandle?.endsWith('.md') == true
+      ? rawHandle!.substring(0, rawHandle.length - 3)
+      : rawHandle;
   if (handle == null || handle.isEmpty) {
     return const Rejection.badRequest('A product handle is required');
   }
@@ -102,6 +131,7 @@ Future<Object?> readProductMarkdownHandler(Request request) async {
       origin: origin,
       countryCode: countryCode,
       currencyCode: currencyCode,
+      regionId: region?.id,
       policy: policy,
     ),
     headers: const {

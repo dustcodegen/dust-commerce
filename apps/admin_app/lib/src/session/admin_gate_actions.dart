@@ -11,12 +11,14 @@ mixin _AdminHomeActions
   FocusNode get _profileSearchFocus;
   FocusNode get _promotionSearchFocus;
   FocusNode get _stockLocationSearchFocus;
+  FocusNode get _refundReasonSearchFocus;
 
   void _showStockLocations();
   void _requestInventorySearch();
   Future<void> _createProduct();
   Future<void> _createCustomer();
   Future<void> _createProductOption();
+  Future<void> _createPromotion();
 
   String get selectedIdForNavigation => _selectedId;
   String get selectedCustomerIdForNavigation => _selectedCustomerId;
@@ -71,6 +73,13 @@ mixin _AdminHomeActions
     }
     if (_route == _AdminRoute.stockLocations) {
       _requestInventorySearch();
+      return;
+    }
+    if (_route == _AdminRoute.refundReasons) {
+      _showRefundReasons();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _refundReasonSearchFocus.requestFocus();
+      });
       return;
     }
     final options = _route == _AdminRoute.productOptions ||
@@ -181,4 +190,12 @@ mixin _AdminHomeActions
         _route = _AdminRoute.promotion;
         _selectedId = id;
       });
+
+  void _showRefundReasons() {
+    context.readAdminRefundReasonViewModel().load(offset: 0);
+    setState(() {
+      _route = _AdminRoute.refundReasons;
+      _selectedId = '';
+    });
+  }
 }

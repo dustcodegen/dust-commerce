@@ -75,6 +75,12 @@ abstract interface class AdminMediaStorage {
   /// Releases reservations after the product transaction finishes.
   void release(List<AdminMediaClaim> media);
 
+  /// Removes unreferenced files older than the staged-upload retention window.
+  Future<void> cleanup({
+    required Set<String> referencedUrls,
+    required DateTime now,
+  });
+
   /// Public URL corresponding to [key].
   String urlFor(String key);
 }
@@ -95,6 +101,12 @@ final class UnavailableAdminMediaStorage implements AdminMediaStorage {
 
   @override
   Future<Option<AdminStoredMediaAsset>> find(String key) async => const None();
+
+  @override
+  Future<void> cleanup({
+    required Set<String> referencedUrls,
+    required DateTime now,
+  }) async {}
 
   @override
   Future<AdminUploadedFile> store(MultipartPart part) async =>

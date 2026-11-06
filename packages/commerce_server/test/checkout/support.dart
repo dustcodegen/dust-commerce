@@ -174,7 +174,7 @@ final class CheckoutHarness {
   /// The stock on hand for [variantId], read straight from the table.
   Future<int> stockOf(String variantId) async {
     final rows = await queryRaw(
-      'SELECT inventory_quantity FROM product_variants WHERE id = \$1',
+      r'SELECT inventory_quantity FROM product_variants WHERE id = $1',
       [variantId],
     ).fetch(database.connection as Executor);
     return rows.single.readIndex<int>(0);

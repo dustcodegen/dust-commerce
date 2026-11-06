@@ -74,4 +74,29 @@ void main() {
     expect(
         detail.state.failure, const Some('This promotion no longer exists.'));
   });
+
+  test('updates promotion detail through the generated client', () async {
+    await detail.load('promo_welcome');
+
+    final updated = await detail.update(
+      'promo_welcome',
+      const AdminUpdatePromotion(
+        code: 'WELCOME20',
+        type: 'percentage',
+        value: 2000,
+        currencyCodeValue: null,
+        startsAtValue: null,
+        endsAtValue: null,
+        usageLimitValue: 25,
+      ),
+    );
+
+    final promotion = switch (updated) {
+      Some(:final value) => value,
+      None() => fail('Expected the updated promotion'),
+    };
+    expect(promotion.code, 'WELCOME20');
+    expect(promotion.value, 2000);
+    expect(detail.state.status, AdminPromotionDetailStatus.ready);
+  });
 }

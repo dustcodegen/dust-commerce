@@ -9,7 +9,7 @@ comparison against a live Medusa preview.
 
 ## Evidence
 
-On 2026-11-05, from `main` revision `d77d53ae`, the repository-root contract
+On 2026-11-06, from `feat/admin-promotion-create` revision `2a9ad6ff`, the repository-root contract
 completed successfully:
 
 ```bash
@@ -18,10 +18,11 @@ completed successfully:
 
 The run reported:
 
-- Dust generated-output checks: clean
+- Dust generated-output checks: `199/199` clean
 - Flutter analysis: no issues
-- Flutter tests: 170 passed
+- Flutter tests: 178 passed
 - Widget tests: none added
+- Exact `dust_test_*` databases: cleaned on verifier exit; `dust_commerce` retained
 
 The verification is intentionally scoped to the storefront package. Server,
 Admin, release-artifact, and browser evidence remain separate gates in their

@@ -1,4 +1,5 @@
 import 'package:dust_dart/db.dart';
+import 'media_model.dart';
 
 part 'media.g.dart';
 
@@ -15,4 +16,12 @@ FROM product_images
 WHERE url = $1 AND deleted_at IS NULL
 ''')
   Future<Result<int, SqlxError>> countReferences(String url);
+
+  /// Lists every active public URL so staged files can be reclaimed safely.
+  @Query(r'''
+SELECT DISTINCT url
+FROM product_images
+WHERE deleted_at IS NULL
+''')
+  Future<Result<List<AdminMediaReference>, SqlxError>> activeUrls();
 }

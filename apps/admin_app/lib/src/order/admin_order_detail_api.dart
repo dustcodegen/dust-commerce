@@ -26,6 +26,23 @@ abstract interface class AdminOrderDetailApi {
     @Query('offset') int offset,
   );
 
+  /// Creates one merchant-managed refund reason.
+  @POST('/admin/refund-reasons')
+  Future<AdminRefundReason> createRefundReason(
+    @Body() AdminCreateRefundReason body,
+  );
+
+  /// Edits one active merchant-managed refund reason.
+  @PATCH('/admin/refund-reasons/{id}')
+  Future<AdminRefundReason> updateRefundReason(
+    @Path() String id,
+    @Body() AdminUpdateRefundReason body,
+  );
+
+  /// Retires one merchant-managed refund reason.
+  @DELETE('/admin/refund-reasons/{id}')
+  Future<AdminRefundReasonDeleted> deleteRefundReason(@Path() String id);
+
   /// Refunds one captured payment and returns its refreshed audit response.
   @POST('/admin/payments/{id}/refund')
   Future<AdminRefundedPayment> refundPayment(

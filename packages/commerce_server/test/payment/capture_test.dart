@@ -81,7 +81,7 @@ void main() {
       final orderId = await context.placeOrder();
       await context.authorize(orderId);
       await queryExecute(
-        "UPDATE orders SET status = 'archived' WHERE id = \$1",
+        r"UPDATE orders SET status = 'archived' WHERE id = $1",
         [orderId],
       ).execute(context.database.executor);
 

@@ -29,4 +29,7 @@ enum AdminShellSection {
 
   /// Settings routes for fulfillment requirement groups.
   shippingProfiles,
+
+  /// Settings routes for merchant refund reasons.
+  refundReasons,
 }

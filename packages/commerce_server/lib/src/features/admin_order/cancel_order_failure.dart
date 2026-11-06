@@ -11,6 +11,9 @@ enum AdminCancelOrderFailure {
   /// Completed orders must use the return workflow instead.
   completed,
 
+  /// An archived order cannot change its lifecycle again.
+  archived,
+
   /// Every fulfillment must be canceled before the parent order.
   activeFulfillments,
 

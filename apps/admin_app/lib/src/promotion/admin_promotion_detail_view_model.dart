@@ -1,5 +1,6 @@
 import 'package:admin_app/src/promotion/admin_promotion_api.dart';
 import 'package:admin_app/src/promotion/admin_promotion_detail_state.dart';
+import 'package:commerce_admin_shared/commerce_admin_shared.dart';
 import 'package:dio/dio.dart';
 import 'package:dust_dart/fp.dart';
 import 'package:dust_flutter/state.dart';
@@ -56,8 +57,83 @@ final class AdminPromotionDetailViewModel
     }
   }
 
+  /// Retires the loaded promotion while preserving the detail until navigation.
+  Future<bool> delete(String id) async {
+    final revision = ++_revision;
+    final current = state;
+    emit(current.copyWith(
+      status: AdminPromotionDetailStatus.deleting,
+      failure: const None(),
+    ));
+    try {
+      await args.api.deletePromotion(id);
+      if (revision != _revision) return true;
+      return true;
+    } on DioException catch (error) {
+      if (revision != _revision) return false;
+      _deleteFailed(error.response?.statusCode == 404
+          ? 'This promotion no longer exists.'
+          : error.response?.statusCode == 401
+              ? 'Your admin session has expired.'
+              : 'Unable to delete this promotion. Try again.');
+      return false;
+    } on Object {
+      if (revision != _revision) return false;
+      _deleteFailed('Unable to delete this promotion. Try again.');
+      return false;
+    }
+  }
+
+  /// Replaces editable fields and returns the refreshed server row.
+  Future<Option<AdminPromotion>> update(
+    String id,
+    AdminUpdatePromotion input,
+  ) async {
+    final revision = ++_revision;
+    emit(state.copyWith(
+      status: AdminPromotionDetailStatus.updating,
+      failure: const None(),
+    ));
+    try {
+      final detail = await args.api.updatePromotion(id, input);
+      if (revision != _revision) return const None();
+      emit(AdminPromotionDetailState(
+        status: AdminPromotionDetailStatus.ready,
+        promotion: Some(detail.promotion),
+      ));
+      return Some(detail.promotion);
+    } on DioException catch (error) {
+      if (revision != _revision) return const None();
+      _updateFailed(_updateFailure(error));
+      return const None();
+    } on Object {
+      if (revision != _revision) return const None();
+      _updateFailed('Unable to update this promotion. Try again.');
+      return const None();
+    }
+  }
+
   void _fail(String message) => emit(AdminPromotionDetailState(
         status: AdminPromotionDetailStatus.failed,
         failure: Some(message),
       ));
+
+  void _deleteFailed(String message) => emit(state.copyWith(
+        status: AdminPromotionDetailStatus.ready,
+        failure: Some(message),
+      ));
+
+  void _updateFailed(String message) => emit(state.copyWith(
+        status: AdminPromotionDetailStatus.ready,
+        failure: Some(message),
+      ));
+
+  String _updateFailure(DioException error) =>
+      switch (error.response?.statusCode) {
+        401 => 'Your admin session has expired.',
+        404 => 'This promotion no longer exists.',
+        409 => 'Another promotion already uses this code.',
+        422 => 'Check the promotion values and try again.',
+        _ => 'Unable to update this promotion. Try again.',
+      };
 }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:test/test.dart';
 
@@ -48,6 +49,15 @@ void main() {
         .assertNotFound();
   });
 
+  test('missing staged media returns not found instead of a false success',
+      () async {
+    final token = await harness.adminToken();
+    final remove = harness.client.delete('/admin/uploads/missing_media.png')
+      ..bearer(token);
+
+    (await remove.send()).assertNotFound();
+  });
+
   test('rejects invalid or excessive uploads without leftovers', () async {
     final token = await harness.adminToken();
     for (final request in [
@@ -67,5 +77,23 @@ void main() {
       (await request.send()).assertUnprocessable();
       expect(harness.mediaDirectory.listSync(), isEmpty);
     }
+  });
+
+  test('reclaims old unreferenced staged files before a new upload', () async {
+    final orphan = File('${harness.mediaDirectory.path}/stale_media_1.png')
+      ..writeAsBytesSync(pngBytes);
+    final foreign = File('${harness.mediaDirectory.path}/.keep')
+      ..writeAsStringSync('leave this file alone');
+    await orphan.setLastModified(
+      DateTime.utc(2099, 1, 1),
+    );
+    await foreign.setLastModified(
+      DateTime.utc(2099, 1, 1),
+    );
+
+    await harness.uploadPng();
+
+    expect(orphan.existsSync(), isFalse);
+    expect(foreign.existsSync(), isTrue);
   });
 }

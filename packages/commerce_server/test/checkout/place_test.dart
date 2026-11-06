@@ -29,7 +29,7 @@ void main() {
       expect(order.customerId, account.customerId);
       expect(order.email, 'ada@example.com');
       final rows = await queryRaw(
-        'SELECT customer_id, email FROM carts WHERE id = \$1',
+        r'SELECT customer_id, email FROM carts WHERE id = $1',
         [cartId],
       ).fetch(harness.database.connection as Executor);
       expect(rows.single.readIndex<String>(0), account.customerId);
@@ -84,7 +84,7 @@ void main() {
 
       final rows = await queryRaw(
         'SELECT COUNT(orders.id), MAX(carts.completed_at) FROM carts '
-        'LEFT JOIN orders ON orders.cart_id = carts.id WHERE carts.id = \$1',
+        r'LEFT JOIN orders ON orders.cart_id = carts.id WHERE carts.id = $1',
         [cartId],
       ).fetch(harness.database.connection as Executor);
       expect(rows.single.readIndex<int>(0), 1);
@@ -112,7 +112,7 @@ void main() {
           .assertConflict();
 
       final rows = await queryRaw(
-        'SELECT COUNT(*) FROM orders WHERE email = \$1',
+        r'SELECT COUNT(*) FROM orders WHERE email = $1',
         ['loser@example.com'],
       ).fetch(harness.database.connection as Executor);
       expect(rows.single.readIndex<int>(0), 0);

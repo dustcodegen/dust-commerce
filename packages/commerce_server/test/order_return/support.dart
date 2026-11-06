@@ -50,13 +50,13 @@ final class ReturnScenario {
       await queryExecute(
         "INSERT INTO fulfillments "
         "(id, order_id, location_id, provider_id, delivered_at) "
-        "VALUES (\$1, \$2, 'location_test', 'manual', CURRENT_TIMESTAMP)",
+        r"VALUES ($1, $2, 'location_test', 'manual', CURRENT_TIMESTAMP)",
         ['ful_${order.id}', order.id],
       ).execute(harness.database.executor);
       await queryExecute(
         "INSERT INTO fulfillment_items "
         "(id, fulfillment_id, title, quantity, sku, barcode, line_item_id) "
-        "VALUES (\$1, \$2, \$3, \$4, '', '', \$5)",
+        r"VALUES ($1, $2, $3, $4, '', '', $5)",
         [
           'fulitem_${order.id}',
           'ful_${order.id}',

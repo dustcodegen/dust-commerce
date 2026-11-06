@@ -2,6 +2,9 @@ part of 'media_storage.dart';
 
 /// Durable single-node media storage with streamed, signature-checked writes.
 final class LocalAdminMediaStorage implements AdminMediaStorage {
+  /// Files left staged for longer than this are safe to reclaim.
+  static const stagedRetention = Duration(hours: 1);
+
   /// Creates a local storage adapter.
   LocalAdminMediaStorage({
     required Directory root,
@@ -71,6 +74,30 @@ final class LocalAdminMediaStorage implements AdminMediaStorage {
   }
 
   @override
+  Future<void> cleanup({
+    required Set<String> referencedUrls,
+    required DateTime now,
+  }) async {
+    if (!_root.existsSync()) return;
+    final cutoff = now.toUtc().subtract(stagedRetention);
+    for (final entity in _root.listSync()) {
+      if (entity is! File) continue;
+      final key = entity.path.split(Platform.pathSeparator).last;
+      if (!_validKey.hasMatch(key) && !_pendingKey.hasMatch(key)) continue;
+      if (_claimed.contains(key) || _deleting.contains(key)) continue;
+      if (referencedUrls.contains(urlFor(key))) continue;
+      final modified = entity.statSync().modified.toUtc();
+      if (modified.isAfter(cutoff)) continue;
+      _deleting.add(key);
+      try {
+        entity.deleteSync();
+      } finally {
+        _deleting.remove(key);
+      }
+    }
+  }
+
+  @override
   Future<AdminUploadedFile> store(MultipartPart part) async {
     if (!part.isFile) {
       throw const AdminMediaException(AdminMediaFailure.invalidImage);
@@ -127,6 +154,8 @@ final class LocalAdminMediaStorage implements AdminMediaStorage {
   }
 
   static final RegExp _opaqueKey = RegExp(r'^[A-Za-z0-9_-]{8,128}$');
+  static final RegExp _pendingKey =
+      RegExp(r'^\.[A-Za-z0-9_-]{8,128}\.pending$');
   static final RegExp _validKey =
       RegExp(r'^[A-Za-z0-9_-]{8,128}\.(?:jpg|png|gif|webp)$');
 

@@ -112,7 +112,7 @@ void main() {
       await queryExecute(
         'INSERT INTO auth_tokens '
         '(token_hash, auth_identity_id, created_at, expires_at) '
-        "VALUES (\$1, 'id_2', '2026-09-04T12:00:00.000Z', "
+        r"VALUES ($1, 'id_2', '2026-09-04T12:00:00.000Z', "
         "'2026-09-05T11:59:59.000Z')",
         [await Tokens.fingerprint(token)],
       ).execute(harness.database.executor);

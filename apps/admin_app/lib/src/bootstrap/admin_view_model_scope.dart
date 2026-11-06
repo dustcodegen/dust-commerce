@@ -27,8 +27,8 @@ import 'package:admin_app/src/product_option/admin_product_option_detail_view_mo
 import 'package:admin_app/src/product_option/admin_product_option_view_model.dart';
 import 'package:admin_app/src/product_type/admin_product_type_detail_view_model.dart';
 import 'package:admin_app/src/product_type/admin_product_type_view_model.dart';
-import 'package:admin_app/src/promotion/admin_promotion_detail_view_model.dart';
-import 'package:admin_app/src/promotion/admin_promotion_view_model.dart';
+import 'package:admin_app/src/promotion/admin_promotion_view_models_scope.dart';
+import 'package:admin_app/src/refund_reason/admin_refund_reason_view_model.dart';
 import 'package:admin_app/src/session/admin_session_view_model.dart';
 import 'package:admin_app/src/shipping_profile/admin_shipping_profile_detail_view_model.dart';
 import 'package:admin_app/src/shipping_profile/admin_shipping_profile_view_model.dart';
@@ -135,15 +135,14 @@ final class AdminViewModelScope extends StatelessWidget {
                                                               value: deps
                                                                   .shippingProfileDetail,
                                                               child:
-                                                                  AdminPromotionViewModelScope
-                                                                      .value(
-                                                                value: deps
-                                                                    .promotions,
+                                                                  AdminPromotionViewModels(
+                                                                dependencies:
+                                                                    deps,
                                                                 child:
-                                                                    AdminPromotionDetailViewModelScope
+                                                                    AdminRefundReasonViewModelScope
                                                                         .value(
                                                                   value: deps
-                                                                      .promotionDetail,
+                                                                      .refundReasons,
                                                                   child: child,
                                                                 ),
                                                               ),

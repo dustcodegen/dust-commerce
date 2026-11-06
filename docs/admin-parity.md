@@ -17,6 +17,91 @@ The repository's 180-code-line gate still reports 6 legacy files. New slices
 add no over-limit handwritten file, and touched legacy files are split by
 responsibility. The remaining debt stays visible instead of weakening the gate.
 
+## Current local package gate
+
+On 2026-11-06 at `b3d90847`, `./scripts/verify_package.sh apps/admin_app`
+completed with Dust `264/264` clean, Flutter analysis clean, and `175` Admin
+non-widget tests passing. No widget tests were added; CI and remote merge remain
+deferred until the one-day local review window ends.
+
+## Fresh local Admin smoke
+
+Validated 2026-11-06 against the current `feat/admin-promotion-create` branch
+using the isolated `dust_commerce_smoke` PostgreSQL database, the Dust API on
+`127.0.0.1:3878`, and the Admin web build on `127.0.0.1:13002`. A disposable
+`owner@example.com` Admin was bootstrapped with the repository's local admin
+bootstrap command; no production credential or remote service was used.
+
+- Admin email/password sign-in completed through the route-level bearer flow.
+- The authenticated shell rendered the Morrow navigation, `Powered by dust`,
+  seeded product table, status rows, paging, and merchant navigation groups.
+- Promotions loaded the seeded `WELCOME10` row and its active status.
+- The Create Promotion surface rendered the code, type, value, usage-limit,
+  Cancel, and Create controls. The mutation was intentionally not submitted.
+
+This is local browser evidence only; it does not claim CI, deployment, or
+production Admin credentials.
+
+## Promotion creation slice
+
+`POST /admin/promotions` now closes the first write gap in the protected
+promotion surface. The route uses the existing route-level `AdminAuth` guard,
+an explicit generated `AdminCreatePromotion` body allowlist, normalized
+uppercase codes and lowercase currencies, and one direct SQLx `INSERT ...
+RETURNING` projection. Percentage values are bounded to basis points, fixed
+values require a currency, percentage policies reject a currency, date windows
+must be increasing, and active code conflicts return `409` without a partial
+row. PostgreSQL owns the promotion timestamps and the response remains the
+standalone Admin allowlist rather than inheriting persistence fields.
+
+The focused PostgreSQL route gate covers unauthenticated access, normalized
+percentage and fixed creation, scheduled status, duplicate codes, invalid
+cross-field definitions, and no-write rejection. The generated Admin client
+exposes the body-only create method; bearer ownership remains in Dio. The
+Admin promotions page now has a focused create surface for code, type, value,
+currency, and usage limit, with server-owned error handling and a generated
+client integration test that returns to the newly created detail route.
+
+## Promotion retirement slice
+
+`DELETE /admin/promotions/{id}` now retires one active promotion behind the
+same route-level Admin bearer guard. The direct SQLx update sets the existing
+`deleted_at` audit field with PostgreSQL time, returns a standalone
+`{id, object, deleted}` acknowledgement, hides the row from Admin reads, and
+leaves redemption history intact. The generated Admin client and detail route
+include confirmation, safe failure copy, and a server-authoritative loading
+state. Focused PostgreSQL coverage verifies authorization, soft deletion,
+repeat/missing failures, and the refreshed hidden detail; the Admin package
+gate covers the generated client and ViewModel flow without widget tests.
+
+## Promotion editing slice
+
+`PATCH /admin/promotions/{id}` updates the editable promotion definition
+behind the same route-level Admin bearer guard. The request is an explicit
+generated allowlist, values are normalized and revalidated server-side, and a
+single direct SQLx `UPDATE ... RETURNING` projection preserves committed
+redemptions while preventing duplicate active codes or a usage limit below the
+current usage count. The response is the standalone Admin detail contract.
+
+The generated Admin client, detail ViewModel, and focused edit form cover
+successful updates plus safe 401, 404, 409, and 422 handling. PostgreSQL still
+owns audit timestamps; the route never accepts internal columns or persistence
+fields. The server and Admin package gates include the update path without
+widget tests.
+
+## Staged-media cleanup slice
+
+Admin uploads now perform a best-effort cleanup pass before accepting new
+multipart data. The direct SQLx media projection supplies only active product
+image URLs; the local adapter protects claimed files and removes unreferenced
+files older than one hour, including abandoned staged files. Cleanup failures
+never reject a valid upload and only generated asset or pending names are
+eligible for deletion, so unrelated files in the media root are preserved. The
+focused media gate covers authorization, public reads, attached-file
+protection, invalid uploads, missing-key rejection, old-orphan reclamation,
+and foreign-file safety; object storage remains the separate multi-node
+boundary.
+
 ## Isolation boundary
 
 - `apps/commerce_app` is the customer storefront on port `13001`.
@@ -46,9 +131,9 @@ generated by PostgreSQL.
 | Orders and post-purchase | protected list, detail, filtered CSV export, generated Admin client state, search, region/status/date filtering, paging, allowlisted ordering, fulfillment creation and cancellation, shipment creation with carrier labels, delivery marking, requested-return discovery and atomic receipt, whole-order cancellation, and independent manual-payment refunds implemented; external refund providers remain |
 | Customers and groups | protected customer list/detail/create/edit/delete, address create/read/update/delete, customer-owned order history and guest-checkout profile acquisition implemented; protected customer-group list/create/detail/edit/delete, group-scoped customer search/account filter/order/paging, Created/Updated preset and custom filtering, atomic add/remove membership, generated client state and Admin navigation implemented; visual comparison remains |
 | Inventory and locations | product-level variant stock editing, atomic intact-return restoration, and a protected searchable stock-location list with direct SQLx address allowlist, dedicated generated Admin client, authenticated ViewModel and responsive Inventory/Locations route implemented; inventory items, reservations, location mutations and location detail remain |
-| Pricing and promotions | protected promotion list/detail APIs, search, date filters, ordering, generated Admin client, direct SQLx allowlists, read-only Admin table with paging, and row-to-detail navigation implemented; creation, deletion and campaigns remain |
+| Pricing and promotions | protected promotion list/detail APIs plus guarded code-promotion creation, editing, retirement, search, date filters, ordering, generated Admin client, direct SQLx allowlists, read-only Admin table with paging, and row-to-detail navigation implemented; campaigns remain |
 | Regions, shipping, tax, channels | protected sales-channel discovery and product availability editing plus shipping-profile discovery, product assignment, settings CRUD, query controls and Admin navigation implemented; locations, shipping options and tax remain |
-| Uploads, notifications, search, translations | guarded streamed image upload, staged deletion and public immutable reads implemented with a single-node filesystem adapter; external object storage, abandoned-upload cleanup and other areas remain |
+| Uploads, notifications, search, translations | guarded streamed image upload, staged deletion, abandoned-upload cleanup and public immutable reads implemented with a single-node filesystem adapter; external object storage and other areas remain |
 | Workflows and extension boundaries | not started |
 | Flutter admin shell and visual parity | Medusa-shaped shell, product table/detail, responsive layouts and light/dark/system selection implemented; remaining routes and unletterboxed pixel comparison remain |
 
@@ -352,7 +437,13 @@ direct SQLx allowlists, the generated Dio client owns authorization, and the
 dedicated right-side drawer reloads the authoritative order after saving.
 Partial refunds retain Captured and the remaining action; a full refund changes
 the aggregate status to Refunded and disables it. Manual-provider desktop and
-390px browser QA passed; external provider adapters remain unavailable.
+390px browser QA passed. Refund reasons now support guarded create, edit and
+soft-retire mutations through direct SQLx projections; historical refund rows
+retain retired reason data. The Admin app's generated Dio client exposes the
+same typed mutation contracts while keeping bearer ownership in its
+interceptor. The authenticated Admin shell now exposes a Settings › Refund
+Reasons route with search, paging, create, edit and soft-retire controls;
+external provider adapters remain unavailable.
 
 Fulfillment shipment now follows Medusa's order-detail lifecycle and focus-form
 source. A route-level Admin guard and explicit authenticated-admin extraction

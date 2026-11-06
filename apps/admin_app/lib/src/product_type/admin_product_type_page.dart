@@ -2,12 +2,10 @@ import 'package:admin_app/src/product_type/admin_product_type_create_page.dart';
 import 'package:admin_app/src/product_type/admin_product_type_delete.dart';
 import 'package:admin_app/src/product_type/admin_product_type_edit_drawer.dart';
 import 'package:admin_app/src/product_type/admin_product_type_page_header.dart';
+import 'package:admin_app/src/product_type/admin_product_type_page_body.dart';
 import 'package:admin_app/src/product_type/admin_product_type_pagination.dart';
-import 'package:admin_app/src/product_type/admin_product_type_state.dart';
-import 'package:admin_app/src/product_type/admin_product_type_table.dart';
 import 'package:admin_app/src/product_type/admin_product_type_view_model.dart';
 import 'package:commerce_admin_shared/commerce_admin_shared.dart';
-import 'package:dust_dart/fp.dart';
 import 'package:flutter/material.dart';
 
 /// Medusa's product-types settings route backed by the authenticated API.
@@ -68,52 +66,19 @@ final class _AdminProductTypePageState extends State<AdminProductTypePage> {
                       .search(_query.text),
                 ),
                 Divider(height: 1, color: Theme.of(context).dividerColor),
-                _body(context, state),
+                AdminProductTypePageBody(
+                  state: state,
+                  onRetry: context.readAdminProductTypeViewModel().load,
+                  onOpen: widget.onOpen,
+                  onEdit: (productType) => _edit(context, productType),
+                  onDelete: (productType) => _delete(context, productType),
+                ),
                 AdminProductTypePagination(state: state),
               ],
             ),
           ),
         ),
       ),
-    );
-  }
-
-  Widget _body(BuildContext context, AdminProductTypeState state) {
-    if (state.status == AdminProductTypeStatus.loading &&
-        state.productTypes.isEmpty) {
-      return const SizedBox(
-        height: 120,
-        child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
-      );
-    }
-    if (state.failure case Some(value: final message)) {
-      return SizedBox(
-        height: 120,
-        child: Center(
-          child: OutlinedButton(
-            onPressed: context.readAdminProductTypeViewModel().load,
-            child: Text('$message Retry'),
-          ),
-        ),
-      );
-    }
-    if (state.productTypes.isEmpty) {
-      return const SizedBox(
-        height: 120,
-        child: Center(child: Text('No records')),
-      );
-    }
-    return Stack(
-      children: [
-        AdminProductTypeTable(
-          productTypes: state.productTypes,
-          onOpen: widget.onOpen,
-          onEdit: (productType) => _edit(context, productType),
-          onDelete: (productType) => _delete(context, productType),
-        ),
-        if (state.status == AdminProductTypeStatus.loading)
-          const LinearProgressIndicator(minHeight: 2),
-      ],
     );
   }
 

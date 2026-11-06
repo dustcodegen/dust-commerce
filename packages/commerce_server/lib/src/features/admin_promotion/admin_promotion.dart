@@ -2,9 +2,19 @@
 library;
 
 export 'deps.dart';
+export 'create_failure.dart';
+export 'create_response.dart';
+export 'delete_handler.dart';
+export 'delete_repository.dart';
+export 'delete_service.dart';
+export 'update_failure.dart';
+export 'update_service.dart';
+export 'handler/create.dart';
 export 'handler.dart';
+export 'repository/create.dart';
 export 'model.dart';
 export 'query.dart';
 export 'repository.dart';
+export 'repository/update.dart';
 export 'router.dart';
 export 'service.dart';

@@ -71,7 +71,7 @@ void main() {
         });
       expect(await harness.stockOf('var_small'), 50);
       final orders = await queryRaw(
-        'SELECT COUNT(*) FROM orders WHERE cart_id = \$1',
+        r'SELECT COUNT(*) FROM orders WHERE cart_id = $1',
         [cartId],
       ).fetch(harness.database.connection as Executor);
       expect(orders.single.readIndex<int>(0), 0);

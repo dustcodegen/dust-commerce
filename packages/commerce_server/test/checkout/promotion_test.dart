@@ -50,9 +50,7 @@ void main() {
       (client.post('/store/carts/$cartId/promotions')..json({'code': code}))
           .send();
 
-  test('freezes the discount and counts the redemption', () async {
-    final cartId = await cartWorth();
-    await apply(cartId, 'SAVE10');
+  Future<Order> place(String cartId) async {
     (await (client.post('/store/carts/$cartId/shipping-method')
               ..json({'option_id': 'ship_standard'}))
             .send())
@@ -78,8 +76,13 @@ void main() {
         .send();
 
     placed.assertCreated();
-    final order = Order.fromJson(placed.json! as Map<String, Object?>);
+    return Order.fromJson(placed.json! as Map<String, Object?>);
+  }
 
+  test('freezes the discount and counts the redemption', () async {
+    final cartId = await cartWorth();
+    (await apply(cartId, 'SAVE10')).assertOk();
+    final order = await place(cartId);
     expect(order.discountTotal, Money.of(200, 'usd'));
     expect(order.total, Money.of(1980, 'usd'));
 
@@ -92,6 +95,39 @@ void main() {
     ).fetch(database.connection as Executor);
     expect(rows.single.readIndex<int>(0), 1);
     expect(rows.single.readIndex<String>(1), 'SAVE10');
+  });
+
+  test('counts the original promotion when its code is renamed and reused',
+      () async {
+    final cartId = await cartWorth();
+    (await apply(cartId, 'SAVE10')).assertOk();
+    final renamed = await queryExecute(
+      "UPDATE promotions SET code = 'RENAMED' WHERE id = 'p1'",
+      [],
+    ).execute(database.executor);
+    expect(renamed, isA<Ok<ExecResult, SqlxError>>());
+    final replaced = await queryExecute(
+      "INSERT INTO promotions (id, code, type, value) "
+      "VALUES ('replacement', 'SAVE10', 'percentage', 3000)",
+      [],
+    ).execute(database.executor);
+    expect(replaced, isA<Ok<ExecResult, SqlxError>>());
+
+    final order = await place(cartId);
+
+    expect(order.discountTotal, Money.of(200, 'usd'));
+    final counts = await queryRaw(
+      "SELECT id, usage_count FROM promotions "
+      "WHERE id IN ('p1', 'replacement') ORDER BY id",
+      [],
+    ).fetch(database.executor);
+    expect(
+      {
+        for (final row in counts)
+          row.read<String>('id'): row.read<int>('usage_count')
+      },
+      {'p1': 1, 'replacement': 0},
+    );
   });
 }
 

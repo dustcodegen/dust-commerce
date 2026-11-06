@@ -36,4 +36,47 @@ LIMIT $2 OFFSET $3
     int limit,
     int offset,
   );
+
+  /// Inserts one active reason and returns its public projection.
+  @Query(r'''
+INSERT INTO refund_reasons (id, label, code, description)
+VALUES ($1, $2, $3, $4)
+ON CONFLICT DO NOTHING
+RETURNING id, label, code, description
+''')
+  Future<Result<AdminRefundReasonResponse?, SqlxError>> insert(
+    String id,
+    String label,
+    String code,
+    String? description,
+  );
+
+  /// Replaces editable fields while preserving refund history.
+  @Query(r'''
+UPDATE refund_reasons
+SET label = $2, code = $3, description = $4
+WHERE id = $1 AND deleted_at IS NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM refund_reasons conflict
+    WHERE conflict.id <> $1
+      AND conflict.deleted_at IS NULL
+      AND conflict.code = $3
+  )
+RETURNING id, label, code, description
+''')
+  Future<Result<AdminRefundReasonResponse?, SqlxError>> update(
+    String id,
+    String label,
+    String code,
+    String? description,
+  );
+
+  /// Retires one active reason without rewriting historical refunds.
+  @Query(r'''
+UPDATE refund_reasons
+SET deleted_at = CURRENT_TIMESTAMP
+WHERE id = $1 AND deleted_at IS NULL
+RETURNING id
+''')
+  Future<Result<String?, SqlxError>> retire(String id);
 }

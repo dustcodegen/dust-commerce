@@ -1,3 +1,4 @@
+import 'package:admin_app/src/product_option/admin_product_option_create_chrome.dart';
 import 'package:admin_app/src/product_option/admin_product_option_view_model.dart';
 import 'package:commerce_admin_shared/commerce_admin_shared.dart';
 import 'package:dust_dart/fp.dart';
@@ -35,7 +36,10 @@ final class _AdminProductOptionCreateFormState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _header(),
+                AdminProductOptionCreateHeader(
+                  busy: _busy,
+                  onClose: () => Navigator.of(context).pop(),
+                ),
                 Expanded(
                   child: Align(
                     alignment: Alignment.topCenter,
@@ -89,59 +93,15 @@ final class _AdminProductOptionCreateFormState
                     ),
                   ),
                 ),
-                _footer(),
+                AdminProductOptionCreateFooter(
+                  busy: _busy,
+                  onCancel: () => Navigator.of(context).pop(),
+                  onSave: _save,
+                ),
               ],
             ),
           ),
         ),
-      );
-  Widget _header() => Container(
-        height: 56,
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: Theme.of(context).dividerColor),
-          ),
-        ),
-        child: Row(children: [
-          const SizedBox(width: 18),
-          IconButton(
-            tooltip: 'Close',
-            onPressed: _busy ? null : () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.close_rounded, size: 18),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-            decoration: BoxDecoration(
-              border: Border.all(color: Theme.of(context).dividerColor),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Text('esc', style: Theme.of(context).textTheme.labelSmall),
-          ),
-        ]),
-      );
-  Widget _footer() => Container(
-        height: 64,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        decoration: BoxDecoration(
-          border:
-              Border(top: BorderSide(color: Theme.of(context).dividerColor)),
-        ),
-        child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-          OutlinedButton(
-            onPressed: _busy ? null : () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          const SizedBox(width: 8),
-          FilledButton(
-            onPressed: _busy ? null : _save,
-            child: _busy
-                ? const SizedBox.square(
-                    dimension: 15,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('Save'),
-          ),
-        ]),
       );
   String? _requiredTitle(String? value) =>
       (value?.trim().isEmpty ?? true) ? 'Title is required' : null;

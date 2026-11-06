@@ -25,7 +25,7 @@ void main() {
     final order = Order.fromJson(placed.json! as Map<String, Object?>);
     final rows = await queryRaw(
       'SELECT email, first_name, last_name, phone, has_account, '
-      'created_at, updated_at FROM customers WHERE email = \$1',
+      r'created_at, updated_at FROM customers WHERE email = $1',
       ['guest@example.com'],
     ).fetch(harness.database.connection as Executor);
 
@@ -54,7 +54,7 @@ void main() {
 
     final rows = await queryRaw(
       'SELECT COUNT(*), MAX(first_name) FROM customers '
-      'WHERE email = \$1 AND has_account = 0 AND deleted_at IS NULL',
+      r'WHERE email = $1 AND has_account = 0 AND deleted_at IS NULL',
       ['guest@example.com'],
     ).fetch(harness.database.connection as Executor);
 

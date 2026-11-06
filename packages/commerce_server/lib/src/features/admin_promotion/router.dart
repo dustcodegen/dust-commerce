@@ -3,5 +3,16 @@ import 'package:dust_server/server.dart';
 
 /// Promotion routes merged below the parent Admin authentication layer.
 Router adminPromotionRoutes() => Router()
-  ..route('/promotions', get(listAdminPromotionsHandler))
-  ..route('/promotions/{id}', get(readAdminPromotionHandler));
+  ..route(
+    '/promotions',
+    get(listAdminPromotionsHandler).post(
+      createAdminPromotionHandler,
+      status: 201,
+    ),
+  )
+  ..route(
+    '/promotions/{id}',
+    get(readAdminPromotionHandler)
+        .patch(updateAdminPromotionHandler)
+        .delete(deleteAdminPromotionHandler),
+  );

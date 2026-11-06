@@ -23,7 +23,7 @@ void main() {
 
     final cartId = await harness.cartWith('var_small');
     final cartChannel = await queryRaw(
-      'SELECT sales_channel_id FROM cart_sales_channels WHERE cart_id = \$1',
+      r'SELECT sales_channel_id FROM cart_sales_channels WHERE cart_id = $1',
       [cartId],
     ).fetch(harness.database.connection as Executor);
     expect(cartChannel.single.readIndex<String>(0), 'sc_web');
@@ -32,7 +32,7 @@ void main() {
     final orderChannel = await queryRaw(
       'SELECT link.sales_channel_id FROM order_sales_channels link '
       'JOIN orders placed ON placed.id = link.order_id '
-      'WHERE placed.cart_id = \$1',
+      r'WHERE placed.cart_id = $1',
       [cartId],
     ).fetch(harness.database.connection as Executor);
     expect(orderChannel.single.readIndex<String>(0), 'sc_web');

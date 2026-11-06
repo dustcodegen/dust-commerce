@@ -24,6 +24,7 @@ final class AdminSidebar extends StatelessWidget {
     required this.onPromotionsRequested,
     required this.onProductTypesRequested,
     required this.onShippingProfilesRequested,
+    required this.onRefundReasonsRequested,
     required this.selectedSection,
     required this.onSignOut,
     super.key,
@@ -61,6 +62,9 @@ final class AdminSidebar extends StatelessWidget {
 
   /// Opens fulfillment profiles in Settings.
   final VoidCallback onShippingProfilesRequested;
+
+  /// Opens merchant-managed refund reasons.
+  final VoidCallback onRefundReasonsRequested;
 
   /// Revokes the current admin session.
   final VoidCallback? onSignOut;
@@ -153,7 +157,8 @@ final class AdminSidebar extends StatelessWidget {
                   icon: Icons.settings_outlined,
                   label: 'Settings',
                   selected: selectedSection == AdminShellSection.productTypes ||
-                      selectedSection == AdminShellSection.shippingProfiles,
+                      selectedSection == AdminShellSection.shippingProfiles ||
+                      selectedSection == AdminShellSection.refundReasons,
                   onTap: onProductTypesRequested,
                 ),
                 _SubNav(
@@ -161,6 +166,11 @@ final class AdminSidebar extends StatelessWidget {
                   selected:
                       selectedSection == AdminShellSection.shippingProfiles,
                   onTap: onShippingProfilesRequested,
+                ),
+                _SubNav(
+                  label: 'Refund Reasons',
+                  selected: selectedSection == AdminShellSection.refundReasons,
+                  onTap: onRefundReasonsRequested,
                 ),
                 const SizedBox(height: 8),
                 AdminUserMenu(

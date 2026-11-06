@@ -44,6 +44,10 @@ Future<Result<AdminOrderDetailResponse, Rejection>> cancelAdminOrderHandler(
         'Cannot cancel a completed order. Use the return process.',
       )),
     Err(
+      error: AdminCancelOrderRejected(failure: AdminCancelOrderFailure.archived)
+    ) =>
+      const Err(Rejection.status(422, 'Cannot cancel an archived order')),
+    Err(
       error: AdminCancelOrderRejected(
         failure: AdminCancelOrderFailure.activeFulfillments,
       )

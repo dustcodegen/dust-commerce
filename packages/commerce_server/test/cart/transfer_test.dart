@@ -83,7 +83,7 @@ void main() {
     expect(responses.map((response) => response.statusCode).toList()..sort(),
         [200, 404]);
     final rows = await queryRaw(
-      'SELECT customer_id FROM carts WHERE id = \$1',
+      r'SELECT customer_id FROM carts WHERE id = $1',
       [cartId],
     ).fetch(harness.database.connection as Executor);
     expect(

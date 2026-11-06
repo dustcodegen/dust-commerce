@@ -11,7 +11,8 @@ Router cartRoutes() {
   final create = Router()
     ..routeLayer(fromExtractor(const OptionalCustomerAuth()))
     ..route('/carts/buy', post(buyCartHandler, status: 201))
-    ..route('/carts', post(createCartHandler, status: 201));
+    ..route('/carts', post(createCartHandler, status: 201))
+    ..route('/cart/add', post(addFormLineHandler));
   final byId = Router()
     ..routeLayer(fromExtractor(const CartAccessExtractor()))
     ..route(

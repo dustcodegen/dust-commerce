@@ -234,14 +234,14 @@ Store list, detail, add-line and quantity recheck now enforce the current
 single-store channel's product availability.
 Product-type CRUD/assignment remains outside the implemented boundary.
 
-Admin promotions now expose the first pricing-and-promotions slice:
-`GET /admin/promotions` follows Medusa's protected list boundary with `q`,
-`created_at`, `updated_at`, `order`, `limit` and `offset` query parameters.
-Rows are direct SQLx allowlists from the final `promotions` table and contain
-only code, method, derived status, policy value, optional schedule/limit fields
-and database-owned timestamps. This intentionally stops at list/read parity;
-campaigns, rule editing, creation, deletion and visual table parity remain
-separate slices.
+Admin promotions now expose a protected pricing-and-promotions slice:
+`GET /admin/promotions` follows Medusa's list boundary with `q`, `created_at`,
+`updated_at`, `order`, `limit` and `offset` query parameters. Guarded create,
+edit and retirement operations use explicit Admin contracts and direct SQLx
+allowlists; updates preserve redemption history and reject duplicate codes or
+unsafe usage limits. Rows contain only code, method, derived status, policy
+value, optional schedule/limit fields and database-owned timestamps. Campaigns,
+advanced rule editing and visual table parity remain separate slices.
 
 ### Order transfers keep the capability out of the database
 

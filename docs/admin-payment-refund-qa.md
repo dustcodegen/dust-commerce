@@ -23,6 +23,9 @@ Pinned source truth:
   note. An omitted amount refunds the complete remaining balance.
 - One serialized SQLx transaction validates payment state, reason ownership
   and remaining value before recording the immutable refund audit.
+- The target payment and order rows are locked with `FOR UPDATE` inside that
+  transaction, so two server nodes cannot validate the same remaining balance
+  concurrently.
 - The public service result is flat. SQLx failures are translated inside the
   feature and cannot form `Result<Result<...>>`.
 - Admin responses are direct SQLx `FromRow` allowlists. Provider metadata and
@@ -86,6 +89,5 @@ local merchant.
 ## Remaining gaps
 
 - External provider adapters and reconciliation references are not available.
-- Refund-reason merchant CRUD is separate from the seeded reason discovery.
 - Same-state raster comparison with a running Medusa Admin remains open.
 - Customer notification remains disabled until a real adapter exists.

@@ -10,6 +10,17 @@ abstract final class AdminPaymentRefundRepository {
   const factory AdminPaymentRefundRepository(Executor db) =
       _$AdminPaymentRefundRepository;
 
+  /// Locks the same order row as cancellation before reading the balance.
+  @Query(r'''
+SELECT order_row.id
+FROM orders order_row
+JOIN payment_collections payment ON payment.order_id = order_row.id
+WHERE payment.id = $1 AND payment.deleted_at IS NULL
+  AND order_row.deleted_at IS NULL
+FOR UPDATE OF order_row
+''')
+  Future<Result<String?, SqlxError>> lockOrderForPayment(String paymentId);
+
   /// Reads payment and aggregate refund facts before the first write.
   @Query(r'''
 SELECT payment.id AS payment_id, payment.order_id, payment.provider AS provider_id,
