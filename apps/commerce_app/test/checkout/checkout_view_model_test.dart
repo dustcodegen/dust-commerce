@@ -66,7 +66,8 @@ void main() {
     expect(model.state.order!.paymentStatus, PaymentStatus.captured);
   });
 
-  test('pickup selection keeps the store details in client cart state', () async {
+  test('pickup selection keeps the store details in client cart state',
+      () async {
     final model = context.checkout()..prepare();
     expect(await saveTestAddress(model), isTrue);
     expect(await model.loadDelivery(), isTrue);
