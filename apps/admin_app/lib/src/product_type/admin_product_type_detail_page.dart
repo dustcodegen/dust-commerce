@@ -1,13 +1,12 @@
 import 'dart:async';
 
 import 'package:admin_app/src/product_type/admin_product_type_delete.dart';
+import 'package:admin_app/src/product_type/admin_product_type_detail_body.dart';
+import 'package:admin_app/src/product_type/admin_product_type_detail_failure.dart';
 import 'package:admin_app/src/product_type/admin_product_type_detail_state.dart';
 import 'package:admin_app/src/product_type/admin_product_type_detail_view_model.dart';
 import 'package:admin_app/src/product_type/admin_product_type_edit_drawer.dart';
 import 'package:admin_app/src/product_type/admin_product_type_view_model.dart';
-import 'package:admin_app/src/product_type/detail/admin_product_type_data_sections.dart';
-import 'package:admin_app/src/product_type/detail/admin_product_type_general_section.dart';
-import 'package:admin_app/src/product_type/detail/admin_product_type_products_section.dart';
 import 'package:commerce_admin_shared/commerce_admin_shared.dart';
 import 'package:dust_dart/fp.dart';
 import 'package:flutter/material.dart';
@@ -54,64 +53,27 @@ final class _AdminProductTypeDetailPageState
   Widget build(BuildContext context) {
     final state = context.watchAdminProductTypeDetailViewModel().value;
     return switch (state.productType) {
-      Some(value: final productType) => _body(context, state, productType),
+      Some(value: final productType) => AdminProductTypeDetailBody(
+          state: state,
+          productType: productType,
+          onEdit: () => _edit(context, productType),
+          onDelete: () => _delete(context, productType),
+          onOpenProduct: widget.onOpenProduct,
+        ),
       None() when state.status == AdminProductTypeDetailStatus.loading =>
         const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-      None() => _failure(context, state),
-    };
-  }
-
-  Widget _body(
-    BuildContext context,
-    AdminProductTypeDetailState state,
-    AdminProductType productType,
-  ) =>
-      ListView(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 32),
-        children: [
-          Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1600),
-              child: Column(children: [
-                AdminProductTypeGeneralSection(
-                  productType: productType,
-                  onEdit: () => _edit(context, productType),
-                  onDelete: () => _delete(context, productType),
-                ),
-                const SizedBox(height: 12),
-                AdminProductTypeProductsSection(
-                  state: state,
-                  onOpen: widget.onOpenProduct,
-                ),
-                const SizedBox(height: 12),
-                AdminProductTypeDataSections(productType: productType),
-              ]),
-            ),
-          ),
-        ],
-      );
-
-  Widget _failure(BuildContext context, AdminProductTypeDetailState state) =>
-      Center(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Text(switch (state.failure) {
+      None() => AdminProductTypeDetailFailure(
+          message: switch (state.failure) {
             Some(value: final message) => message,
             None() => 'Unable to load this product type.',
-          }),
-          const SizedBox(height: 12),
-          Row(mainAxisSize: MainAxisSize.min, children: [
-            OutlinedButton(
-                onPressed: widget.onBack, child: const Text('Types')),
-            const SizedBox(width: 8),
-            FilledButton(
-              onPressed: () => context
-                  .readAdminProductTypeDetailViewModel()
-                  .load(widget.productTypeId),
-              child: const Text('Retry'),
-            ),
-          ]),
-        ]),
-      );
+          },
+          onBack: widget.onBack,
+          onRetry: () => context
+              .readAdminProductTypeDetailViewModel()
+              .load(widget.productTypeId),
+        ),
+    };
+  }
 
   Future<void> _edit(
     BuildContext context,
