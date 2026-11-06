@@ -26,4 +26,12 @@ mixin _AdminCreationActions on State<_AdminHome>, _AdminHomeActions {
     if (!mounted || created == null) return;
     _showProductOption(created.id);
   }
+
+  @override
+  Future<void> _createPromotion() async {
+    final created = await showAdminPromotionCreatePage(context);
+    if (!mounted || created == null) return;
+    await context.readAdminPromotionViewModel().load(offset: 0);
+    if (mounted) _showPromotion(created.id);
+  }
 }

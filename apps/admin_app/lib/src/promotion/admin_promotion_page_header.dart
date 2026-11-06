@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 /// Heading matching Medusa's promotions list route.
 final class AdminPromotionPageHeader extends StatelessWidget {
   /// Creates the promotion-list header.
-  const AdminPromotionPageHeader({super.key});
+  const AdminPromotionPageHeader({required this.onCreate, super.key});
+
+  /// Opens the focused promotion form.
+  final VoidCallback onCreate;
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -26,6 +29,11 @@ final class AdminPromotionPageHeader extends StatelessWidget {
                 ),
               ],
             ),
+          ),
+          FilledButton.icon(
+            onPressed: onCreate,
+            icon: const Icon(Icons.add_rounded, size: 17),
+            label: const Text('Create promotion'),
           ),
         ]),
       );

@@ -17,6 +17,7 @@ mixin _AdminHomeActions
   Future<void> _createProduct();
   Future<void> _createCustomer();
   Future<void> _createProductOption();
+  Future<void> _createPromotion();
 
   String get selectedIdForNavigation => _selectedId;
   String get selectedCustomerIdForNavigation => _selectedCustomerId;

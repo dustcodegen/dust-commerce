@@ -138,6 +138,7 @@ mixin _AdminHomeNavigation on State<_AdminHome>, _AdminHomeActions {
           ),
         _AdminRoute.promotions => AdminPromotionPage(
             searchFocus: _promotionSearchFocus,
+            onCreate: _createPromotion,
             onOpen: _showPromotion,
           ),
         _AdminRoute.promotion => AdminPromotionDetailPage(

@@ -10,12 +10,16 @@ final class AdminPromotionPage extends StatefulWidget {
   /// Creates the promotions route.
   const AdminPromotionPage({
     required this.searchFocus,
+    required this.onCreate,
     required this.onOpen,
     super.key,
   });
 
   /// Opens one promotion detail route.
   final ValueChanged<String> onOpen;
+
+  /// Opens the focused promotion creation surface.
+  final VoidCallback onCreate;
 
   /// Focus target shared with the sidebar search action.
   final FocusNode searchFocus;
@@ -44,7 +48,7 @@ final class _AdminPromotionPageState extends State<AdminPromotionPage> {
             ),
             clipBehavior: Clip.antiAlias,
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              const AdminPromotionPageHeader(),
+              AdminPromotionPageHeader(onCreate: widget.onCreate),
               Divider(height: 1, color: Theme.of(context).dividerColor),
               AdminPromotionQueryBar(
                 state: state,

@@ -31,6 +31,7 @@ import 'package:admin_app/src/product_type/admin_product_type_detail_view_model.
 import 'package:admin_app/src/product_type/admin_product_type_view_model.dart';
 import 'package:admin_app/src/promotion/admin_promotion_detail_page.dart';
 import 'package:admin_app/src/promotion/admin_promotion_detail_view_model.dart';
+import 'package:admin_app/src/promotion/admin_promotion_create_page.dart';
 import 'package:admin_app/src/promotion/admin_promotion_page.dart';
 import 'package:admin_app/src/promotion/admin_promotion_view_model.dart';
 import 'package:admin_app/src/session/admin_session_state.dart';
