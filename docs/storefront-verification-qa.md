@@ -9,7 +9,7 @@ comparison against a live Medusa preview.
 
 ## Evidence
 
-On 2026-11-06, from `feat/admin-promotion-create` revision `4498b89b`, the repository-root contract
+On 2026-11-06, from `feat/admin-promotion-create` revision `628d5689`, the repository-root contract
 completed successfully:
 
 ```bash
