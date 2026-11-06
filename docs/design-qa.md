@@ -355,6 +355,21 @@ These are content/branding fixture differences, not missing confirmation
 sections. This is a same-viewport structural/raster comparison; exact pixel
 identity is not claimed across different content, currency, or branding.
 
+On 2026-11-06, the pinned local DTC source at commit
+`4a1d53dc434ed124a78c4e2c9f312e1f47d4e9eb` and Dust were compared at the
+default `1280 × 720` viewport on their delivery step. The source ran at
+`http://localhost:8000/dk/checkout?step=delivery` with a disposable pickup
+shipping option added to its local database; Dust ran at
+`http://127.0.0.1:13001/checkout?step=delivery`. Both renders showed the same
+source-owned hierarchy and state: the selected `Pick up your order` mode,
+`Store`, `Choose a store near you`, a selected store radio card, the right
+aligned zero-price amount, and `Continue to payment`. The source card showed
+`Morrow New York`, `, DK`, `€0.00`; Dust showed `Morrow New York`,
+`100 Broadway, New York, NY`, `USD 0.00`. The address, currency, and store
+label are intentional fixture differences; the card geometry, radio treatment,
+spacing, and action placement match. This closes the matched pickup raster
+comparison without claiming byte-identical pixels across different fixtures.
+
 ## Open findings
 
 - P1 — Add external payment-provider refund adapters before claiming a complete
