@@ -24,6 +24,24 @@ completed with Dust `264/264` clean, Flutter analysis clean, and `175` Admin
 non-widget tests passing. No widget tests were added; CI and remote merge remain
 deferred until the one-day local review window ends.
 
+## Fresh local Admin smoke
+
+Validated 2026-11-06 against the current `feat/admin-promotion-create` branch
+using the isolated `dust_commerce_smoke` PostgreSQL database, the Dust API on
+`127.0.0.1:3878`, and the Admin web build on `127.0.0.1:13002`. A disposable
+`owner@example.com` Admin was bootstrapped with the repository's local admin
+bootstrap command; no production credential or remote service was used.
+
+- Admin email/password sign-in completed through the route-level bearer flow.
+- The authenticated shell rendered the Morrow navigation, `Powered by dust`,
+  seeded product table, status rows, paging, and merchant navigation groups.
+- Promotions loaded the seeded `WELCOME10` row and its active status.
+- The Create Promotion surface rendered the code, type, value, usage-limit,
+  Cancel, and Create controls. The mutation was intentionally not submitted.
+
+This is local browser evidence only; it does not claim CI, deployment, or
+production Admin credentials.
+
 ## Promotion creation slice
 
 `POST /admin/promotions` now closes the first write gap in the protected
