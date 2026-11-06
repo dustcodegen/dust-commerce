@@ -609,9 +609,9 @@ raster is available, so pixel parity is not claimed.
   four-column gallery, 24px grid gap, 560px upload panel and sticky footer—but
   code inspection is not a pixel comparison. Run Medusa Admin locally with
   equivalent product data, capture both editors, and repeat the combined pass.
-- P1 — The filesystem adapter is durable for one server node. Multi-node
-  deployment still needs object storage and cleanup for uploads left staged
-  after an abandoned browser session.
+- P1 — The filesystem adapter is durable for one server node. Uploads left
+  staged after an abandoned browser session are now reclaimed after the
+  one-hour retention window; multi-node deployment still needs object storage.
 - P2 — Orders pass source-structure and live-behavior QA, but need same-state
   Medusa order-list and order-detail captures before pixel parity can be
   claimed. Sales-channel discovery, order query behavior and the source-shaped
