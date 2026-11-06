@@ -24,9 +24,13 @@ String renderProductMarkdown(
   required String origin,
   required String countryCode,
   required String currencyCode,
+  String? regionId,
   StoreRegionPolicy? policy,
 }) {
   final base = '$origin/$countryCode';
+  final regionField = regionId == null
+      ? ''
+      : '&region_id=${Uri.encodeQueryComponent(regionId)}';
   final optionTitles = <String, String>{
     for (final option in product.options) option.id: option.title,
   };
@@ -74,7 +78,7 @@ $variants
 
 ## Buy
 
-- Add to cart: POST `variant_id={variant_id}&quantity={n}` (form-encoded) to $origin/store/cart/add
+- Add to cart: POST `variant_id={variant_id}&quantity={n}$regionField` (form-encoded) to $origin/store/cart/add
 - Checkout link: $origin/buy/{variant_id}:{quantity}?context/address_country=${countryCode.toUpperCase()}
 
 ## Policies

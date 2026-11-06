@@ -51,8 +51,16 @@ bool _acceptsMarkdown(Request request) {
   final accept = request.headers['accept'];
   if (accept == null) return false;
   return accept.split(',').any((value) {
-    final mediaType = value.trim().split(';').first.trim().toLowerCase();
-    return mediaType == 'text/markdown';
+    final parts = value.split(';');
+    if (parts.first.trim().toLowerCase() != 'text/markdown') return false;
+    for (final parameter in parts.skip(1)) {
+      final fields = parameter.split('=');
+      if (fields.first.trim().toLowerCase() != 'q') continue;
+      if (fields.length != 2) return false;
+      final quality = double.tryParse(fields.last.trim());
+      return quality != null && quality > 0 && quality <= 1;
+    }
+    return true;
   });
 }
 
@@ -123,6 +131,7 @@ Future<Object?> readProductMarkdownHandler(Request request) async {
       origin: origin,
       countryCode: countryCode,
       currencyCode: currencyCode,
+      regionId: region?.id,
       policy: policy,
     ),
     headers: const {
