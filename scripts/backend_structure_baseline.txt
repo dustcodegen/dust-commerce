@@ -7,6 +7,7 @@ packages/commerce_server/lib/src/features/admin/handler/update_variant.dart
 packages/commerce_server/lib/src/features/admin/repository/export.dart
 packages/commerce_server/lib/src/features/admin/repository/image_variants.dart
 packages/commerce_server/lib/src/features/admin/repository/media.dart
+packages/commerce_server/lib/src/features/admin/repository/media_model.dart
 packages/commerce_server/lib/src/features/admin/repository/product_create.dart
 packages/commerce_server/lib/src/features/admin/repository/update_variant.dart
 packages/commerce_server/lib/src/features/admin/service/export.dart
