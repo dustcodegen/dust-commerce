@@ -296,6 +296,14 @@ the header remained `Cart (0)`. Repeating the failure with a second product
 confirms that the missing comparison state is a preview-runtime problem, not
 an item-specific fixture failure.
 
+On 2026-11-06 the public preview was rechecked at
+`https://next.medusajs.com/dk/products/iphone-16-bundle`. The product exposed
+an enabled `Add to cart` action. After one click the button settled from
+`Loading…`, the header changed from `Cart (1)` to `Cart (2)`, and the cart
+preview showed `Quantity: 2`, `€500.00`, and `Subtotal (excl. taxes)
+€500.00`. The live preview cart path is reachable again; the earlier failure
+is retained above as historical evidence rather than treated as current state.
+
 The pinned DTC source was also run locally from commit
 `913d4482641da21c9a219c92a5aa6b959af9bfd7` on 2026-11-04. Its backend ran on
 `19090` against a disposable PostgreSQL database and its storefront on
@@ -304,7 +312,8 @@ source's default `M / White` T-shirt variant and pressing `Add to cart`
 completed successfully: the source header showed `Cart (1)` and the cart
 preview showed the variant, quantity `1`, `€10.00`, and subtotal `€10.00`.
 This is now the same-state source baseline for local pixel and flow
-comparison; the public preview remains a separate broken fixture.
+comparison; the public preview was a separate broken fixture during that
+earlier run.
 
 The same-day Dust run used the seeded `Essential T-Shirt`, `M / Black`,
 Standard shipping and Manual Payment on `13001`/`3878`. The address save now
@@ -348,9 +357,6 @@ identity is not claimed across different content, currency, or branding.
 
 ## Open findings
 
-- P2 — Repeat the verification success/failure capture against the live Medusa
-  preview when its route is reachable, because its current cart failure is a
-  separate runtime issue.
 - P1 — Add external payment-provider refund adapters before claiming a complete
   production refund lifecycle; labels and exchanges remain separate.
 
