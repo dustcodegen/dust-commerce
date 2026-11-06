@@ -14,6 +14,8 @@ The stacked commits are independently reviewable:
 - `8d6d637` adds the guarded transactional update operation.
 - `abb05d0` adds the generated Admin client and dedicated edit state.
 - `10f8a5b` adds the functional action menu and edit drawer.
+- `52ccbbe0`, `54dc2b17` and `3819b740` add the guarded delete flow and
+  customer-membership controls.
 
 ## Pinned Medusa comparison
 
@@ -28,9 +30,10 @@ required Name field, submits the update and exposes Cancel/Save footer actions.
 The server `[id]/route.ts` uses authenticated `POST` and returns the refreshed
 `customer_group` envelope.
 
-The Flutter detail exposes only Edit because deletion is not implemented yet;
-it does not render a disabled or fake destructive action. The 560 px right-side
-drawer follows the source title, field order and sticky actions.
+The Flutter detail now exposes Edit in the normal action group and Delete in a
+separate typed-confirmation destructive group, matching the source hierarchy.
+The 560 px right-side drawer follows the source title, field order and sticky
+actions.
 
 ## Contract and server behavior
 
@@ -99,9 +102,9 @@ Authenticated browser QA verified:
 
 ## Remaining parity boundary
 
-Customer-group deletion, Add/remove membership, row selection, detail date
-filters and same-state Medusa raster comparison remain separate slices. The
-broader Admin and storefront are not yet a complete Medusa replacement.
+Row selection, detail date filters and same-state Medusa raster comparison
+remain separate slices. The broader Admin and storefront are not yet a
+complete Medusa replacement.
 
 final result: passed for source structure and live behavior; same-state raster
 comparison remains open.
