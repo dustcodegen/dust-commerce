@@ -5,6 +5,7 @@ import 'package:commerce_server/src/features/admin_order/cancel_order_repository
 import 'package:commerce_server/src/features/admin_order/deps.dart';
 import 'package:commerce_server/src/features/admin_order/detail_model.dart';
 import 'package:commerce_server/src/features/admin_order/detail_repository.dart';
+import 'package:commerce_server/src/infra/database.dart';
 import 'package:commerce_server/src/infra/option.dart';
 import 'package:dust_dart/db.dart';
 
@@ -20,23 +21,27 @@ Future<Result<AdminOrderDetailResponse, AdminCancelOrderError>>
       AdminCancelOrderFailure.unavailable,
     ));
   }
-  final persisted = await deps.serialWrite(
-    () => deps.database.transaction<AdminCancelOrderOutcome>(
-      (tx) => _persist(
-        AdminCancelOrderRepository(tx),
-        AdminOrderDetailRepository(tx),
-        deps.nextId,
-        orderId,
-        adminId,
-      ),
+  return deps.serialWrite(
+    () => transactionResult<AdminOrderDetailResponse, AdminCancelOrderError>(
+      deps.database,
+      (tx) async {
+        final persisted = await _persist(
+          AdminCancelOrderRepository(tx),
+          AdminOrderDetailRepository(tx),
+          deps.nextId,
+          orderId,
+          adminId,
+        );
+        return switch (persisted) {
+          Ok(value: AdminCancelOrderReady(:final response)) => Ok(response),
+          Ok(value: AdminCancelOrderDenied(:final failure)) =>
+            Err(AdminCancelOrderRejected(failure)),
+          Err(:final error) => Err(AdminCancelOrderStorage(error)),
+        };
+      },
+      storageError: AdminCancelOrderStorage.new,
     ),
   );
-  return switch (persisted) {
-    Ok(value: AdminCancelOrderReady(:final response)) => Ok(response),
-    Ok(value: AdminCancelOrderDenied(:final failure)) =>
-      Err(AdminCancelOrderRejected(failure)),
-    Err(:final error) => Err(AdminCancelOrderStorage(error)),
-  };
 }
 
 bool _validId(String value) => value.isNotEmpty && value.trim() == value;
@@ -48,6 +53,11 @@ Future<Result<AdminCancelOrderOutcome, SqlxError>> _persist(
   String orderId,
   String adminId,
 ) async {
+  final locked = await writes.lockOrder(orderId);
+  if (locked case Err(:final error)) return Err(error);
+  if (locked case Ok(value: null)) return const Ok(_unavailable);
+
+  // Start a fresh PostgreSQL snapshot after any preceding refund commits.
   final found = await writes.target(orderId);
   if (found case Err(:final error)) return Err(error);
   final target = optionOf(
@@ -57,6 +67,7 @@ Future<Result<AdminCancelOrderOutcome, SqlxError>> _persist(
   final order = (target as Some<AdminCancelOrderTarget>).value;
   if (order.status == 'canceled') return const Ok(_alreadyCanceled);
   if (order.status == 'completed') return const Ok(_completed);
+  if (order.status == 'archived') return const Ok(_archived);
   if (order.activeFulfillmentCount > 0) return const Ok(_activeFulfillments);
 
   final paymentResult = await _cancelPayment(
@@ -144,6 +155,7 @@ const _unavailable =
 const _alreadyCanceled =
     AdminCancelOrderDenied(AdminCancelOrderFailure.alreadyCanceled);
 const _completed = AdminCancelOrderDenied(AdminCancelOrderFailure.completed);
+const _archived = AdminCancelOrderDenied(AdminCancelOrderFailure.archived);
 const _activeFulfillments =
     AdminCancelOrderDenied(AdminCancelOrderFailure.activeFulfillments);
 

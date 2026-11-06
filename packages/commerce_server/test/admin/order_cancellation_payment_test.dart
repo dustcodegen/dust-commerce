@@ -54,4 +54,44 @@ UPDATE payment_collections SET provider = 'external' WHERE id = 'pay_detail'
     expect(await scenario.stock(), reserved);
     expect(await scenario.refundCount(), 0);
   });
+
+  test('archived orders preserve the captured payment and reserved stock',
+      () async {
+    await scenario.harness.raw('''
+UPDATE orders SET status = 'archived' WHERE id = 'ord_detail'
+''');
+    final reserved = await scenario.stock();
+
+    (await scenario.cancel()).assertStatus(422);
+
+    expect(await scenario.orderStatus(), 'archived');
+    expect(await _paymentStatus(scenario), 'captured');
+    expect(await scenario.stock(), reserved);
+    expect(await scenario.refundCount(), 0);
+  });
+
+  test('rolls back refunds and stock if the final order write is rejected',
+      () async {
+    await scenario.harness.raw(r'''
+CREATE FUNCTION test_ignore_order_cancel() RETURNS trigger LANGUAGE plpgsql
+AS $$ BEGIN RETURN NULL; END; $$
+''');
+    await scenario.harness.raw('''
+CREATE TRIGGER test_ignore_order_cancel BEFORE UPDATE OF status ON orders
+FOR EACH ROW EXECUTE FUNCTION test_ignore_order_cancel()
+''');
+    final reserved = await scenario.stock();
+
+    (await scenario.cancel()).assertStatus(422);
+
+    expect(await scenario.orderStatus(), 'pending');
+    expect(await _paymentStatus(scenario), 'captured');
+    expect(await scenario.stock(), reserved);
+    expect(await scenario.refundCount(), 0);
+  });
 }
+
+Future<String> _paymentStatus(OrderCancellationScenario scenario) async =>
+    (await scenario.harness.raw('''
+SELECT status FROM payment_collections WHERE id = 'pay_detail'
+''')).single.readIndex<String>(0);

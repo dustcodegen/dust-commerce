@@ -48,6 +48,11 @@ Future<Result<AdminPaymentRefundOutcome, SqlxError>> _persist(
   String adminId,
   AdminRefundPayment body,
 ) async {
+  final locked = await payments.lockOrderForPayment(paymentId);
+  if (locked case Err(:final error)) return Err(error);
+  if (locked case Ok(value: null)) return const Ok(_unavailable);
+
+  // Start a fresh PostgreSQL snapshot after any preceding refund commits.
   final found = await payments.target(paymentId);
   if (found case Err(:final error)) return Err(error);
   final target = optionOf(
